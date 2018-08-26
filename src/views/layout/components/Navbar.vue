@@ -2,20 +2,27 @@
   <el-menu class="navbar" mode="horizontal">
     <hamburger :toggle-click="toggleSideBar" :is-active="sidebar.opened" class="hamburger-container"/>
 
+    <div class="system-name">{{ $t('login.title') }}</div>
+
+    <div class="user-name">{{ name }}</div>
+
     <breadcrumb class="breadcrumb-container"/>
 
     <div class="right-menu">
-      <error-log class="errLog-container right-menu-item"/>
+      <!-- <error-log class="errLog-container right-menu-item"/> -->
 
       <el-tooltip :content="$t('navbar.screenfull')" effect="dark" placement="bottom">
         <screenfull class="screenfull right-menu-item"/>
       </el-tooltip>
 
-      <lang-select class="international right-menu-item"/>
+      <!-- <lang-select class="international right-menu-item"/> -->
 
       <el-tooltip :content="$t('navbar.theme')" effect="dark" placement="bottom">
         <theme-picker class="theme-switch right-menu-item"/>
       </el-tooltip>
+
+      <div class="tips">消息</div>
+      <div class="download">下载中心</div>
 
       <el-dropdown class="avatar-container right-menu-item" trigger="click">
         <div class="avatar-wrapper">
@@ -28,11 +35,6 @@
               {{ $t('navbar.dashboard') }}
             </el-dropdown-item>
           </router-link>
-          <a target="_blank" href="https://github.com/PanJiaChen/vue-element-admin/">
-            <el-dropdown-item>
-              {{ $t('navbar.github') }}
-            </el-dropdown-item>
-          </a>
           <el-dropdown-item divided>
             <span style="display:block;" @click="logout">{{ $t('navbar.logOut') }}</span>
           </el-dropdown-item>
@@ -46,7 +48,6 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
-import ErrorLog from '@/components/ErrorLog'
 import Screenfull from '@/components/Screenfull'
 import LangSelect from '@/components/LangSelect'
 import ThemePicker from '@/components/ThemePicker'
@@ -55,7 +56,6 @@ export default {
   components: {
     Breadcrumb,
     Hamburger,
-    ErrorLog,
     Screenfull,
     LangSelect,
     ThemePicker
@@ -90,6 +90,21 @@ export default {
     height: 50px;
     float: left;
     padding: 0 10px;
+  }
+  .system-name, .user-name, .tips, .download {
+    display: inline-block;
+    vertical-align: top;
+    color: #97a8be;
+    margin-left: 20px;
+    font-size: 14px;
+  }
+  .tips, .download {
+    margin-left: 10px;
+    cursor: pointer;
+  }
+
+  .download {
+    margin-right: 20px;
   }
   .breadcrumb-container{
     float: left;

@@ -3,50 +3,32 @@
 import Layout from '@/views/layout/Layout'
 
 const tableRouter = {
-  path: '/table',
+  path: '/activity',
   component: Layout,
-  redirect: '/table/complex-table',
-  name: 'Table',
+  redirect: '/activity/activity-manage',
+  name: 'Activity',
   meta: {
-    title: 'Table',
+    title: '活动管理',
     icon: 'table'
   },
   children: [
     {
-      path: 'dynamic-table',
-      component: () => import('@/views/table/dynamicTable/index'),
-      name: 'DynamicTable',
-      meta: { title: 'dynamicTable' }
+      path: 'activity-manage',
+      component: () => import('@/views/activity/activityManage'),
+      name: 'ActivityManage',
+      meta: { title: '我的活动' }
     },
     {
-      path: 'drag-table',
-      component: () => import('@/views/table/dragTable'),
-      name: 'DragTable',
-      meta: { title: 'dragTable' }
+      path: 'activity-record',
+      component: () => import('@/views/activity/activityRecord'),
+      name: 'AtivityRecord',
+      meta: { title: '活动记录' }
     },
     {
-      path: 'inline-edit-table',
-      component: () => import('@/views/table/inlineEditTable'),
-      name: 'InlineEditTable',
-      meta: { title: 'inlineEditTable' }
-    },
-    {
-      path: 'tree-table',
-      component: () => import('@/views/table/treeTable/treeTable'),
-      name: 'TreeTableDemo',
-      meta: { title: 'treeTable' }
-    },
-    {
-      path: 'custom-tree-table',
-      component: () => import('@/views/table/treeTable/customTreeTable'),
-      name: 'CustomTreeTableDemo',
-      meta: { title: 'customTreeTable' }
-    },
-    {
-      path: 'complex-table',
-      component: () => import('@/views/table/complexTable'),
-      name: 'ComplexTable',
-      meta: { title: 'complexTable' }
+      path: 'activity-subkectlib',
+      component: () => import('@/views/activity/subjectLib'),
+      name: 'SubkectLib',
+      meta: { title: '题库管理' }
     }
   ]
 }
