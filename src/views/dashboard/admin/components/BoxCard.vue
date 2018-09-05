@@ -5,22 +5,10 @@
     </div>
     <div style="position:relative;">
       <pan-thumb :image="avatar" class="panThumb"/>
-      <mallki class-name="mallki-text" text="vue-element-admin"/>
       <div style="padding-top:35px;" class="progress-item">
-        <span>Vue</span>
-        <el-progress :percentage="70"/>
-      </div>
-      <div class="progress-item">
-        <span>JavaScript</span>
-        <el-progress :percentage="18"/>
-      </div>
-      <div class="progress-item">
-        <span>Css</span>
-        <el-progress :percentage="12"/>
-      </div>
-      <div class="progress-item">
-        <span>ESLint</span>
-        <el-progress :percentage="100" status="success"/>
+        <h4>账户余额: <span>{{ acount }}</span> &yen;
+          <el-button class="recharge_btn" @click="handleRecharge">充值</el-button>
+        </h4>
       </div>
     </div>
   </el-card>
@@ -29,34 +17,23 @@
 <script>
 import { mapGetters } from 'vuex'
 import PanThumb from '@/components/PanThumb'
-import Mallki from '@/components/TextHoverEffect/Mallki'
 
 export default {
-  components: { PanThumb, Mallki },
-
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        success: 'success',
-        pending: 'danger'
-      }
-      return statusMap[status]
-    }
-  },
+  components: { PanThumb },
   data() {
     return {
-      statisticsData: {
-        article_count: 1024,
-        pageviews_count: 1024
-      }
+      acount: 1000
     }
   },
   computed: {
     ...mapGetters([
-      'name',
-      'avatar',
-      'roles'
+      'avatar'
     ])
+  },
+  methods: {
+    handleRecharge() {
+      this.$emit('recharge')
+    }
   }
 }
 </script>
@@ -83,13 +60,6 @@ export default {
       }
     }
   }
-  .mallki-text {
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    font-size: 20px;
-    font-weight: bold;
-  }
   .panThumb {
     z-index: 100;
     height: 70px!important;
@@ -107,12 +77,17 @@ export default {
   }
   .progress-item {
     margin-bottom: 10px;
-    font-size: 14px;
-  }
-  @media only screen and (max-width: 1510px){
-    .mallki-text{
-      display: none;
+    font-size: 24px;
+    text-align: center;
+    h4 {
+      margin: 0;
     }
+    span {
+      color: red;
+    }
+  }
+  .recharge_btn {
+    vertical-align: middle;
   }
 }
 </style>

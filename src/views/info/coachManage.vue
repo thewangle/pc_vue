@@ -22,7 +22,7 @@
       </el-table-column>
       <el-table-column label="用户名" width="150px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{ scope.row.timestamp }}</span>
         </template>
       </el-table-column>
       <el-table-column label="手机号" min-width="150px">
@@ -99,9 +99,9 @@
 </template>
 
 <script>
-import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
+import { fetchList, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // 水波纹指令
-import { parseTime } from '@/utils'
+// import { parseTime } from '@/utils'
 
 const calendarTypeOptions = [
   { key: 'CN', display_name: 'China' },

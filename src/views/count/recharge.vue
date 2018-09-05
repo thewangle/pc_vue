@@ -100,7 +100,7 @@ import { fetchList } from '@/api/article'
 import waves from '@/directive/waves' // 水波纹指令
 
 export default {
-  name: 'Show',
+  name: 'Recharge',
   directives: {
     waves
   },

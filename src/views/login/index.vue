@@ -5,7 +5,6 @@
 
       <div class="title-container">
         <h3 class="title">{{ $t('login.title') }}</h3>
-        <!-- <lang-select class="set-language"/> -->
       </div>
 
       <el-form-item prop="username">
@@ -14,7 +13,7 @@
         </span>
         <el-input
           v-model="loginForm.username"
-          :placeholder="$t('login.username')"
+          placeholder="用户名"
           name="username"
           type="text"
           auto-complete="on"
@@ -28,7 +27,7 @@
         <el-input
           :type="passwordType"
           v-model="loginForm.password"
-          :placeholder="$t('login.password')"
+          placeholder="密码"
           name="password"
           auto-complete="on"
           @keyup.enter.native="handleLogin" />
@@ -45,16 +44,14 @@
 </template>
 
 <script>
-import { isvalidUsername } from '@/utils/validate'
-import LangSelect from '@/components/LangSelect'
-import SocialSign from './socialsignin'
+import { login } from './../../service/common'
+import {} from '@/utils/auth'
 
 export default {
   name: 'Login',
-  components: { LangSelect, SocialSign },
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!isvalidUsername(value)) {
+      if (value.length <= 0) {
         callback(new Error('Please enter the correct user name'))
       } else {
         callback()
@@ -96,15 +93,18 @@ export default {
       }
     },
     handleLogin() {
-      this.$refs.loginForm.validate(valid => {
+      this.$refs.loginForm.validate(async valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('LoginByUsername', this.loginForm).then(() => {
+          const { username, password } = this.loginForm
+          try {
+            const res = await login({ user_name: username, passwd: password })
             this.loading = false
+            const {} = res.data
             this.$router.push({ path: '/' })
-          }).catch(() => {
+          } catch (e) {
             this.loading = false
-          })
+          }
         } else {
           console.log('error submit!!')
           return false
@@ -112,22 +112,6 @@ export default {
       })
     },
     afterQRScan() {
-      // const hash = window.location.hash.slice(1)
-      // const hashObj = getQueryObject(hash)
-      // const originUrl = window.location.origin
-      // history.replaceState({}, '', originUrl)
-      // const codeMap = {
-      //   wechat: 'code',
-      //   tencent: 'code'
-      // }
-      // const codeName = hashObj[codeMap[this.auth_type]]
-      // if (!codeName) {
-      //   alert('第三方登录失败')
-      // } else {
-      //   this.$store.dispatch('LoginByThirdparty', codeName).then(() => {
-      //     this.$router.push({ path: '/' })
-      //   })
-      // }
     }
   }
 }

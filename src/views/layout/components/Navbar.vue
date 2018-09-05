@@ -21,8 +21,12 @@
         <theme-picker class="theme-switch right-menu-item"/>
       </el-tooltip>
 
-      <div class="tips">消息</div>
-      <div class="download">下载中心</div>
+      <div class="tips">
+        <router-link to="/documentation">消息</router-link>
+      </div>
+      <div class="download">
+        <router-link to="/documentation">下载中心</router-link>
+      </div>
 
       <el-dropdown class="avatar-container right-menu-item" trigger="click">
         <div class="avatar-wrapper">
@@ -32,11 +36,11 @@
         <el-dropdown-menu slot="dropdown">
           <router-link to="/">
             <el-dropdown-item>
-              {{ $t('navbar.dashboard') }}
+              首页
             </el-dropdown-item>
           </router-link>
           <el-dropdown-item divided>
-            <span style="display:block;" @click="logout">{{ $t('navbar.logOut') }}</span>
+            <span style="display:block;" @click="logout">登出</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -63,8 +67,7 @@ export default {
   computed: {
     ...mapGetters([
       'sidebar',
-      'name',
-      'avatar'
+      'name'
     ])
   },
   methods: {
@@ -72,7 +75,7 @@ export default {
       this.$store.dispatch('toggleSideBar')
     },
     logout() {
-      this.$store.dispatch('LogOut').then(() => {
+      this.$store.dispatch('FedLogOut').then(() => {
         location.reload()// In order to re-instantiate the vue-router object to avoid bugs
       })
     }

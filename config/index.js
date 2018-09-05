@@ -9,7 +9,12 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+      '/i': {
+        target: 'http://lyq.siygo.com',
+        changeOrigin: true
+      }
+    },
 
     // Various Dev Server settings
 
