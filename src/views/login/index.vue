@@ -4,7 +4,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">{{ $t('login.title') }}</h3>
+        <h3 class="title">伴行服务商管理系统</h3>
       </div>
 
       <el-form-item prop="username">
@@ -36,7 +36,7 @@
         </span>
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">{{ $t('login.logIn') }}</el-button>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
 
     </el-form>
 
@@ -53,14 +53,14 @@ export default {
   data() {
     const validateUsername = (rule, value, callback) => {
       if (value.length <= 0) {
-        callback(new Error('Please enter the correct user name'))
+        callback(new Error('请输入正确的用户名'))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+        callback(new Error('请输入6位以上的密码'))
       } else {
         callback()
       }
