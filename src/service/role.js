@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 /**
- * 根据角色获取权限列表
+ * 根据角色获取菜单
  * @param {*} data
  * data: {role_id: int}
  */
@@ -20,15 +20,106 @@ export function fetchRoleMenulist(data) {
  */
 export function setRoleMenulist(data) {
   return request({
-    url: '/i/topteam/admin/setrolemenu',
+    url: '/i/topteam/admin/modifyrolemenu',
     method: 'post',
     data
   })
 }
 
-export function fetchRoleList(data) {
+/**
+ * 获取角色列表
+ */
+export function fetchRoleList() {
   return request({
     url: '/i/topteam/admin/getrolelist',
     method: 'get'
+  })
+}
+
+/**
+ * 添加角色
+ * @param {*} data
+ * data: {role_name: string}
+ */
+export function addRole(data) {
+  return request({
+    url: '/i/topteam/admin/addrole',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 删除角色
+ * @param {*} data
+ * data: {role_id: int}
+ */
+export function deleteRole(data) {
+  return request({
+    url: '/i/topteam/admin/delrole',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 编辑角色
+ * @param {*} data
+ * data: {role_id: int, role_name: string}
+ */
+export function editRole(data) {
+  return request({
+    url: '/i/topteam/admin/updaterole',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 添加员工
+ * @param {*} data
+ * data: { name: string, phone: int, role_id: int, gender: int, username: string, password: string }
+ */
+export function addStaff(data) {
+  return request({
+    url: '/i/topteam/admin/addstaff',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 获取员工列表
+ */
+export function fetchStaffList() {
+  return request({
+    url: '/i/topteam/admin/getstafflist',
+    method: 'get'
+  })
+}
+
+/**
+ * 更新员工信息
+ * @param {*} data
+ * { name: string, phone: int, role_id: int, gender: int, admin_id: int }
+ */
+export function editStaff(data) {
+  return request({
+    url: '/i/topteam/admin/updatestaff',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 删除员工
+ * @param {*} data
+ * { admin_id: int }
+ */
+export function deleteStaff(data) {
+  return request({
+    url: '/i/topteam/admin/delstaff',
+    method: 'post',
+    data
   })
 }

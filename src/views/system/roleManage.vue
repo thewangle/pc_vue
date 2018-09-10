@@ -5,16 +5,16 @@
         <el-card class="box-card" shadow="hover">
           <div slot="header">
             <span>角色</span>
-            <el-button type="primary" style="margin-left: 50px;">新增角色</el-button>
+            <el-button type="primary" style="margin-left: 50px;" @click="handleAddRoleVisible">新增角色</el-button>
           </div>
           <div class="content">
-            <div><el-radio v-model="role" label="1" border>超级管理员</el-radio></div>
-            <div><el-radio v-model="role" label="2" border>一级代理商</el-radio></div>
-            <div><el-radio v-model="role" label="3" border>二级代理商</el-radio></div>
-            <div><el-radio v-model="role" label="4" border>三级代理商</el-radio></div>
-            <div><el-radio v-model="role" label="5" border>教练</el-radio></div>
-            <div><el-radio v-model="role" label="6" border>总部普通员工</el-radio></div>
-            <div><el-radio v-model="role" label="7" border>总部渠道员工</el-radio></div>
+            <div v-for="item in roleList" :key="item.id">
+              <el-radio v-model="role" :label="item.id" border width="80px">{{ item.role_name }}</el-radio>
+              <div style="float: right;">
+                <el-button type="primary" round @click="handleOpenRole(item.id)">编辑角色</el-button>
+                <el-button type="danger" round style="margin-left: 10px;" @click="handleDeleteRole(item.id)">删除角色</el-button>
+              </div>
+            </div>
           </div>
         </el-card>
       </el-col>
@@ -22,66 +22,176 @@
         <el-card class="box-card" shadow="hover">
           <div slot="header">
             <span>权限</span>
+            <el-button type="primary" style="margin-left: 50px;" @click="handleChangeRoleMenuList()">修改权限</el-button>
           </div>
           <div class="content">
             <el-tree
-              :data="data2"
-              :default-expanded-keys="[2, 3]"
-              :default-checked-keys="[5]"
+              ref="menuTree"
+              :data="menuList"
               :props="defaultProps"
+              :default-checked-keys="checkedMenuList"
               show-checkbox
               node-key="id"/>
           </div>
         </el-card>
       </el-col>
     </el-row>
+    <el-dialog :visible.sync="addRoleVisible" :title="title" @close="handleClose">
+      <el-form>
+        <el-form-item label="角色名" label-width="60px">
+          <el-input v-model="roleName" auto-complete="off" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="addRoleVisible = false">取 消</el-button>
+        <el-button type="primary" @click="handleAddRole">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
+import { fetchRoleList, fetchRoleMenulist, addRole, deleteRole, editRole, setRoleMenulist } from './../../service/role'
+import { fetchMenuList } from './../../service/common'
+import { getRoleId } from '@/utils/auth'
 export default {
   name: 'RoleManage',
   data() {
     return {
-      role: '1',
-      data2: [{
-        id: 1,
-        label: '一级 1',
-        children: [{
-          id: 4,
-          label: '二级 1-1',
-          children: [{
-            id: 9,
-            label: '三级 1-1-1'
-          }, {
-            id: 10,
-            label: '三级 1-1-2'
-          }]
-        }]
-      }, {
-        id: 2,
-        label: '一级 2',
-        children: [{
-          id: 5,
-          label: '二级 2-1'
-        }, {
-          id: 6,
-          label: '二级 2-2'
-        }]
-      }, {
-        id: 3,
-        label: '一级 3',
-        children: [{
-          id: 7,
-          label: '二级 3-1'
-        }, {
-          id: 8,
-          label: '二级 3-2'
-        }]
-      }],
+      roleList: [],
+      role: getRoleId(),
+      menuList: [],
+      allMenuList: [],
+      checkedMenuList: [],
+      roleName: '',
+      title: '',
+      id: '',
+      addRoleVisible: false,
       defaultProps: {
-        children: 'children',
-        label: 'label'
+        children: 'childs',
+        label: 'menu_name'
       }
+    }
+  },
+  watch: {
+    'role'(newVal) {
+      this.role = newVal
+      this._initMenuList()
+    }
+  },
+  async created() {
+    await this._getMenuList()
+    this._initRoleList()
+    this._initMenuList()
+  },
+  methods: {
+    // 获得选中菜单项
+    _getcheckedMenuIds(menuList) {
+      menuList.forEach((item) => {
+        item.checked && this.checkedMenuList.push(item.id)
+        if (item.childs.length > 0) {
+          this._getcheckedMenuIds(item.childs)
+        }
+      })
+    },
+    // 获取角色列表
+    async _initRoleList() {
+      const roleList = await fetchRoleList()
+      const { data } = roleList
+      this.roleList = data
+    },
+    // 获取所有的菜单项
+    async _getMenuList() {
+      const menuList = await fetchMenuList()
+      const { data } = menuList
+      this.allMenuList = data
+    },
+    // 根据角色获取菜单并获得默认选中项
+    async _initMenuList() {
+      const menuList = await fetchRoleMenulist({ role_id: this.role })
+      const { data } = menuList
+      this.menuList = data
+      this.checkedMenuList = []
+      this._getcheckedMenuIds(this.menuList)
+      console.log(this.checkedMenuList)
+    },
+    // 添加角色 || 修改角色
+    async _addRole() {
+      if (!this.roleName) {
+        this.$message({
+          message: '角色名不能为空',
+          type: 'error'
+        })
+        return
+      }
+      if (this.id) {
+        try {
+          await editRole({ role_name: this.roleName, role_id: this.id })
+          this.$message({
+            message: '角色更新成功',
+            type: 'success'
+          })
+          this._initRoleList()
+          this.handleClose()
+        } catch (e) {
+          this.handleClose()
+        }
+      } else {
+        try {
+          await addRole({ role_name: this.roleName })
+          this.$message({
+            message: '添加成功',
+            type: 'success'
+          })
+          this._initRoleList()
+          this.handleClose()
+        } catch (e) {
+          this.handleClose()
+        }
+      }
+    },
+    // 删除角色
+    async _deleteRole(id) {
+      this.$confirm('确认删除该角色？')
+        .then(async _ => {
+          await deleteRole({ role_id: id })
+          await this._initRoleList()
+          await this._initMenuList()
+        })
+        .catch(_ => {})
+    },
+    // 打开新增角色弹框
+    handleAddRoleVisible() {
+      this.addRoleVisible = true
+      this.title = '新增角色'
+    },
+    handleAddRole() {
+      this._addRole()
+    },
+    handleOpenRole(id) {
+      this.addRoleVisible = true
+      this.title = '更新角色'
+      this.id = id
+    },
+    handleDeleteRole(id) {
+      this._deleteRole(id)
+      this.id = id
+    },
+    handleClose() {
+      this.roleName = ''
+      this.addRoleVisible = false
+      this.id = ''
+    },
+    // 更改权限
+    handleChangeRoleMenuList() {
+      const menu_ids = this.$refs.menuTree.getCheckedKeys().join()
+      this.$confirm('确认修改该角色权限吗')
+        .then(async _ => {
+          await setRoleMenulist({ role_id: this.role, menu_ids: menu_ids })
+          await this._initMenuList()
+        })
+        .catch(async _ => {
+          await this._initMenuList()
+        })
     }
   }
 }

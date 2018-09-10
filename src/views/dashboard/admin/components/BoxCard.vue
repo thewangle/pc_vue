@@ -4,7 +4,7 @@
       <img src="https://wpimg.wallstcn.com/e7d23d71-cf19-4b90-a1cc-f56af8c0903d.png">
     </div>
     <div style="position:relative;">
-      <pan-thumb :image="avatar" class="panThumb"/>
+      <!-- <pan-thumb :image="avatar" class="panThumb"/> -->
       <div style="padding-top:35px;" class="progress-item">
         <h4>账户余额: <span>{{ acount }}</span> &yen;
           <el-button class="recharge_btn" @click="handleRecharge">充值</el-button>
@@ -15,7 +15,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import PanThumb from '@/components/PanThumb'
 
 export default {
@@ -26,9 +25,6 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'avatar'
-    ])
   },
   methods: {
     handleRecharge() {

@@ -2,7 +2,7 @@
   <el-menu class="navbar" mode="horizontal">
     <hamburger :toggle-click="toggleSideBar" :is-active="sidebar.opened" class="hamburger-container"/>
 
-    <div class="system-name">{{ $t('login.title') }}</div>
+    <div class="system-name">伴行测试管理系统V1.0</div>
 
     <div class="user-name">{{ name }}</div>
 
@@ -30,7 +30,7 @@
 
       <el-dropdown class="avatar-container right-menu-item" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
+          <img src="./test.jpg" class="user-avatar">
           <i class="el-icon-caret-bottom"/>
         </div>
         <el-dropdown-menu slot="dropdown">
@@ -50,6 +50,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { getUserName } from '@/utils/auth'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import Screenfull from '@/components/Screenfull'
@@ -64,10 +65,14 @@ export default {
     LangSelect,
     ThemePicker
   },
+  data() {
+    return {
+      name: getUserName()
+    }
+  },
   computed: {
     ...mapGetters([
-      'sidebar',
-      'name'
+      'sidebar'
     ])
   },
   methods: {

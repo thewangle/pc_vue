@@ -42,3 +42,13 @@ export function logout() {
     method: 'get'
   })
 }
+
+/**
+ * 获取城市列表
+ */
+export function fetchCityList() {
+  return request({
+    url: '/i/topteam/api/getcitylist',
+    method: 'get'
+  })
+}

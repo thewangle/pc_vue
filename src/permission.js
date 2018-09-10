@@ -10,7 +10,7 @@ import { getToken } from '@/utils/auth' // getToken from cookie
 NProgress.configure({ showSpinner: false })// NProgress Configuration
 
 const whiteList = ['/login', '/authredirect']// no redirect whitelist
-
+// const menuListPromise
 router.beforeEach(async(to, from, next) => {
   // const menuList = await fetchMenuList()
   // console.log(menuList)

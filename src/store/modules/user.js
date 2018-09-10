@@ -1,4 +1,4 @@
-import { getToken, removeToken } from '@/utils/auth'
+import { getToken, removeToken, removeUserInfo } from '@/utils/auth'
 import { logout } from '../../service/common'
 
 const user = {
@@ -52,6 +52,7 @@ const user = {
       return new Promise(resolve => {
         commit('CLEAR_USERINFO')
         removeToken()
+        removeUserInfo()
         resolve()
       })
     }

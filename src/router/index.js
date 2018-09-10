@@ -154,7 +154,7 @@ export const asyncRouterMap = [
 ]
 
 const routes = constantRouterMap.concat(asyncRouterMap)
-console.log(routes)
+// console.log(routes)
 
 export default new Router({
   // mode: 'history', // require service support

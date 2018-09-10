@@ -1,16 +1,16 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.businessName" placeholder="请输入运营商名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-input v-model="listQuery.activityName" placeholder="请输入活动名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-select v-model="listQuery.activity" placeholder="请选择活动类型" clearable style="width: 200px" class="filter-item" @change="handleFilter">
+      <el-input v-model="listQuery.agent_name" placeholder="请输入运营商名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.name" placeholder="请输入活动名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-select v-model="listQuery.type" placeholder="请选择活动类型" clearable style="width: 200px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in activities" :key="item.key" :label="item.label" :value="item.key"/>
       </el-select>
-      <el-select v-model="listQuery.status" placeholder="请选择活动状态" style="width: 200px" class="filter-item" @change="handleFilter" >
+      <el-select v-model="listQuery.status" placeholder="请选择活动状态" clearable style="width: 200px" class="filter-item" @change="handleFilter" >
         <el-option v-for="item in status" :key="item.key" :label="item.label" :value="item.key"/>
       </el-select>
       <el-button v-waves style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增活动</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreateActivity">新增活动</el-button>
     </div>
 
     <el-table
@@ -19,121 +19,160 @@
       border
       fit
       highlight-current-row
-      style="width: 100%;min-height:1000px;">
+      style="width: 100%;">
       <el-table-column label="序号" align="center" width="65">
         <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
+          <span>{{ scope.$index + 1 }}</span>
         </template>
       </el-table-column>
       <el-table-column label="运营商" width="150px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{ scope.row.agent_name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="活动名称" min-width="150px">
+      <el-table-column label="活动名称" min-width="130px">
         <template slot-scope="scope">
-          <span class="link-type">{{ scope.row.title }}</span>
+          <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="游戏类型" width="110px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
+          <span>{{ scope.row.status | activityFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="活动封面" width="80px">
+      <el-table-column label="活动封面" width="100px">
         <template slot-scope="scope">
-          <svg-icon v-for="n in +scope.row.importance" :key="n" icon-class="star" class="meta-item__icon"/>
+          <span>{{ scope.row.icon }}</span>
         </template>
       </el-table-column>
       <el-table-column label="活动时间" align="center" width="95">
         <template slot-scope="scope">
-          <span v-if="scope.row.pageviews" class="link-type">{{ scope.row.pageviews }}</span>
-          <span v-else>0</span>
+          <span>{{ scope.row.keep_time }}分钟</span>
         </template>
       </el-table-column>
       <el-table-column label="初始分值" align="center" width="95">
         <template slot-scope="scope">
-          <span v-if="scope.row.pageviews" class="link-type">{{ scope.row.pageviews }}</span>
-          <span v-else>0</span>
+          <span>{{ scope.row.score }}</span>
         </template>
       </el-table-column>
       <el-table-column label="活动状态" class-name="status-col" width="100">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.status | statusFilter">{{ scope.row.status }}</el-tag>
+          <span>{{ scope.row.activity_status | statusFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" min-width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <el-button v-if="scope.row.status!='published'" size="mini" type="success" @click="handleModifyStatus(scope.row,'published')">{{ $t('table.publish') }}
+          <el-button type="primary" size="mini">修改</el-button>
+          <el-button size="mini" type="success">查看
           </el-button>
-          <el-button v-if="scope.row.status!='draft'" size="mini" @click="handleModifyStatus(scope.row,'draft')">{{ $t('table.draft') }}
+          <el-button size="mini">去审批
           </el-button>
-          <el-button v-if="scope.row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(scope.row,'deleted')">{{ $t('table.delete') }}
+          <el-button size="mini" type="danger">删除
           </el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <div class="pagination-container">
+    <!-- <div class="pagination-container">
       <el-pagination :current-page="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
-    </div>
+    </div> -->
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item :label="$t('table.type')" prop="type">
-          <el-select v-model="temp.type" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key"/>
+    <el-dialog :visible.sync="dialogFormVisible" title="新增活动" fullscreen class="activityDialog">
+      <hr >
+      <el-form :inline="true" :model="activityInfo" class="demo-form-inline">
+        <el-form-item label="运营商名">
+          <el-input v-model="activityInfo.agentName" disabled />
+        </el-form-item>
+        <el-form-item label="活动类型">
+          <el-select v-model="activityInfo.type">
+            <el-option label="团队-基础版" value="1" />
+            <el-option label="团队-精英版" value="2" />
+            <el-option label="个人-基础版" value="3" />
+            <el-option label="个人-精英版" value="4" />
           </el-select>
         </el-form-item>
-        <el-form-item :label="$t('table.date')" prop="timestamp">
-          <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.title')" prop="title">
-          <el-input v-model="temp.title"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.status')">
-          <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item"/>
+        <el-form-item label="选择教练">
+          <el-select v-model="activityInfo.coachId">
+            <el-option v-for="item in coachList" :label="item.name" :value="item.id" :key="item.id" />
           </el-select>
         </el-form-item>
-        <el-form-item :label="$t('table.importance')">
-          <el-rate v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top:8px;"/>
+        <el-form-item label="活动名称">
+          <el-input v-model="activityInfo.name" />
         </el-form-item>
-        <el-form-item :label="$t('table.remark')">
-          <el-input :autosize="{ minRows: 2, maxRows: 4}" v-model="temp.remark" type="textarea" placeholder="Please input"/>
+        <el-form-item label="活动时长（分钟）">
+          <el-input v-model="activityInfo.keepTime" type="number" min="0" />
+        </el-form-item>
+        <el-form-item label="起始分值">
+          <el-input v-model="activityInfo.score" type="number" min="0" />
+        </el-form-item>
+        <el-form-item label="分值形式">
+          <el-select v-model="activityInfo.scoreType">
+            <el-option label="积分" value="1" />
+            <el-option label="砖石" value="2" />
+            <el-option label="游戏币" value="3" />
+            <el-option label="花瓣" value="4" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="可见分数">
+          <el-select v-model="activityInfo.scoreShowType">
+            <el-option label="是" value="1" />
+            <el-option label="否" value="2" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="起止时间">
+          <el-date-picker
+            v-model="activityInfo.time"
+            type="datetimerange"
+            range-separator="至"
+            start-placeholder="开始时间"
+            end-placeholder="结束时间"
+            value-format="timestamp"/>
+        </el-form-item>
+        <el-form-item label="活动描述">
+          <el-input v-model="activityInfo.actDesc" type="textarea"/>
+        </el-form-item>
+        <el-form-item label="活动封面">
+          <el-upload
+            :http-request="handleUpLoadIconImg"
+            :on-preview="handleIconCardPreview"
+            :limit="1"
+            :action="domain"
+            list-type="picture-card"
+          >
+            <el-button>上传图片</el-button>
+          </el-upload>
+          <el-dialog :visible.sync="dialogVisible">
+            <img :src="dialogImageUrl" width="100%" alt="">
+          </el-dialog>
+        </el-form-item>
+        <el-form-item label="活动背景">
+          <el-upload
+            :http-request="handleUpLoadBgImg"
+            :on-preview="handleBgCardPreview"
+            :limit="1"
+            :action="domain"
+            list-type="picture-card"
+          >
+            <el-button>上传图片</el-button>
+          </el-upload>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="handleCreateActivitySubmit">创建活动</el-button>
         </el-form-item>
       </el-form>
-      <el-upload
-        class="upload-demo"
-        drag
-        action="https://jsonplaceholder.typicode.com/posts/"
-        multiple>
-        <i class="el-icon-upload"/>
-        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-      </el-upload>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
-        <el-button v-else type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
-      </div>
+      <hr >
     </el-dialog>
 
   </div>
 </template>
 
 <script>
-import { fetchList, createArticle, updateArticle } from '@/api/article'
+import { fetchCoachList, addActivity, fetchActivityList } from './../../service/activity'
+import { fetchQiNiuToken } from './../../service/common'
+import { getAgentName, getAgentId } from '@/utils/auth'
+import { qiniuAddress } from './../../config'
+import axios from 'axios'
 import waves from '@/directive/waves' // 水波纹指令
-// import { parseTime } from '@/utils'
-
-const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
 
 export default {
   name: 'ActivityManage',
@@ -143,167 +182,199 @@ export default {
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
+        1: '待审核',
+        2: '准备中审核通过',
+        3: '已开始进行中',
+        4: '暂停',
+        5: '结束已完成 ',
+        6: '审核未通过',
+        7: '删除'
       }
       return statusMap[status]
+    },
+    activityFilter(status) {
+      const activityMap = {
+        1: '团队-基础版',
+        2: '团队-精英版',
+        3: '个人-基础版',
+        4: '个人-精英版'
+      }
+      return activityMap[status]
     }
   },
   data() {
     return {
       list: null,
-      total: null,
-      listLoading: true,
+      listLoading: false,
       listQuery: {
-        page: 1,
-        limit: 20,
-        activity: undefined,
-        businessName: undefined,
-        activityName: undefined,
-        status: undefined
+        type: null,
+        agent_name: null,
+        name: null,
+        status: null
       },
       activities: [{ label: '团队-基础版', key: 1 }, { label: '团队-精英版', key: 2 }, { label: '个人-基础版', key: 3 }, { label: '个人-基础版', key: 4 }],
-      calendarTypeOptions,
       status: [{ label: '待审批', key: '1' }, { label: '准备中', key: '2' }, { label: '进行中', key: '3' }, { label: '暂停中', key: '4' }, { label: '已完成', key: '5' }, { label: '未通过', key: '6' }],
-      statusOptions: ['published', 'draft', 'deleted'],
-      temp: {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
-      },
       dialogFormVisible: false,
-      dialogStatus: '',
-      textMap: {
-        update: 'Edit',
-        create: 'Create'
+      // rules: {
+      //   type: [{ required: true, message: 'type is required', trigger: 'change' }],
+      //   timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
+      //   title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+      // },
+      activityInfo: {
+        agentName: getAgentName(), // 代理商名称
+        type: '', // 活动类型
+        coachId: '', // 教练id
+        name: '', // 活动名称
+        keepTime: '', // 活动时长
+        score: '', // 起始分值
+        scoreType: '', // 分值形式,
+        scoreShowType: '', // 是否可见分数
+        time: '', // 活动时间
+        actDesc: '', // 活动描述
+        bgImgUrl: '', // 背景图片URl
+        iconUrl: '' // 活动封面Url
       },
-      rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
-      }
+      dialogImageUrl: '',
+      dialogVisible: false,
+      coachList: [], // 教练列表
+      domain: 'http://upload.qiniup.com/',
+      qiniuAddress: qiniuAddress
     }
   },
   created() {
-    this.getList()
+    this.init()
   },
   methods: {
-    getList() {
-      this.listLoading = true
-      fetchList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
-
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
-      })
-    },
     handleFilter() {
-      this.listQuery.page = 1
-      this.getList()
+      this._fetchActivityList()
     },
-    handleSizeChange(val) {
-      this.listQuery.limit = val
-      this.getList()
+    handleCreateActivity() {
+      this.dialogFormVisible = true
     },
-    handleCurrentChange(val) {
-      this.listQuery.page = val
-      this.getList()
+    handleBgCardPreview() {
+      this.dialogImageUrl = this.activityInfo.bgImgUrl
+      this.dialogVisible = true
     },
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: '操作成功',
-        type: 'success'
+    handleIconCardPreview() {
+      this.dialogImageUrl = this.activityInfo.iconUrl
+      this.dialogVisible = true
+    },
+    handleUpLoadBgImg(req) {
+      const type = 'bgImg'
+      this._uploadQiNiu(req, type)
+    },
+    handleUpLoadIconImg(req) {
+      const type = 'icon'
+      this._uploadQiNiu(req, type)
+    },
+    handleCreateActivitySubmit() {
+      console.log(this.activityInfo)
+      this._addActivity()
+    },
+    // 上传七牛云
+    async _uploadQiNiu(req, type) {
+      const config = {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      }
+      let filetype = ''
+      if (req.file.type === 'image/png') {
+        filetype = 'png'
+      } else {
+        filetype = 'jpg'
+      }
+      // 重命名要上传的文件
+      const keyname = 'top-team' + Date.now() + Math.floor(Math.random() * 100) + '.' + filetype
+      const token = await this._fetchQiNiuToken()
+      const formData = new FormData()
+      formData.append('file', req.file)
+      formData.append('token', token)
+      formData.append('key', keyname)
+      axios.post(this.domain, formData, config).then(res => {
+        const url = this.qiniuAddress + '/' + res.data.key
+        if (type === 'bgImg') {
+          this.activityInfo.bgImgUrl = url
+        }
+        if (type === 'icon') {
+          this.activityInfo.iconUrl = url
+        }
       })
-      row.status = status
     },
-    resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
+    // 获取教练列表
+    async _fetchCoachList() {
+      const res = await fetchCoachList()
+      const { data } = res
+      this.coachList = data
+    },
+    // 获取七牛云token
+    async _fetchQiNiuToken() {
+      const res = await fetchQiNiuToken()
+      const { data } = res
+      return data
+    },
+    // 创建活动
+    async _addActivity() {
+      const data = {}
+      const {
+        time, name, keepTime, score, coachId,
+        actDesc, scoreType, scoreShowType, type, bgImgUrl, iconUrl
+      } = this.activityInfo
+      if (!time.length || !name || !keepTime || !score || !coachId || !type) {
+        this.$message({ message: '必填项不能为空', type: 'error' })
+        return
+      }
+      // 时间
+      data.set_start_time = time[0] / 1000
+      data.set_stop_time = time[1] / 1000
+      // 代理商Id
+      data.agent_id = getAgentId()
+      // 活动名称
+      data.name = name
+      // 活动时长
+      data.keep_time = keepTime
+      // 起始分值
+      data.score = score
+      // 教练ID
+      data.coach_id = coachId
+      // 活动描述
+      data.act_desc = actDesc
+      // 分值形式
+      data.score_type = scoreType
+      // 是否显示分数
+      data.score_show_type = scoreShowType
+      // 活动类型
+      data.type = type
+      // 背景图片
+      data.bg_img = bgImgUrl
+      // 封面图片
+      data.icon = iconUrl
+      // 金额
+      data.money = 400
+
+      const res = await addActivity(data)
+      console.log(res)
+    },
+    async _fetchActivityList() {
+      this.listLoading = true
+      try {
+        const res = await fetchActivityList(this.listQuery)
+        const { data } = res
+        this.listLoading = false
+        console.log(data)
+        this.list = data
+      } catch (e) {
+        this.listLoading = false
       }
     },
-    handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
-    createData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '创建成功',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
-      })
-    },
-    handleUpdate(row) {
-      this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
-    updateData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(tempData).then(() => {
-            for (const v of this.list) {
-              if (v.id === this.temp.id) {
-                const index = this.list.indexOf(v)
-                this.list.splice(index, 1, this.temp)
-                break
-              }
-            }
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
-      })
-    },
-    handleDelete(row) {
-      this.$notify({
-        title: '成功',
-        message: '删除成功',
-        type: 'success',
-        duration: 2000
-      })
-      const index = this.list.indexOf(row)
-      this.list.splice(index, 1)
+    init() {
+      this._fetchCoachList()
+      this._fetchActivityList()
     }
   }
 }
 </script>
+<style lang="scss">
+.activityDialog .el-dialog__body {
+  padding-top: 0;
+}
+</style>
+

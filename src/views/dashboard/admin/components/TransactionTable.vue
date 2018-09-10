@@ -1,5 +1,5 @@
 <template>
-  <el-card :data="list" style="width: 100%;padding-top: 15px;" shadow="hover">
+  <el-card style="width: 100%;padding-top: 15px;" shadow="hover">
     <div slot="header" class="clearfix">
       <span>{{ type === 'team' ? '团队版' : '个人版' }}活动场次</span>
       <el-date-picker
@@ -21,8 +21,6 @@
 </template>
 
 <script>
-import { fetchList } from '@/api/transaction'
-
 export default {
   props: {
     type: {
@@ -32,20 +30,13 @@ export default {
   },
   data() {
     return {
-      list: null,
       value: []
     }
   },
   created() {
-    this.fetchData()
     this.initialDate()
   },
   methods: {
-    fetchData() {
-      fetchList().then(response => {
-        this.list = response.data.items.slice(0, 8)
-      })
-    },
     initialDate() {
       const date = new Date()
       const oldDate = new Date(date.getTime() - (30 * 24 * 60 * 60 * 1000))

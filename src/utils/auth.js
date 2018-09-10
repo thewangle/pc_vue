@@ -54,3 +54,60 @@ export function setUserName(userName) {
 export function removeUserName() {
   return Cookies.remove(UserName)
 }
+
+const AgentName = 'agent_name'
+export function getAgentName() {
+  return Cookies.get(AgentName)
+}
+export function setAgentName(agentName) {
+  return Cookies.set(AgentName, agentName)
+}
+export function removeAgentName() {
+  return Cookies.remove(AgentName)
+}
+
+const ProvinceId = 'province_id'
+export function getProvinceId() {
+  return Cookies.get(ProvinceId)
+}
+
+export function setProvinceId(provinceId) {
+  return Cookies.set(ProvinceId, provinceId)
+}
+
+export function removeProvinceId() {
+  return Cookies.remove(ProvinceId)
+}
+
+const Level = 'level'
+export function getLevel() {
+  return Cookies.get(Level)
+}
+
+export function setLevel(level) {
+  return Cookies.set(Level, level)
+}
+
+export function removeLevel() {
+  return Cookies.remove(Level)
+}
+// 保存用户信息
+export function setUserInfo(user) {
+  const { role_id, agent_id, user_name, agent_name, province_id, level } = user
+  setRoleId(role_id)
+  setAgentId(agent_id)
+  setUserName(user_name)
+  setAgentName(agent_name)
+  setProvinceId(province_id)
+  setLevel(level)
+}
+
+// 清楚用户信息
+export function removeUserInfo() {
+  removeRoleId()
+  removeAgentId()
+  removeUserName()
+  removeAgentName()
+  removeProvinceId()
+  removeLevel()
+}

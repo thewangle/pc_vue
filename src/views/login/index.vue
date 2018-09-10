@@ -45,7 +45,8 @@
 
 <script>
 import { login } from './../../service/common'
-import {} from '@/utils/auth'
+import { fetchRoleMenulist } from './../../service/role'
+import { setUserInfo, getRoleId } from '@/utils/auth'
 
 export default {
   name: 'Login',
@@ -99,8 +100,10 @@ export default {
           const { username, password } = this.loginForm
           try {
             const res = await login({ user_name: username, passwd: password })
+            setUserInfo(res.data)
+            const menuList = await fetchRoleMenulist({ role_id: getRoleId() })
+            console.log(menuList)
             this.loading = false
-            const {} = res.data
             this.$router.push({ path: '/' })
           } catch (e) {
             this.loading = false
