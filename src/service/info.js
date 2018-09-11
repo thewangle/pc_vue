@@ -105,3 +105,98 @@ export function transAgent(data) {
     data
   })
 }
+
+/**
+ * 获取用户下属机构
+ * @param {Obj} data { level: int }
+ */
+export function getSubordinateAgent(data) {
+  return request({
+    url: '/i/topteam/admin/GetSubordinateAgent',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 获取运营商列表
+ * @param {Obj} data { name: str }
+ */
+export function getOperatorList(data) {
+  return request({
+    url: '/i/topteam/admin/GetOperatorList',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 创建运营商
+ * @param {Obj} data
+ */
+export function addOperator(data) {
+  return request({
+    url: '/i/topteam/admin/AddOperator',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 删除运营商
+ */
+export function delOperator(data) {
+  return request({
+    url: '/i/topteam/admin/DelOperator',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 获取教练列表
+ * @param {*} data
+ */
+export function fetchCoachList(data) {
+  return request({
+    url: '/i/topteam/admin/SearchCoachList',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 添加教练
+ * @param {*} data
+ */
+export function addCoach(data) {
+  return request({
+    url: '/i/topteam/admin/AddCoach',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 删除教练
+ * @param {*} data
+ */
+export function delCoach(data) {
+  return request({
+    url: '/i/topteam/admin/DelCoach',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 更新教练
+ * @param {*} data
+ */
+export function updateCoach(data) {
+  return request({
+    url: '/i/topteam/admin/ModifyCoach',
+    method: 'post',
+    data
+  })
+}

@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.yunyinName" placeholder="请输入运营商名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.name" placeholder="请输入运营商名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
 
       <el-button v-waves style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增运营商</el-button>
@@ -13,7 +13,7 @@
       border
       fit
       highlight-current-row
-      style="width: 100%;min-height:1000px;">
+      style="width: 100%;">
       <el-table-column label="序号" align="center" width="65">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
@@ -58,66 +58,65 @@
       </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <el-button v-if="scope.row.status!='published'" size="mini" type="success" @click="handleModifyStatus(scope.row,'published')">{{ $t('table.publish') }}
-          </el-button>
-          <el-button v-if="scope.row.status!='draft'" size="mini" @click="handleModifyStatus(scope.row,'draft')">{{ $t('table.draft') }}
-          </el-button>
-          <el-button v-if="scope.row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(scope.row,'deleted')">{{ $t('table.delete') }}
-          </el-button>
+          <el-button type="primary" size="mini">修改</el-button>
+          <el-button size="mini" type="success">转移</el-button>
+          <el-button size="mini" type="danger" @click="handleDeleteOperator(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <div class="pagination-container">
-      <el-pagination :current-page="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
-    </div>
-
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item :label="$t('table.type')" prop="type">
-          <el-select v-model="temp.type" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key"/>
+    <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible" @close="handleClose">
+      <el-form :model="agentInfo" label-position="right" label-width="120px">
+        <el-form-item label="运营商名称">
+          <el-input v-model="agentInfo.name" />
+        </el-form-item>
+        <el-form-item label="用户名">
+          <el-input v-model="agentInfo.username" />
+        </el-form-item>
+        <el-form-item label="代理级别">
+          <el-select v-model="agentInfo.agent_id" clearable>
+            <el-option v-for="item in daliList" :key="item.id" :label="item.name" :value="item.id"/>
           </el-select>
         </el-form-item>
-        <el-form-item :label="$t('table.date')" prop="timestamp">
-          <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date"/>
+        <el-form-item label="联系人">
+          <el-input v-model="agentInfo.contacts" />
         </el-form-item>
-        <el-form-item :label="$t('table.title')" prop="title">
-          <el-input v-model="temp.title"/>
+        <el-form-item label="联系电话">
+          <el-input v-model="agentInfo.phone" />
         </el-form-item>
-        <el-form-item :label="$t('table.status')">
-          <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item"/>
-          </el-select>
+        <el-form-item label="活动价">
+          <el-input v-model="agentInfo.price" type="number" />
         </el-form-item>
-        <el-form-item :label="$t('table.importance')">
-          <el-rate v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top:8px;"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.remark')">
-          <el-input :autosize="{ minRows: 2, maxRows: 4}" v-model="temp.remark" type="textarea" placeholder="Please input"/>
+        <el-form-item label="所在区域">
+          <el-cascader
+            v-model="agentInfo.selectArea"
+            :options="dialogCityList"
+            :props="defaultProps"
+            size="medium"
+            change-on-select
+            expand-trigger="click"
+            @change="handleCityListChange" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
-        <el-button v-else type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
+        <el-button>取消</el-button>
+        <el-button type="primary" @click="handleCreateAgent">保存</el-button>
       </div>
     </el-dialog>
-
   </div>
 </template>
 
 <script>
-import { fetchList, createArticle, updateArticle } from '@/api/article'
+import { getOperatorList, getSubordinateAgent, addOperator, delOperator } from './../../service/info'
+import { fetchCityList } from './../../service/common'
+import { getProvinceId, getLevel, getAgentId } from '@/utils/auth'
 import waves from '@/directive/waves' // 水波纹指令
 
-const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
+const statusMap = {
+  2: '一级代理商',
+  3: '二级代理商',
+  4: '三级代理商'
+}
 
 export default {
   name: 'YunYinManage',
@@ -127,9 +126,9 @@ export default {
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
+        2: '一级代理商',
+        3: '二级代理商',
+        4: '三级代理商'
       }
       return statusMap[status]
     }
@@ -137,151 +136,154 @@ export default {
   data() {
     return {
       list: null,
-      total: null,
-      listLoading: true,
+      listLoading: false,
       listQuery: {
-        page: 1,
-        limit: 20,
-        yunyinName: undefined
-      },
-      calendarTypeOptions,
-      statusOptions: ['published', 'draft', 'deleted'],
-      temp: {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
+        name: null
       },
       dialogFormVisible: false,
-      dialogStatus: '',
-      textMap: {
-        update: 'Edit',
-        create: 'Create'
+      cityList: [],
+      dialogTitle: '',
+      dialogFormVisible: false,
+      dialogCityList: [],
+      daliList: [],
+      agentInfo: {
+        name: null,
+        username: null,
+        agent_id: getAgentId(),
+        contacts: null,
+        phone: null,
+        price: null,
+        selectArea: []
       },
-      rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+      defaultProps: {
+        value: 'id',
+        label: 'name',
+        children: 'childs'
       }
     }
   },
   created() {
-    this.getList()
+    this.init()
   },
   methods: {
-    getList() {
-      this.listLoading = true
-      fetchList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
-
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
-      })
-    },
     handleFilter() {
-      this.listQuery.page = 1
-      this.getList()
-    },
-    handleSizeChange(val) {
-      this.listQuery.limit = val
-      this.getList()
-    },
-    handleCurrentChange(val) {
-      this.listQuery.page = val
-      this.getList()
-    },
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: '操作成功',
-        type: 'success'
-      })
-      row.status = status
-    },
-    resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
-      }
+      this._fetchOperatorList()
     },
     handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = 'create'
+      this.dialogTitle = '创建运营商'
       this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
+    },
+    handleClose() {
+      this._restForm()
+    },
+    handleDeleteOperator(id) {
+      this.$confirm('确认删除该运营商？')
+        .then(async _ => {
+          await deleteAgent({ agent_id: id })
+          await this._fetchOperatorList()
+        })
+        .catch(_ => {})
+    },
+    // 创建运营商
+    async handleCreateAgent() {
+      try {
+        const res = await addOperator(this.agentInfo)
+        this.dialogFormVisible = false
+        await this._fetchOperatorList()
+      } catch (e) {
+        this.dialogFormVisible = false
+        await this._fetchOperatorList()
+      }
+      this._restForm()
+    },
+    handleCityListChange(value) {
+      this.agentInfo.province_id = value[0]
+      this.agentInfo.city_id = value[1] || 0
+      this.agentInfo.county_id = value[2] || 0
+      const address = this._getAllAdderss()
+      let str = ''
+      address.forEach(item => {
+        str += item
+      })
+      this.agentInfo.address = str
+    },
+    _restForm() {
+      this.agentInfo = {
+        name: null,
+        username: null,
+        agent_id: getAgentId(),
+        contacts: null,
+        phone: null,
+        price: null,
+        selectArea: []
+      }
+    },
+    _getAllAdderss() {
+      const addressArr = []
+      this.agentInfo.selectArea.forEach(item => {
+        this._dealAddress(this.dialogCityList, item, addressArr)
+      })
+      return addressArr
+    },
+    _dealAddress(list, id, target) {
+      list.forEach(item => {
+        if (item.id === id) {
+          target.push(item.name)
+        }
+        (item.childs && item.childs.length > 0) && this._dealAddress(item.childs, id, target)
       })
     },
-    createData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '创建成功',
-              type: 'success',
-              duration: 2000
-            })
-          })
+    // 获取运营商列表
+    async _fetchOperatorList() {
+      this.listLoading = true
+      try {
+        const res = await getOperatorList(this.listQuery)
+        const { data } = res
+        this.list = data
+        this.listLoading = false
+      } catch (e) {
+        this.listLoading = false
+      }
+    },
+    // 获取城市列表
+    async _fetchCityList() {
+      const res = await fetchCityList()
+      const { data } = res
+      this._dealCityList(data)
+      this.cityList = data
+      this.dialogCityList = this._changeCityList(getProvinceId())
+    },
+    // 处理城市数据
+    _dealCityList(list) {
+      list.map(item => {
+        if (item.childs.length > 0) {
+          this._dealCityList(item.childs)
+        } else {
+          delete item.childs
         }
       })
     },
-    handleUpdate(row) {
-      this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
-    updateData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(tempData).then(() => {
-            for (const v of this.list) {
-              if (v.id === this.temp.id) {
-                const index = this.list.indexOf(v)
-                this.list.splice(index, 1, this.temp)
-                break
-              }
-            }
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
-          })
+    // 处理城市
+    _changeCityList(provice) {
+      const dialogCityList = []
+      this.cityList.forEach(item => {
+        if (item.id === provice) {
+          dialogCityList.push(item)
         }
       })
+      return dialogCityList.length ? dialogCityList : this.cityList
     },
-    handleDelete(row) {
-      this.$notify({
-        title: '成功',
-        message: '删除成功',
-        type: 'success',
-        duration: 2000
-      })
-      const index = this.list.indexOf(row)
-      this.list.splice(index, 1)
+    // 处理代理级别
+    async _dealLevel() {
+      const res = await getSubordinateAgent({ level: getLevel() })
+      const { data } = res
+      const list = [{ id: getAgentId(), level: getLevel(), name: statusMap[getLevel()] }]
+      this.daliList = list.concat(data)
+    },
+    init() {
+      this._fetchOperatorList()
+      this._fetchCityList()
+      this._dealLevel()
     }
   }
 }

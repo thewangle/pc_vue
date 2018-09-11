@@ -55,7 +55,12 @@
         </el-form-item>
         <el-form-item label="角色名称">
           <el-select v-model="agentInfo.role_id" clearable>
-            <el-option v-for="item in roleList" :label="item.role_name" :value="item.id" :key="item.id" :disabled="item.id <=6" />
+            <el-option
+              v-for="item in roleList"
+              :label="item.role_name"
+              :value="item.id"
+              :key="item.id"
+              :disabled="(dialogType === 'create' && item.id <=6) || (dialogType === 'update' && item.disable_role)" />
           </el-select>
         </el-form-item>
         <el-form-item label="性别">
@@ -64,10 +69,10 @@
             <el-option label="男" value="1"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="登录名" v-if="dialogType === 'create'">
+        <el-form-item v-if="dialogType === 'create'" label="登录名">
           <el-input v-model="agentInfo.username" />
         </el-form-item>
-        <el-form-item label="密码" v-if="dialogType === 'create'">
+        <el-form-item v-if="dialogType === 'create'" label="密码">
           <el-input v-model="agentInfo.password" />
         </el-form-item>
       </el-form>
@@ -84,7 +89,7 @@ import { fetchStaffList, addStaff, editStaff, deleteStaff, fetchRoleList } from 
 export default {
   name: 'UserManage',
   filters: {
-    genderFilter (status) {
+    genderFilter(status) {
       const map = {
         0: '女',
         1: '男'
