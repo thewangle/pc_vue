@@ -64,7 +64,7 @@
         <template slot-scope="scope">
           <el-button type="primary" size="mini" v-if="scope.row.activity_status === '2' || scope.row.activity_status === '6'">修改</el-button>
           <el-button size="mini" type="success" v-if="scope.row.activity_status !== '1'">查看</el-button>
-          <el-button size="mini" v-if="scope.row.activity_status === '1'">去审批</el-button>
+          <el-button size="mini" v-if="scope.row.activity_status === '1'" @click="handleCheckActivity(scope.row)">去审批</el-button>
           <el-button
             size="mini"
             type="danger"
@@ -88,9 +88,7 @@
         <el-form-item label="活动类型">
           <el-select v-model="activityInfo.type">
             <el-option label="团队-基础版" value="1" />
-            <el-option label="团队-精英版" value="2" />
-            <el-option label="个人-基础版" value="3" />
-            <el-option label="个人-精英版" value="4" />
+            <el-option label="个人-基础版" value="2" />
           </el-select>
         </el-form-item>
         <el-form-item label="选择教练">
@@ -299,7 +297,12 @@
             </el-input>
           </el-form-item>
           <el-form-item label="答案" label-width="100px">
-            <el-input v-model="taskInfo.answer"/>
+            <el-checkbox-group v-model="taskInfo.answer">
+              <el-checkbox label="A"></el-checkbox>
+              <el-checkbox label="B"></el-checkbox>
+              <el-checkbox label="C"></el-checkbox>
+              <el-checkbox label="C"></el-checkbox>
+            </el-checkbox-group>
           </el-form-item>
         </template>
         <el-form-item>
@@ -313,7 +316,7 @@
 </template>
 
 <script>
-import { fetchCoachList, addActivity, fetchActivityList, deleteActivity, fetchTaskList, addTask } from './../../service/activity'
+import { fetchCoachList, addActivity, fetchActivityList, deleteActivity, fetchTaskList, addTask, fetchActivityInfo } from './../../service/activity'
 import { fetchQiNiuToken } from './../../service/common'
 import { getAgentName, getAgentId } from '@/utils/auth'
 import { qiniuAddress } from './../../config'
@@ -340,9 +343,7 @@ export default {
     activityFilter(status) {
       const activityMap = {
         1: '团队-基础版',
-        2: '团队-精英版',
-        3: '个人-基础版',
-        4: '个人-精英版'
+        2: '个人-基础版'
       }
       return activityMap[status]
     },
@@ -459,14 +460,20 @@ export default {
       const type = 'task'
       this._uploadQiNiu(req, type)
     },
+    async handleCheckActivity(row) {
+      const res = await fetchActivityInfo({ act_id: row.id })
+      console.log(res)
+    },
+    // 添加活动
     handleCreateActivitySubmit() {
       this._addActivity()
     },
     // 关闭添加活动对话框
     handleCloseDialog() {
       this.dialogFormDisable = false
+      this.activityId = null
     },
-    // 打卡添加任务对话框
+    // 打开添加任务对话框
     handleOpenTaskDialog() {
       this.dialogTaskVisible = true
     },
@@ -574,17 +581,19 @@ export default {
         await this._fetchTaskList(res.data)
       } catch (e) {
         // 添加活动失败隐藏添加弹窗
-        this.dialogFormVisible = false
+        this.handleCloseDialog()
         await this._fetchActivityList()
       }
     },
     // 添加任务
     async handelCreateTaskSubmit() {
       const data = Object.assign({}, this.taskInfo, { activity_id: this.activityId })
-      data.answer = ['A']
       try {
-        const res = await addTask(data)    
-      } catch (e) {}
+        const res = await addTask(data)
+      } catch (e) { 
+      }
+      this.dialogTaskVisible = false
+      this._fetchTaskList(this.activityId)
     },
     // 获取活动列表
     async _fetchActivityList() {

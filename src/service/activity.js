@@ -70,3 +70,15 @@ export function addTask(data) {
     data
   })
 }
+
+/**
+ * 获取活动信息
+ * @param {*} data
+ */
+export function fetchActivityInfo(data) {
+  return request({
+    url: '/i/topteam/admin/getactivityinfo',
+    method: 'post',
+    data
+  })
+}
