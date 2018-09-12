@@ -23,28 +23,27 @@
       </el-table-column>
       <el-table-column label="用户名" width="150px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.timestamp }}</span>
+          <span>{{ scope.row.username }}</span>
         </template>
       </el-table-column>
       <el-table-column label="手机号" min-width="150px">
         <template slot-scope="scope">
-          <span class="link-type">{{ scope.row.title }}</span>
+          <span>{{ scope.row.phone }}</span>
         </template>
       </el-table-column>
       <el-table-column label="角色" width="110px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
+          <span>{{ scope.row.role_id }}</span>
         </template>
       </el-table-column>
       <el-table-column label="运营商名称" width="120px">
         <template slot-scope="scope">
-          <svg-icon v-for="n in +scope.row.importance" :key="n" icon-class="star" class="meta-item__icon"/>
+          <span>{{ scope.row.xxx }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建日期" align="center" width="95">
+      <el-table-column label="创建日期" align="center" width="145">
         <template slot-scope="scope">
-          <span v-if="scope.row.pageviews" class="link-type">{{ scope.row.pageviews }}</span>
-          <span v-else>0</span>
+          <span>{{ scope.row.update_time }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
@@ -58,7 +57,7 @@
     <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible" @close="handleClose">
       <el-form :model="agentInfo" label-position="right" label-width="120px">
         <el-form-item label="教练姓名">
-          <el-input v-model="agentInfo.name" />
+          <el-input v-model="agentInfo.contacts" />
         </el-form-item>
         <el-form-item label="用户名">
           <el-input v-model="agentInfo.username" :disabled="dialogType === 'update'" />
@@ -99,7 +98,7 @@ export default {
       dialogTitle: '',
       dialogType: '',
       agentInfo: {
-        name: null,
+        contacts: null,
         username: null,
         phone: null
       },
@@ -129,7 +128,7 @@ export default {
       this.dialogType = 'update'
       this.dialogFormVisible = true
       const { name, username, phone } = row
-      const data = { name, username, phone }
+      const data = { contacts: name, username, phone }
       this.agentInfo = data
       this.coachId = row.id
     },
@@ -148,7 +147,7 @@ export default {
           const res = await addCoach(this.agentInfo) 
         }
         if (this.dialogType === 'update') {
-          const res = await updateCoach({ id: this.coachId, name: this.agentInfo.name, phone: this.agentInfo.phone })
+          const res = await updateCoach({ id: this.coachId, contacts: this.agentInfo.contacts, phone: this.agentInfo.phone })
         }
       } catch (e) {
         console.log(e)
@@ -159,7 +158,7 @@ export default {
     // 重置对话框列表
     _resetForm() {
       this.agentInfo = {
-        name: null,
+        contacts: null,
         username: null,
         phone: null
       }

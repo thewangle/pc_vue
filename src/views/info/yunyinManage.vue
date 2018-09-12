@@ -16,44 +16,42 @@
       style="width: 100%;">
       <el-table-column label="序号" align="center" width="65">
         <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
+          <span>{{ scope.$index + 1}}</span>
         </template>
       </el-table-column>
       <el-table-column label="编号" width="150px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.timestamp }}</span>
+          <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
       <el-table-column label="运营商名称" min-width="150px">
         <template slot-scope="scope">
-          <span class="link-type">{{ scope.row.title }}</span>
+          <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="联系人" width="110px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
+          <span>{{ scope.row.contacts }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="联系电话" width="80px">
+      <el-table-column label="联系电话" width="140px">
         <template slot-scope="scope">
-          <svg-icon v-for="n in +scope.row.importance" :key="n" icon-class="star" class="meta-item__icon"/>
+          <span>{{ scope.row.phone }}</span>
         </template>
       </el-table-column>
       <el-table-column label="代理商名称" align="center" width="95">
         <template slot-scope="scope">
-          <span v-if="scope.row.pageviews" class="link-type">{{ scope.row.pageviews }}</span>
-          <span v-else>0</span>
+          <span>{{ scope.row.agent_name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="活动价" align="center" width="95">
         <template slot-scope="scope">
-          <span v-if="scope.row.pageviews" class="link-type">{{ scope.row.pageviews }}</span>
-          <span v-else>0</span>
+          <span>{{ scope.row.price }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="所在地区" class-name="status-col" width="100">
+      <el-table-column label="所在地区" class-name="status-col" width="180">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.status | statusFilter">{{ scope.row.status }}</el-tag>
+          <span>{{ scope.row.address }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">

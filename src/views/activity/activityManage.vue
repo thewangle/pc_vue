@@ -42,7 +42,7 @@
       </el-table-column>
       <el-table-column label="活动封面" width="100px">
         <template slot-scope="scope">
-          <span>{{ scope.row.icon }}</span>
+          <img :src="scope.row.icon" alt="" style="display: block; width: 40px; height: 40px; margin: 0 auto;">
         </template>
       </el-table-column>
       <el-table-column label="活动时间" align="center" width="95">
@@ -55,20 +55,21 @@
           <span>{{ scope.row.score }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="活动状态" class-name="status-col" width="100">
+      <el-table-column label="活动状态" class-name="status-col" width="120">
         <template slot-scope="scope">
           <span>{{ scope.row.activity_status | statusFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" min-width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" min-width="130" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini">修改</el-button>
-          <el-button size="mini" type="success">查看
-          </el-button>
-          <el-button size="mini">去审批
-          </el-button>
-          <el-button size="mini" type="danger">删除
-          </el-button>
+          <el-button type="primary" size="mini" v-if="scope.row.status === '2' || scope.row.status === '6'">修改</el-button>
+          <el-button size="mini" type="success" v-if="scope.row.status !== '1'">查看</el-button>
+          <el-button size="mini" v-if="scope.row.status === '1'">去审批</el-button>
+          <el-button
+            size="mini"
+            type="danger"
+            @click="handleDeleteActivity(scope.row.id)"
+            v-if="scope.row.status === 5 || scope.row.status === '6'">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -77,9 +78,14 @@
       <el-pagination :current-page="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div> -->
 
-    <el-dialog :visible.sync="dialogFormVisible" title="新增活动" fullscreen class="activityDialog">
+    <el-dialog
+      :visible.sync="dialogFormVisible"
+      title="新增活动"
+      fullscreen
+      class="activityDialog"
+      @close="handleCloseDialog">
       <hr >
-      <el-form :inline="true" :model="activityInfo" class="demo-form-inline">
+      <el-form :inline="true" :model="activityInfo" :disable="dialogFormDisable" class="demo-form-inline">
         <el-form-item label="运营商名">
           <el-input v-model="activityInfo.agentName" disabled />
         </el-form-item>
@@ -128,6 +134,9 @@
             end-placeholder="结束时间"
             value-format="timestamp"/>
         </el-form-item>
+        <el-form-item label="活动价格">
+          <el-input v-model="activityInfo.price" type="number"/>
+        </el-form-item>
         <el-form-item label="活动描述">
           <el-input v-model="activityInfo.actDesc" type="textarea"/>
         </el-form-item>
@@ -167,7 +176,7 @@
 </template>
 
 <script>
-import { fetchCoachList, addActivity, fetchActivityList } from './../../service/activity'
+import { fetchCoachList, addActivity, fetchActivityList, deleteActivity } from './../../service/activity'
 import { fetchQiNiuToken } from './../../service/common'
 import { getAgentName, getAgentId } from '@/utils/auth'
 import { qiniuAddress } from './../../config'
@@ -187,8 +196,7 @@ export default {
         3: '已开始进行中',
         4: '暂停',
         5: '结束已完成 ',
-        6: '审核未通过',
-        7: '删除'
+        6: '审核未通过'
       }
       return statusMap[status]
     },
@@ -215,11 +223,7 @@ export default {
       activities: [{ label: '团队-基础版', key: 1 }, { label: '团队-精英版', key: 2 }, { label: '个人-基础版', key: 3 }, { label: '个人-基础版', key: 4 }],
       status: [{ label: '待审批', key: '1' }, { label: '准备中', key: '2' }, { label: '进行中', key: '3' }, { label: '暂停中', key: '4' }, { label: '已完成', key: '5' }, { label: '未通过', key: '6' }],
       dialogFormVisible: false,
-      // rules: {
-      //   type: [{ required: true, message: 'type is required', trigger: 'change' }],
-      //   timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-      //   title: [{ required: true, message: 'title is required', trigger: 'blur' }]
-      // },
+      dialogFormDisable: false,
       activityInfo: {
         agentName: getAgentName(), // 代理商名称
         type: '', // 活动类型
@@ -232,7 +236,8 @@ export default {
         time: '', // 活动时间
         actDesc: '', // 活动描述
         bgImgUrl: '', // 背景图片URl
-        iconUrl: '' // 活动封面Url
+        iconUrl: '', // 活动封面Url
+        price: '' //活动价格
       },
       dialogImageUrl: '',
       dialogVisible: false,
@@ -270,6 +275,18 @@ export default {
     handleCreateActivitySubmit() {
       console.log(this.activityInfo)
       this._addActivity()
+    },
+    handleCloseDialog() {
+      this.dialogFormDisable = false
+    },
+    // 删除活动
+    handleDeleteActivity(id) {
+      this.$confirm('确认删除该活动？')
+        .then(async _ => {
+          await deleteActivity(id)
+          await this._fetchActivityList()
+        })
+        .catch(_ => {})
     },
     // 上传七牛云
     async _uploadQiNiu(req, type) {
@@ -316,9 +333,9 @@ export default {
       const data = {}
       const {
         time, name, keepTime, score, coachId,
-        actDesc, scoreType, scoreShowType, type, bgImgUrl, iconUrl
+        actDesc, scoreType, scoreShowType, type, bgImgUrl, iconUrl, price
       } = this.activityInfo
-      if (!time.length || !name || !keepTime || !score || !coachId || !type) {
+      if (!time.length || !name || !keepTime || !score || !coachId || !type || !price) {
         this.$message({ message: '必填项不能为空', type: 'error' })
         return
       }
@@ -348,10 +365,16 @@ export default {
       // 封面图片
       data.icon = iconUrl
       // 金额
-      data.money = 400
-
-      const res = await addActivity(data)
-      console.log(res)
+      data.money = price
+      try {
+        const res = await addActivity(data)
+        // 创建活动成功form禁用
+        this.dialogFormDisable = true
+      } catch (e) {
+        // 添加活动失败隐藏添加弹窗
+        this.dialogFormVisible = false
+        await this._fetchActivityList()
+      }
     },
     async _fetchActivityList() {
       this.listLoading = true
@@ -359,7 +382,6 @@ export default {
         const res = await fetchActivityList(this.listQuery)
         const { data } = res
         this.listLoading = false
-        console.log(data)
         this.list = data
       } catch (e) {
         this.listLoading = false

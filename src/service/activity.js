@@ -35,3 +35,14 @@ export function fetchCoachList() {
     method: 'get'
   })
 }
+
+/**
+ * 删除活动
+ * @param {*} id 活动id
+ */
+export function deleteActivity(id) {
+  return request({
+    url: `/i/topteam/admin/delTask?task_id=${id}`,
+    method: 'get'
+  })
+}
