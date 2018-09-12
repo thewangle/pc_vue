@@ -46,3 +46,27 @@ export function deleteActivity(id) {
     method: 'get'
   })
 }
+
+/**
+ * 获取活动下任务列表
+ * @param {Obj} data {activity_id}
+ */
+export function fetchTaskList(data) {
+  return request({
+    url: '/i/topteam/admin/GetTaskList',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 创建任务
+ * @param {Obj} data
+ */
+export function addTask(data) {
+  return request({
+    url: 'i/topteam/admin/addTask',
+    method: 'post',
+    data
+  })
+}

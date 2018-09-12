@@ -37,7 +37,7 @@
       </el-table-column>
       <el-table-column label="游戏类型" width="110px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.status | activityFilter }}</span>
+          <span>{{ scope.row.type | activityFilter }}</span>
         </template>
       </el-table-column>
       <el-table-column label="活动封面" width="100px">
@@ -62,21 +62,17 @@
       </el-table-column>
       <el-table-column label="操作" align="center" min-width="130" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" v-if="scope.row.status === '2' || scope.row.status === '6'">修改</el-button>
-          <el-button size="mini" type="success" v-if="scope.row.status !== '1'">查看</el-button>
-          <el-button size="mini" v-if="scope.row.status === '1'">去审批</el-button>
+          <el-button type="primary" size="mini" v-if="scope.row.activity_status === '2' || scope.row.activity_status === '6'">修改</el-button>
+          <el-button size="mini" type="success" v-if="scope.row.activity_status !== '1'">查看</el-button>
+          <el-button size="mini" v-if="scope.row.activity_status === '1'">去审批</el-button>
           <el-button
             size="mini"
             type="danger"
             @click="handleDeleteActivity(scope.row.id)"
-            v-if="scope.row.status === 5 || scope.row.status === '6'">删除</el-button>
+            v-if="scope.row.activity_status === 5 || scope.row.activity_status === '6'">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-
-    <!-- <div class="pagination-container">
-      <el-pagination :current-page="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
-    </div> -->
 
     <el-dialog
       :visible.sync="dialogFormVisible"
@@ -85,7 +81,7 @@
       class="activityDialog"
       @close="handleCloseDialog">
       <hr >
-      <el-form :inline="true" :model="activityInfo" :disable="dialogFormDisable" class="demo-form-inline">
+      <el-form :inline="true" :model="activityInfo" :disabled="dialogFormDisable" class="demo-form-inline">
         <el-form-item label="运营商名">
           <el-input v-model="activityInfo.agentName" disabled />
         </el-form-item>
@@ -170,13 +166,154 @@
         </el-form-item>
       </el-form>
       <hr >
+      <div class="job-list">
+        <div class="job-title">
+          <h3 style="display: inline-block">任务列表</h3>
+          <el-button type="success" style="float: right" :disabled="!activityId">导入任务</el-button>
+          <el-button type="primary" style="float: right; margin-right: 20px;" @click="handleOpenTaskDialog" :disabled="!activityId">添加任务</el-button>
+        </div>
+        <div class="job-table">
+          <el-table
+            :data="taskList"
+            border
+            fit
+            highlight-current-row
+            style="width: 100%;">
+            <el-table-column label="序号" align="center" width="65">
+              <template slot-scope="scope">
+                <span>{{ scope.$index + 1 }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="题目标题" width="150px" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.name }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="描述" min-width="130px">
+              <template slot-scope="scope">
+                <span>{{ scope.row.desc }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="答案" width="150px" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.answer}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="题目类型" width="100px">
+              <template slot-scope="scope">
+                <span>{{ scope.row.type | typeFilter }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="分值" align="center" width="95">
+              <template slot-scope="scope">
+                <span>{{ scope.row.score }}分钟</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="答题类型" align="center" width="95">
+              <template slot-scope="scope">
+                <span>{{ scope.row.answer_type | answerTypeFilter }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="活动状态" class-name="status-col" width="120">
+              <template slot-scope="scope">
+                <span>{{ scope.row.activity_status | statusFilter }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" align="center" min-width="130" class-name="small-padding fixed-width">
+              <template slot-scope="scope">
+                <el-button type="primary">修改</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+    </el-dialog>
+
+    <el-dialog
+      :visible.sync="dialogTaskVisible"
+      title="新增任务"
+      class="activityDialog"
+      @close="handleCloseTaskDialog">
+      <el-form :model="taskInfo" class="demo-form-inline">
+        <el-form-item label="题目标题" label-width="100px">
+          <el-input v-model="taskInfo.name" />
+        </el-form-item>
+        <el-form-item label="题目类型" label-width="100px">
+          <el-select v-model="taskInfo.type">
+            <el-option label="选择题" value="1" />
+            <el-option label="文字题" value="2" />
+            <el-option label="图片题" value="3" />
+            <el-option label="视频题" value="4" />
+            <el-option label="语音题" value="5" />
+            <el-option label="拍照题" value="6" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="题目描述" label-width="100px">
+          <el-input v-model="taskInfo.desc" type="textarea" />
+        </el-form-item>
+        <el-form-item label="题目分值" label-width="100px">
+          <el-input v-model="taskInfo.score" type="number" />
+        </el-form-item>
+        <el-form-item label="答题类型" label-width="100px">
+          <el-select v-model="taskInfo.answer_type">
+            <el-option label="普通题" value="1" />
+            <el-option label="关卡题" value="2" />
+            <el-option label="团队限时题" value="3" />
+            <el-option label="活动抢答题" value="4" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="题目顺序" label-width="100px">
+          <el-input v-model="taskInfo.seq" type="number" />
+        </el-form-item>
+        <el-form-item label="答题人数" label-width="100px">
+          <el-input v-model="taskInfo.answer_limit" type="number" />
+        </el-form-item>
+        <!-- 文字题目 -->
+        <template v-if="taskInfo.type === '1'">
+          <el-form-item label="题目图片" label-width="100px">
+            <el-upload
+              :http-request="handleUpLoadTaksImg"
+              :on-preview="handleTaskImgPreview"
+              :limit="1"
+              :action="domain"
+              list-type="picture-card"
+            >
+              <el-button>上传图片</el-button>
+            </el-upload>
+            <el-dialog :visible.sync="dialogTaskImgVisible">
+              <img :src="dialogTaskImageUrl" width="100%" alt="">
+            </el-dialog>
+          </el-form-item>
+          <el-form-item label="题目选项" label-width="100px">
+            <el-input v-model="taskInfo.options.A" placeholder="请输入选项内容">
+               <template slot="prepend">A</template>
+            </el-input>
+            <el-input v-model="taskInfo.options.B" placeholder="请输入选项内容">
+               <template slot="prepend">B</template>
+            </el-input>
+            <el-input v-model="taskInfo.options.C" placeholder="请输入选项内容">
+               <template slot="prepend">C</template>
+            </el-input>
+            <el-input v-model="taskInfo.options.D" placeholder="请输入选项内容">
+               <template slot="prepend">D</template>
+            </el-input>
+          </el-form-item>
+          <el-form-item label="答案" label-width="100px">
+            <el-input v-model="taskInfo.answer"/>
+          </el-form-item>
+        </template>
+        <el-form-item>
+          <el-button @click="handleCloseTaskDialog">取消</el-button>
+          <el-button type="primary" @click="handelCreateTaskSubmit">添加题目</el-button>
+        </el-form-item>
+      </el-form>
     </el-dialog>
 
   </div>
 </template>
 
 <script>
-import { fetchCoachList, addActivity, fetchActivityList, deleteActivity } from './../../service/activity'
+import { fetchCoachList, addActivity, fetchActivityList, deleteActivity, fetchTaskList, addTask } from './../../service/activity'
 import { fetchQiNiuToken } from './../../service/common'
 import { getAgentName, getAgentId } from '@/utils/auth'
 import { qiniuAddress } from './../../config'
@@ -208,6 +345,26 @@ export default {
         4: '个人-精英版'
       }
       return activityMap[status]
+    },
+    typeFilter(type) {
+      const typeMap = {
+        1: '选择题',
+        2: '文字题',
+        3: '图片题',
+        4: '视频题',
+        5: '语音题',
+        6: '拍照题'
+      }
+      return typeMap[type]
+    },
+    answerTypeFilter(type) {
+      const typeMap = {
+        1: '普通题',
+        2: '关卡题',
+        3: '团队限时题',
+        4: '活动抢答题'
+      }
+      return typeMap[type]
     }
   },
   data() {
@@ -224,6 +381,10 @@ export default {
       status: [{ label: '待审批', key: '1' }, { label: '准备中', key: '2' }, { label: '进行中', key: '3' }, { label: '暂停中', key: '4' }, { label: '已完成', key: '5' }, { label: '未通过', key: '6' }],
       dialogFormVisible: false,
       dialogFormDisable: false,
+      taskList: [],
+      dialogTaskVisible: false,
+      dialogTaskImgVisible: false,
+      dialogTaskImageUrl: '',
       activityInfo: {
         agentName: getAgentName(), // 代理商名称
         type: '', // 活动类型
@@ -238,6 +399,24 @@ export default {
         bgImgUrl: '', // 背景图片URl
         iconUrl: '', // 活动封面Url
         price: '' //活动价格
+      },
+      activityId: null,
+      taskInfo: {
+        name: null,
+        type: '1',
+        desc: null,
+        answer_type: '1',
+        seq: null,
+        question_img: null,
+        options: {
+          A: null,
+          B: null,
+          C: null,
+          D: null
+        },
+        answer: null,
+        score: null,
+        answer_limit: 1
       },
       dialogImageUrl: '',
       dialogVisible: false,
@@ -264,6 +443,10 @@ export default {
       this.dialogImageUrl = this.activityInfo.iconUrl
       this.dialogVisible = true
     },
+    handleTaskImgPreview() {
+      this.dialogTaskImageUrl = this.taskInfo.question_img
+      this.dialogTaskImgVisible = true
+    },
     handleUpLoadBgImg(req) {
       const type = 'bgImg'
       this._uploadQiNiu(req, type)
@@ -272,12 +455,25 @@ export default {
       const type = 'icon'
       this._uploadQiNiu(req, type)
     },
+    handleUpLoadTaksImg(req) {
+      const type = 'task'
+      this._uploadQiNiu(req, type)
+    },
     handleCreateActivitySubmit() {
-      console.log(this.activityInfo)
       this._addActivity()
     },
+    // 关闭添加活动对话框
     handleCloseDialog() {
       this.dialogFormDisable = false
+    },
+    // 打卡添加任务对话框
+    handleOpenTaskDialog() {
+      this.dialogTaskVisible = true
+    },
+    // 关闭添加任务对话框
+    handleCloseTaskDialog() {
+      console.log('关闭添加任务对话框')
+      this.dialogTaskVisible = false
     },
     // 删除活动
     handleDeleteActivity(id) {
@@ -313,6 +509,9 @@ export default {
         }
         if (type === 'icon') {
           this.activityInfo.iconUrl = url
+        }
+        if (type === 'task') {
+          this.taskInfo.question_img = url
         }
       })
     },
@@ -370,12 +569,24 @@ export default {
         const res = await addActivity(data)
         // 创建活动成功form禁用
         this.dialogFormDisable = true
+        // 创建活动成功保存活动id
+        this.activityId = res.data
+        await this._fetchTaskList(res.data)
       } catch (e) {
         // 添加活动失败隐藏添加弹窗
         this.dialogFormVisible = false
         await this._fetchActivityList()
       }
     },
+    // 添加任务
+    async handelCreateTaskSubmit() {
+      const data = Object.assign({}, this.taskInfo, { activity_id: this.activityId })
+      data.answer = ['A']
+      try {
+        const res = await addTask(data)    
+      } catch (e) {}
+    },
+    // 获取活动列表
     async _fetchActivityList() {
       this.listLoading = true
       try {
@@ -386,6 +597,13 @@ export default {
       } catch (e) {
         this.listLoading = false
       }
+    },
+    // 获取活动下任务列表
+    async _fetchTaskList(id) {
+      const res = await fetchTaskList({ activity_id: id })
+      let { data } = res
+      if (!data) data = []
+      this.taskList = data
     },
     init() {
       this._fetchCoachList()
