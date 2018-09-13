@@ -42,7 +42,7 @@ export function fetchCoachList() {
  */
 export function deleteActivity(id) {
   return request({
-    url: `/i/topteam/admin/delTask?task_id=${id}`,
+    url: `/i/topteam/admin/delTask?id=${id}`,
     method: 'get'
   })
 }
@@ -78,6 +78,17 @@ export function addTask(data) {
 export function fetchActivityInfo(data) {
   return request({
     url: '/i/topteam/admin/getactivityinfo',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 审批活动不通过接口
+ */
+export function auditact(data) {
+  return request({
+    url: '/i/topteam/admin/auditact',
     method: 'post',
     data
   })

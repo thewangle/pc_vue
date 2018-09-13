@@ -62,18 +62,19 @@
       </el-table-column>
       <el-table-column label="操作" align="center" min-width="130" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" v-if="scope.row.activity_status === '2' || scope.row.activity_status === '6'">修改</el-button>
-          <el-button size="mini" type="success" v-if="scope.row.activity_status !== '1'">查看</el-button>
-          <el-button size="mini" v-if="scope.row.activity_status === '1'" @click="handleCheckActivity(scope.row)">去审批</el-button>
+          <el-button v-if="scope.row.activity_status === '2' || scope.row.activity_status === '6'" type="primary" size="mini">修改</el-button>
+          <el-button v-if="scope.row.activity_status !== '1'" size="mini" type="success">查看</el-button>
+          <el-button v-if="scope.row.activity_status === '1'" size="mini" @click="handleCheckActivity(scope.row)">去审批</el-button>
           <el-button
+            v-if="scope.row.activity_status === 5 || scope.row.activity_status === '6'"
             size="mini"
             type="danger"
-            @click="handleDeleteActivity(scope.row.id)"
-            v-if="scope.row.activity_status === 5 || scope.row.activity_status === '6'">删除</el-button>
+            @click="handleDeleteActivity(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
 
+    <!-- 新增活动对话框 start -->
     <el-dialog
       :visible.sync="dialogFormVisible"
       title="新增活动"
@@ -140,6 +141,7 @@
             :on-preview="handleIconCardPreview"
             :limit="1"
             :action="domain"
+            :file-list="iconFilelist"
             list-type="picture-card"
           >
             <el-button>上传图片</el-button>
@@ -154,6 +156,7 @@
             :on-preview="handleBgCardPreview"
             :limit="1"
             :action="domain"
+            :file-list="bgFileList"
             list-type="picture-card"
           >
             <el-button>上传图片</el-button>
@@ -167,8 +170,8 @@
       <div class="job-list">
         <div class="job-title">
           <h3 style="display: inline-block">任务列表</h3>
-          <el-button type="success" style="float: right" :disabled="!activityId">导入任务</el-button>
-          <el-button type="primary" style="float: right; margin-right: 20px;" @click="handleOpenTaskDialog" :disabled="!activityId">添加任务</el-button>
+          <el-button :disabled="!activityId" type="success" style="float: right">导入任务</el-button>
+          <el-button :disabled="!activityId" type="primary" style="float: right; margin-right: 20px;" @click="handleOpenTaskDialog">添加任务</el-button>
         </div>
         <div class="job-table">
           <el-table
@@ -189,12 +192,12 @@
             </el-table-column>
             <el-table-column label="描述" min-width="130px">
               <template slot-scope="scope">
-                <span>{{ scope.row.desc }}</span>
+                <span>{{ scope.row.task_desc }}</span>
               </template>
             </el-table-column>
             <el-table-column label="答案" width="150px" align="center">
               <template slot-scope="scope">
-                <span>{{ scope.row.answer}}</span>
+                <span>{{ scope.row.answer }}</span>
               </template>
             </el-table-column>
             <el-table-column label="题目类型" width="100px">
@@ -204,17 +207,12 @@
             </el-table-column>
             <el-table-column label="分值" align="center" width="95">
               <template slot-scope="scope">
-                <span>{{ scope.row.score }}分钟</span>
+                <span>{{ scope.row.score }}</span>
               </template>
             </el-table-column>
             <el-table-column label="答题类型" align="center" width="95">
               <template slot-scope="scope">
                 <span>{{ scope.row.answer_type | answerTypeFilter }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="活动状态" class-name="status-col" width="120">
-              <template slot-scope="scope">
-                <span>{{ scope.row.activity_status | statusFilter }}</span>
               </template>
             </el-table-column>
             <el-table-column label="操作" align="center" min-width="130" class-name="small-padding fixed-width">
@@ -226,7 +224,9 @@
         </div>
       </div>
     </el-dialog>
+    <!-- 新增活动对话框 end -->
 
+    <!-- 新增题目对话框 start -->
     <el-dialog
       :visible.sync="dialogTaskVisible"
       title="新增任务"
@@ -274,6 +274,7 @@
               :on-preview="handleTaskImgPreview"
               :limit="1"
               :action="domain"
+              :file-list="taskQFileList"
               list-type="picture-card"
             >
               <el-button>上传图片</el-button>
@@ -284,24 +285,24 @@
           </el-form-item>
           <el-form-item label="题目选项" label-width="100px">
             <el-input v-model="taskInfo.options.A" placeholder="请输入选项内容">
-               <template slot="prepend">A</template>
+              <template slot="prepend">A</template>
             </el-input>
             <el-input v-model="taskInfo.options.B" placeholder="请输入选项内容">
-               <template slot="prepend">B</template>
+              <template slot="prepend">B</template>
             </el-input>
             <el-input v-model="taskInfo.options.C" placeholder="请输入选项内容">
-               <template slot="prepend">C</template>
+              <template slot="prepend">C</template>
             </el-input>
             <el-input v-model="taskInfo.options.D" placeholder="请输入选项内容">
-               <template slot="prepend">D</template>
+              <template slot="prepend">D</template>
             </el-input>
           </el-form-item>
           <el-form-item label="答案" label-width="100px">
             <el-checkbox-group v-model="taskInfo.answer">
-              <el-checkbox label="A"></el-checkbox>
-              <el-checkbox label="B"></el-checkbox>
-              <el-checkbox label="C"></el-checkbox>
-              <el-checkbox label="C"></el-checkbox>
+              <el-checkbox label="A"/>
+              <el-checkbox label="B"/>
+              <el-checkbox label="C"/>
+              <el-checkbox label="D"/>
             </el-checkbox-group>
           </el-form-item>
         </template>
@@ -311,12 +312,127 @@
         </el-form-item>
       </el-form>
     </el-dialog>
+    <!-- 新增题目对话框 end -->
 
+    <el-dialog
+      :visible.sync="dialogCheckVisible"
+      class="activityDialog"
+      fullscreen
+      @close="handleCloseCheckDialog">
+      <hr />
+      <div slot="title">
+        <h3>
+          {{ dialogTitle }}
+          <el-button @click="handelAuditact" v-if="dialogType === 'check'">不通过</el-button>
+          <el-button type="primary" v-if="dialogType === 'check'">通过</el-button>
+        </h3>
+      </div>
+      <div class="info clearfix">
+        <div class="info-tab-left" style="width: 50%;float: left;">
+          <h4>活动信息</h4>
+          <el-form v-model="checkInfo">
+            <el-form-item label="活动名称" label-width="100px">
+              <span v-if="dialogType === 'check'">{{ checkInfo.name }}</span>  
+              <!-- <el-input v-model="checkInfo.name" :disabled="dialogType === 'check'"/> -->
+            </el-form-item>
+            <el-form-item label="活动类型" label-width="100px">
+              <span v-if="dialogType === 'check'">{{ checkInfo.activity_status | activityFilter }}</span>  
+              <!-- <el-input v-model="checkInfo.type" :disabled="dialogType === 'check'"/> -->
+            </el-form-item>
+            <el-form-item label="开始时间" label-width="100px">
+              <span v-if="dialogType === 'check'">{{ checkInfo.set_start_time | timeFilter }}</span>
+              <!-- <el-input v-model="checkInfo.set_start_time" :disabled="dialogType === 'check'"/> -->
+            </el-form-item>
+            <el-form-item label="开始时间" label-width="100px">
+              <span v-if="dialogType === 'check'">{{ checkInfo.set_stop_time | timeFilter }}</span>
+              <!-- <el-input v-model="checkInfo.set_stop_time" :disabled="dialogType === 'check'"/> -->
+            </el-form-item>
+          </el-form>
+        </div>
+        <div class="info-tab-right" style="width: 50%; float: right;">
+          <h4>活动二维码</h4>
+          <div class="er-img" style="width: 140px; height: 140px; margin: 0 auto; border: 1px solid #ccc; margin-top: 40px">
+            <span style="color: red; font-size: 18px;">活动审批完成后创建二维码</span>
+          </div>
+        </div>
+      </div>
+      <hr />
+      <div class="job-list">
+        <div class="job-title">
+          <h3 style="display: inline-block">任务列表</h3>
+        </div>
+        <div class="job-table">
+          <el-table
+            :data="taskList"
+            border
+            fit
+            highlight-current-row
+            style="width: 100%;">
+            <el-table-column label="序号" align="center" width="65">
+              <template slot-scope="scope">
+                <span>{{ scope.$index + 1 }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="题目标题" width="150px" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.name }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="描述" min-width="130px">
+              <template slot-scope="scope">
+                <span>{{ scope.row.task_desc }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="答案" width="150px" align="center">
+              <template slot-scope="scope">
+                <span>{{ scope.row.answer }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="题目类型" width="100px">
+              <template slot-scope="scope">
+                <span>{{ scope.row.type | typeFilter }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="分值" align="center" width="95">
+              <template slot-scope="scope">
+                <span>{{ scope.row.score }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="答题类型" align="center" width="95">
+              <template slot-scope="scope">
+                <span>{{ scope.row.answer_type | answerTypeFilter }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" align="center" min-width="130" class-name="small-padding fixed-width" v-if="dialogType !== 'check'">
+              <template slot-scope="scope">
+                <el-button type="primary">修改</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+    </el-dialog>
+
+    <el-dialog 
+      :visible.sync="dialogReasonVisible"
+      class="activityDialog"
+      title="不通过原因"
+      @close="handleCloseReasonDialog">
+      <el-form>
+        <el-form-item>
+          <el-input v-model="reason" type="textarea" /> 
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="handleCloseReasonDialog">取消</el-button>
+          <el-button type="primary" @click="handleCancelActivity">确认</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchCoachList, addActivity, fetchActivityList, deleteActivity, fetchTaskList, addTask, fetchActivityInfo } from './../../service/activity'
+import { fetchCoachList, addActivity, fetchActivityList, deleteActivity, fetchTaskList, addTask, fetchActivityInfo, auditact } from './../../service/activity'
 import { fetchQiNiuToken } from './../../service/common'
 import { getAgentName, getAgentId } from '@/utils/auth'
 import { qiniuAddress } from './../../config'
@@ -366,10 +482,23 @@ export default {
         4: '活动抢答题'
       }
       return typeMap[type]
+    },
+    timeFilter(timestamp) {
+      var date = new Date(timestamp*1000);//如果date为10位不需要乘1000
+      var Y = date.getFullYear() + '-'
+      var M = (+date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-'
+      var D = (+date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' '
+      var h = (+date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
+      var m = (+date.getMinutes() <10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
+      var s = (+date.getSeconds() <10 ? '0' + date.getSeconds() : date.getSeconds())
+      return Y+M+D+h+m+s
     }
   },
   data() {
     return {
+      iconFilelist: [],
+      bgFileList: [],
+      taskQFileList: [],
       list: null,
       listLoading: false,
       listQuery: {
@@ -380,12 +509,17 @@ export default {
       },
       activities: [{ label: '团队-基础版', key: 1 }, { label: '团队-精英版', key: 2 }, { label: '个人-基础版', key: 3 }, { label: '个人-基础版', key: 4 }],
       status: [{ label: '待审批', key: '1' }, { label: '准备中', key: '2' }, { label: '进行中', key: '3' }, { label: '暂停中', key: '4' }, { label: '已完成', key: '5' }, { label: '未通过', key: '6' }],
-      dialogFormVisible: false,
-      dialogFormDisable: false,
+      dialogFormVisible: false, // 添加活动对话框展示
+      dialogFormDisable: false, // 添加活动对话框表单禁用
       taskList: [],
-      dialogTaskVisible: false,
-      dialogTaskImgVisible: false,
+      dialogTaskVisible: false, // 添加任务对话框展示
+      dialogTaskImgVisible: false, // 添加任务对话框中图片对话框展示
       dialogTaskImageUrl: '',
+      dialogCheckVisible: false,   // 活动审批对话框展示
+      dialogTitle: '',
+      dialogType: '',
+      dialogReasonVisible: false, // reason对话框
+      reason: '',
       activityInfo: {
         agentName: getAgentName(), // 代理商名称
         type: '', // 活动类型
@@ -399,7 +533,7 @@ export default {
         actDesc: '', // 活动描述
         bgImgUrl: '', // 背景图片URl
         iconUrl: '', // 活动封面Url
-        price: '' //活动价格
+        price: '' // 活动价格
       },
       activityId: null,
       taskInfo: {
@@ -415,7 +549,7 @@ export default {
           C: null,
           D: null
         },
-        answer: null,
+        answer: [],
         score: null,
         answer_limit: 1
       },
@@ -423,7 +557,13 @@ export default {
       dialogVisible: false,
       coachList: [], // 教练列表
       domain: 'http://upload.qiniup.com/',
-      qiniuAddress: qiniuAddress
+      qiniuAddress: qiniuAddress,
+      checkInfo: {
+        name: null,
+        activity_status: null,
+        set_start_time: null,
+        set_stop_time: null,
+      }
     }
   },
   created() {
@@ -460,18 +600,36 @@ export default {
       const type = 'task'
       this._uploadQiNiu(req, type)
     },
+    // 打开审批不通过通过弹窗
+    handelAuditact() {
+      this.dialogReasonVisible = true
+    },
+    // 打开审批活动弹窗
     async handleCheckActivity(row) {
+      this.activityId = row.id
       const res = await fetchActivityInfo({ act_id: row.id })
-      console.log(res)
+      await this._fetchTaskList(row.id)
+      const { data } = res
+      const { name, activity_status, set_start_time, set_stop_time } = data
+      this.checkInfo = { name, activity_status, set_start_time, set_stop_time }
+      this.dialogCheckVisible = true
+      this.dialogTitle = '活动审批'
+      this.dialogType = 'check'
     },
     // 添加活动
     handleCreateActivitySubmit() {
       this._addActivity()
     },
+    // 关闭不通关原因对话框
+    handleCloseReasonDialog() {
+      this.dialogReasonVisible = false
+      this.reason = ''
+    },
     // 关闭添加活动对话框
     handleCloseDialog() {
       this.dialogFormDisable = false
       this.activityId = null
+      this._resetActivityInfo()
     },
     // 打开添加任务对话框
     handleOpenTaskDialog() {
@@ -479,8 +637,13 @@ export default {
     },
     // 关闭添加任务对话框
     handleCloseTaskDialog() {
-      console.log('关闭添加任务对话框')
+      this._resetTaskInfo()
       this.dialogTaskVisible = false
+    },
+    // 关闭活动审批对话框
+    handleCloseCheckDialog() {
+      this.dialogCheckVisible = false
+      this.activityId = ''
     },
     // 删除活动
     handleDeleteActivity(id) {
@@ -488,6 +651,25 @@ export default {
         .then(async _ => {
           await deleteActivity(id)
           await this._fetchActivityList()
+          this.$message({
+            message: '删除成功',
+            type: 'success'
+          })
+        })
+        .catch(_ => {})
+    },
+    // 审批活动不通过
+    handleCancelActivity() {
+      this.$confirm('确认不通过该活动？')
+        .then(async _ => {
+          await auditact({ activity_id: this.activityId, reason: this.reason })
+          this.handleCloseReasonDialog()
+          this.handleCloseCheckDialog()
+          await this._fetchActivityList()
+          this.$message({
+            message: '审批成功',
+            type: 'success'
+          })
         })
         .catch(_ => {})
     },
@@ -587,10 +769,20 @@ export default {
     },
     // 添加任务
     async handelCreateTaskSubmit() {
+      const { name, score, seq } = this.taskInfo
+      if (!name || !score || !seq) {
+        this.$message({
+          message: '必填项不能为空',
+          type: 'error'
+        })
+        return
+      }
       const data = Object.assign({}, this.taskInfo, { activity_id: this.activityId })
+      data.answer = JSON.stringify(data.answer)
+      data.options = JSON.stringify(data.options)
       try {
-        const res = await addTask(data)
-      } catch (e) { 
+        const res = await addTask(JSON.stringify(data))
+      } catch (e) {
       }
       this.dialogTaskVisible = false
       this._fetchTaskList(this.activityId)
@@ -614,6 +806,47 @@ export default {
       if (!data) data = []
       this.taskList = data
     },
+    // 重置创建活动
+    _resetActivityInfo() {
+      this.activityInfo = {
+        agentName: getAgentName(), // 代理商名称
+        type: '', // 活动类型
+        coachId: '', // 教练id
+        name: '', // 活动名称
+        keepTime: '', // 活动时长
+        score: '', // 起始分值
+        scoreType: '', // 分值形式,
+        scoreShowType: '', // 是否可见分数
+        time: '', // 活动时间
+        actDesc: '', // 活动描述
+        bgImgUrl: '', // 背景图片URl
+        iconUrl: '', // 活动封面Url
+        price: '' // 活动价格
+      }
+      this.iconFilelist = []
+      this.bgFileList = []
+    },
+    // 重置添加任务
+    _resetTaskInfo() {
+      this.taskInfo = {
+        name: null,
+        type: '1',
+        desc: null,
+        answer_type: '1',
+        seq: null,
+        question_img: null,
+        options: {
+          A: null,
+          B: null,
+          C: null,
+          D: null
+        },
+        answer: [],
+        score: null,
+        answer_limit: 1
+      }
+      this.taskQFileList = []
+    },
     init() {
       this._fetchCoachList()
       this._fetchActivityList()
@@ -624,6 +857,13 @@ export default {
 <style lang="scss">
 .activityDialog .el-dialog__body {
   padding-top: 0;
+}
+.clearfix::after {
+  display: block;
+  content: '';
+  overflow: hidden;
+  height: 0;
+  clear: both;
 }
 </style>
 

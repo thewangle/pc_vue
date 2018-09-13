@@ -92,7 +92,7 @@ export default {
       listQuery: {
         agent_name: null,
         name: null,
-        phone: null,
+        phone: null
       },
       dialogFormVisible: false,
       dialogTitle: '',
@@ -108,7 +108,7 @@ export default {
   created() {
     this.init()
   },
-  methods: {    
+  methods: {
     handleFilter() {
       this._fetchCoachList()
     },
@@ -144,7 +144,7 @@ export default {
     async handleCreateCoach() {
       try {
         if (this.dialogType === 'create') {
-          const res = await addCoach(this.agentInfo) 
+          const res = await addCoach(this.agentInfo)
         }
         if (this.dialogType === 'update') {
           const res = await updateCoach({ id: this.coachId, contacts: this.agentInfo.contacts, phone: this.agentInfo.phone })

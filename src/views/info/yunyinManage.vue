@@ -16,7 +16,7 @@
       style="width: 100%;">
       <el-table-column label="序号" align="center" width="65">
         <template slot-scope="scope">
-          <span>{{ scope.$index + 1}}</span>
+          <span>{{ scope.$index + 1 }}</span>
         </template>
       </el-table-column>
       <el-table-column label="编号" width="150px" align="center">
