@@ -1027,7 +1027,7 @@ export default {
         // 创建活动成功form禁用
         this.dialogFormDisable = true
         // 创建活动成功保存活动id
-        this.activityId = res
+        this.activityId = res.data
         await this._fetchTaskList(res.data)
         this.$message({ message: '创建成功', type: 'success' })
       } catch (e) {

@@ -26,7 +26,7 @@
       border
       fit
       highlight-current-row
-      style="width: 100%;min-height:1000px;">
+      style="width: 100%;">
       <el-table-column label="序号" align="center" width="65">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
@@ -55,13 +55,12 @@
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row, 'info')">查看</el-button>
-          <el-button size="mini" type="success" @click="handleUpdate(scope.row,'recharge')">充值记录</el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <div class="pagination-container">
-      <el-pagination :current-page="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
+      <el-pagination :current-page="listQuery.page_no" :page-sizes="[10,20,30, 50]" :page-size="listQuery.page_size" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div>
 
     <el-dialog :visible.sync="dialogInfoVisible" title="财务统计查看" custom-class="count-dialog">
@@ -96,7 +95,7 @@
 </template>
 
 <script>
-import { fetchList } from '@/api/article'
+import {  } from '@/api/article'
 import { fetchCountList } from './../../service/count'
 import waves from '@/directive/waves' // 水波纹指令
 
@@ -115,7 +114,7 @@ export default {
         page_size: 20,
         agent_name: undefined,
         agent_type: 0,
-        dateValue: '',
+        dateValue: [],
         start_time: '',
         end_time: ''
       },
@@ -127,43 +126,35 @@ export default {
         timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
         title: [{ required: true, message: 'title is required', trigger: 'blur' }]
       },
+      gridData: []
     }
   },
   created() {
-    this.getList()
+    const sTime = (new Date()).getTime() - 30 * 24 * 60 * 1000
+    const eTime = (new Date()).getTime()
+    console.log(sTime)
+    console.log(eTime)
+    this.listQuery.dateValue = [sTime, eTime]
   },
   methods: {
-    getList() {
-      this.listLoading = true
-      fetchList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
-
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
-      })
-    },
     handleFilter() {
-      this.listQuery.page = 1
-      this.getList()
+      this.listQuery.page_no = 1
+      this._fetchCountList()
     },
     handleSizeChange(val) {
-      this.listQuery.limit = val
-      this.getList()
+      this.listQuery.page_size = val
+      this._fetchCountList()
     },
     handleCurrentChange(val) {
-      this.listQuery.page = val
-      this.getList()
+      this.listQuery.page_no = val
+      this._fetchCountList()
     },
     handleUpdate(rowm, type) {
       if (type === 'info') {
         this.dialogInfoVisible = true
       }
-      if (type === 'recharge') {
-        this.dialogRechargeVisible = true
-      }
+    },
+    async _fetchCountList() {
     }
   }
 }
