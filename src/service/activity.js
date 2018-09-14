@@ -42,7 +42,7 @@ export function fetchCoachList() {
  */
 export function deleteActivity(id) {
   return request({
-    url: `/i/topteam/admin/delTask?id=${id}`,
+    url: `/i/topteam/admin/delactivity?act_id=${id}`,
     method: 'get'
   })
 }
@@ -89,6 +89,61 @@ export function fetchActivityInfo(data) {
 export function auditact(data) {
   return request({
     url: '/i/topteam/admin/auditact',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 创建订单
+ */
+export function creatOrder(data) {
+  return request({
+    url: '/i/topteam/api/createorder',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 获取支付配置
+ */
+export function getPayInfo(data) {
+  return request({
+    url: '/i/topteam/api/getpayinfo',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 修改活动
+ * @param {*} data
+ */
+export function updateActivity(data) {
+  return request({
+    url: '/i/topteam/admin/updateactivity',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 删除任务
+ */
+export function delTask(id) {
+  return request({
+    url: `/i/topteam/admin/delTask?id=${id}`,
+    method: 'get'
+  })
+}
+
+/**
+ * 修改任务
+ */
+export function editTask(data) {
+  return request({
+    url: '/i/topteam/admin/ModifyTask',
     method: 'post',
     data
   })

@@ -52,7 +52,7 @@
       </el-table-column>
       <el-table-column label="活动价" align="center" width="95">
         <template slot-scope="scope">
-          <span>{{ scope.row.price }}</span>
+          <span>{{ scope.row.price / 100 }}</span>
         </template>
       </el-table-column>
       <el-table-column label="所在地区" class-name="status-col" width="100">
@@ -75,7 +75,7 @@
           <el-input v-model="agentInfo.name" />
         </el-form-item>
         <el-form-item label="用户名">
-          <el-input v-model="agentInfo.username" />
+          <el-input v-model="agentInfo.username"/>
         </el-form-item>
         <el-form-item label="代理级别">
           <el-select v-model="agentInfo.level" clearable>
@@ -103,7 +103,8 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button>取消</el-button>
-        <el-button type="primary" @click="handleCreateAgent">保存</el-button>
+        <el-button type="primary" @click="handleCreateAgent" v-if="dialogType === 'add'">保存</el-button>
+        <el-button type="primary" @click="handleEditAgent" v-if="dialogType === 'edit'">修改</el-button>
       </div>
     </el-dialog>
 
@@ -142,8 +143,10 @@ export default {
       allDaili: [{ label: '一级代理', key: 2 }, { label: '二级代理', key: 3 }, { label: '三级代理', key: 4 }], // 代理商等级
       dialogFormVisible: false,
       dialogTitle: '',
+      dialogType: '',
       cityList: [], // 城市列表
       dialogCityList: [],
+      id: '',
       agentInfo: {
         name: null,
         username: null,
@@ -169,6 +172,20 @@ export default {
     },
     handleClose() {
       // TODO: resetForm
+      this._resetForm()
+    },
+    _resetForm() {
+      this.agentInfo = {
+        name: null,
+        username: null,
+        level: null,
+        contacts: null,
+        phone: null,
+        price: null,
+        selectArea: []
+      }
+      this.dialogType = ''
+      this.id = ''
     },
     // 创建代理商
     async handleCreateAgent() {
@@ -176,9 +193,38 @@ export default {
         const res = await createAgent(this.agentInfo)
         this.dialogFormVisible = false
         await this._fetchAgentList()
+        this.$message({
+          message: '创建成功',
+          type: 'success'
+        })
       } catch (e) {
         this.dialogFormVisible = false
         await this._fetchAgentList()
+        this.$message({
+          message: '创建失败',
+          type: 'error'
+        })
+      }
+    },
+    // 修改代理商
+    async handleEditAgent() {
+      this.handleCityListChange(this.agentInfo.selectArea)
+      const param = Object.assign({}, this.agentInfo, { id: this.id })
+      try {
+        const res = await editAgent(param)
+        this.dialogFormVisible = false
+        await this._fetchAgentList()
+        this.$message({
+          message: '修改成功',
+          type: 'success'
+        })
+      } catch (e) {
+        this.dialogFormVisible = false
+        await this._fetchAgentList()
+        this.$message({
+          message: '创建失败',
+          type: 'error'
+        })
       }
     },
     handleCityListChange(value) {
@@ -195,14 +241,26 @@ export default {
     },
     async handleCreate() {
       this.dialogTitle = '新增代理商'
+      this.dialogType = 'add'
       // await this._fetchSubordinateAgent()
       this.dialogFormVisible = true
       this.dialogCityList = this._changeCityList()
     },
     async handleUpdateAgent(row) {
       this.dialogTitle = '修改代理商'
+      this.dialogType = 'edit'
+      this.id = row.id
       // await this._fetchSubordinateAgent(row.level)
       this.dialogFormVisible = true
+      this.agentInfo = {
+        name: row.name,
+        username: row.username,
+        level: row.level,
+        contacts: row.contacts,
+        phone: row.phone,
+        price: row.price / 100,
+        selectArea: [row.province_id, row.city_id, row.county_id]
+      },
       this.dialogCityList = this._changeCityList(row.province_id)
     },
     // 删除代理商

@@ -26,24 +26,24 @@
           <span>{{ scope.row.username }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="手机号" min-width="150px">
+      <el-table-column label="手机号" width="150px">
         <template slot-scope="scope">
           <span>{{ scope.row.phone }}</span>
         </template>
       </el-table-column>
       <el-table-column label="角色" width="110px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.role_id }}</span>
+          <span>{{ scope.row.role_id | roleFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="运营商名称" width="120px">
+      <el-table-column label="运营商名称" min-width="120px">
         <template slot-scope="scope">
-          <span>{{ scope.row.xxx }}</span>
+          <span>{{ scope.row.agent_name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建日期" align="center" width="145">
+      <el-table-column label="创建日期" align="center" width="170">
         <template slot-scope="scope">
-          <span>{{ scope.row.update_time }}</span>
+          <span>{{ scope.row.update_time | timeFilter}}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
@@ -84,6 +84,21 @@ export default {
     waves
   },
   filters: {
+    roleFilter(id) {
+      if (id === '6') {
+        return '教练'
+      }
+    },
+    timeFilter(timestamp) {
+      var date = new Date(timestamp * 1000)// 如果date为10位不需要乘1000
+      var Y = date.getFullYear() + '-'
+      var M = (+date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
+      var D = (+date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' '
+      var h = (+date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
+      var m = (+date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
+      var s = (+date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
+      return Y + M + D + h + m + s
+    }
   },
   data() {
     return {
@@ -133,18 +148,31 @@ export default {
       this.coachId = row.id
     },
     handleDelCoach(row) {
-      this.$confirm('确认删除该运营商？')
+      this.$confirm('确认删除该教练？')
         .then(async _ => {
           await delCoach({ id: row.id })
           await this._fetchCoachList()
+          this.$message({
+            message: '删除成功',
+            type: 'success'
+          })
         })
-        .catch(_ => {})
+        .catch(_ => {
+          this.$message({
+            message: '删除失败',
+            type: 'error'
+          })
+        })
     },
     // 创建教练
     async handleCreateCoach() {
       try {
         if (this.dialogType === 'create') {
           const res = await addCoach(this.agentInfo)
+          this.$message({
+            message: '添加成功',
+            type: 'success'
+          })
         }
         if (this.dialogType === 'update') {
           const res = await updateCoach({ id: this.coachId, contacts: this.agentInfo.contacts, phone: this.agentInfo.phone })

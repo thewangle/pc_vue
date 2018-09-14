@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.name" placeholder="请输入代理商/运营商名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.agent_name" placeholder="请输入代理商/运营商名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
 
       <el-date-picker
         v-model="listQuery.dateValue"
@@ -9,7 +9,7 @@
         range-separator="至"
         start-placeholder="开始日期"
         end-placeholder="结束日期"
-        value-format="yyyy-MM-dd"
+        value-format="timestamp"
         @change="handleFilter"
       />
 
@@ -97,6 +97,7 @@
 
 <script>
 import { fetchList } from '@/api/article'
+import { fetchCountList } from './../../service/count'
 import waves from '@/directive/waves' // 水波纹指令
 
 export default {
@@ -108,13 +109,15 @@ export default {
     return {
       list: null,
       total: null,
-      listLoading: true,
+      listLoading: false,
       listQuery: {
-        page: 1,
-        limit: 20,
-        status: undefined,
-        name: undefined,
-        dateValue: ''
+        page_no: 1,
+        page_size: 20,
+        agent_name: undefined,
+        agent_type: 0,
+        dateValue: '',
+        start_time: '',
+        end_time: ''
       },
       status: [{ label: '代理商', key: 1 }, { label: '运营商', key: 2 }],
       dialogInfoVisible: false,
@@ -124,228 +127,6 @@ export default {
         timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
         title: [{ required: true, message: 'title is required', trigger: 'blur' }]
       },
-      gridData: [{
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }]
-
     }
   },
   created() {

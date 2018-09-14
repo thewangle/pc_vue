@@ -56,7 +56,7 @@
       </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini">修改</el-button>
+          <el-button type="primary" size="mini" @click="handleEditOperator(scope.row)">修改</el-button>
           <el-button size="mini" type="success">转移</el-button>
           <el-button size="mini" type="danger" @click="handleDeleteOperator(scope.row.id)">删除</el-button>
         </template>
@@ -98,14 +98,15 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button>取消</el-button>
-        <el-button type="primary" @click="handleCreateAgent">保存</el-button>
+        <el-button type="primary" @click="handleCreateAgent" v-if="dialotType === 'add'">保存</el-button>
+        <el-button type="primary" @click="handleEditAgent" v-if="dialotType === 'edit'">保存</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getOperatorList, getSubordinateAgent, addOperator, delOperator } from './../../service/info'
+import { getOperatorList, getSubordinateAgent, addOperator, delOperator, editOperator } from './../../service/info'
 import { fetchCityList } from './../../service/common'
 import { getProvinceId, getLevel, getAgentId } from '@/utils/auth'
 import waves from '@/directive/waves' // 水波纹指令
@@ -141,6 +142,8 @@ export default {
       dialogFormVisible: false,
       cityList: [],
       dialogTitle: '',
+      dialotType: '',
+      id: '',
       dialogFormVisible: false,
       dialogCityList: [],
       daliList: [],
@@ -169,7 +172,23 @@ export default {
     },
     handleCreate() {
       this.dialogTitle = '创建运营商'
+      this.dialotType = 'add'
       this.dialogFormVisible = true
+    },
+    handleEditOperator(row) {
+      this.dialogTitle = '修改运营商'
+      this.dialotType = 'edit'
+      this.dialogFormVisible = true
+      this.id = row.id
+      this.agentInfo = {
+        name: row.name,
+        username: row.username,
+        agent_id: getAgentId(),
+        contacts: row.contacts,
+        phone: row.phone,
+        price: row.price,
+        selectArea: [row.province_id, row.city_id, row.county_id]
+      }
     },
     handleClose() {
       this._restForm()
@@ -177,7 +196,7 @@ export default {
     handleDeleteOperator(id) {
       this.$confirm('确认删除该运营商？')
         .then(async _ => {
-          await deleteAgent({ agent_id: id })
+          await delOperator({ agent_id: id })
           await this._fetchOperatorList()
         })
         .catch(_ => {})
@@ -188,9 +207,39 @@ export default {
         const res = await addOperator(this.agentInfo)
         this.dialogFormVisible = false
         await this._fetchOperatorList()
+        this.$message({
+          message: '创建成功',
+          type: 'success'
+        })
       } catch (e) {
         this.dialogFormVisible = false
         await this._fetchOperatorList()
+        this.$message({
+          message: '创建失败',
+          type: 'error'
+        })
+      }
+      this._restForm()
+    },
+    // 修改运营商
+    async handleEditAgent() {
+      this.handleCityListChange(this.agentInfo.selectArea)
+      const param = Object.assign({}, this.agentInfo, { id: this.id })
+      try {
+        const res = await editOperator(param)
+        this.dialogFormVisible = false
+        await this._fetchOperatorList()
+        this.$message({
+          message: '修改成功',
+          type: 'success'
+        })
+      } catch (e) {
+        this.dialogFormVisible = false
+        await this._fetchOperatorList()
+        this.$message({
+          message: '修改失败',
+          type: 'error'
+        })
       }
       this._restForm()
     },
@@ -215,6 +264,8 @@ export default {
         price: null,
         selectArea: []
       }
+      this.id = '',
+      this.dialotType = ''
     },
     _getAllAdderss() {
       const addressArr = []
@@ -275,8 +326,8 @@ export default {
     async _dealLevel() {
       const res = await getSubordinateAgent({ level: getLevel() })
       const { data } = res
-      const list = [{ id: getAgentId(), level: getLevel(), name: statusMap[getLevel()] }]
-      this.daliList = list.concat(data)
+      // const list = [{ id: getAgentId(), level: getLevel(), name: statusMap[getLevel()] }]
+      this.daliList = data
     },
     init() {
       this._fetchOperatorList()

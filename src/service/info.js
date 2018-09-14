@@ -143,6 +143,18 @@ export function addOperator(data) {
 }
 
 /**
+ * 修改运营商
+ * @param {Obj} data
+ */
+export function editOperator(data) {
+  return request({
+    url: '/i/topteam/admin/ModifyOperator',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * 删除运营商
  */
 export function delOperator(data) {

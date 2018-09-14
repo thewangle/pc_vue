@@ -62,8 +62,8 @@
       </el-table-column>
       <el-table-column label="操作" align="center" min-width="130" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button v-if="scope.row.activity_status === '2' || scope.row.activity_status === '6'" type="primary" size="mini">修改</el-button>
-          <el-button v-if="scope.row.activity_status !== '1'" size="mini" type="success">查看</el-button>
+          <el-button v-if="scope.row.activity_status === '2' || scope.row.activity_status === '6'" type="primary" size="mini" @click="handleEditActivity(scope.row)">修改</el-button>
+          <el-button v-if="scope.row.activity_status !== '1'" size="mini" type="success" @click="handleShowActivityInfo(scope.row)">查看</el-button>
           <el-button v-if="scope.row.activity_status === '1'" size="mini" @click="handleCheckActivity(scope.row)">去审批</el-button>
           <el-button
             v-if="scope.row.activity_status === 5 || scope.row.activity_status === '6'"
@@ -87,24 +87,24 @@
           <el-input v-model="activityInfo.agentName" disabled />
         </el-form-item>
         <el-form-item label="活动类型">
-          <el-select v-model="activityInfo.type">
+          <el-select v-model="activityInfo.type" @change="activityInfo.coachId = null">
             <el-option label="团队-基础版" value="1" />
             <el-option label="个人-基础版" value="2" />
           </el-select>
         </el-form-item>
         <el-form-item label="选择教练">
-          <el-select v-model="activityInfo.coachId">
+          <el-select v-model="activityInfo.coachId" :disabled="!activityInfo.type || activityInfo.type === '2'">
             <el-option v-for="item in coachList" :label="item.name" :value="item.id" :key="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="活动名称">
           <el-input v-model="activityInfo.name" />
         </el-form-item>
-        <el-form-item label="活动时长（分钟）">
-          <el-input v-model="activityInfo.keepTime" type="number" min="0" />
-        </el-form-item>
         <el-form-item label="起始分值">
-          <el-input v-model="activityInfo.score" type="number" min="0" />
+          <el-input v-model="activityInfo.score" type="number" min="0" :disabled="!activityInfo.type || activityInfo.type === '2'" />
+        </el-form-item>
+        <el-form-item label="活动价格">
+          <el-input v-model="activityInfo.price" type="number"/>
         </el-form-item>
         <el-form-item label="分值形式">
           <el-select v-model="activityInfo.scoreType">
@@ -115,10 +115,15 @@
           </el-select>
         </el-form-item>
         <el-form-item label="可见分数">
-          <el-select v-model="activityInfo.scoreShowType">
+          <el-select v-model="activityInfo.scoreShowType" :disabled="!activityInfo.type || activityInfo.type === '2'">
             <el-option label="是" value="1" />
             <el-option label="否" value="2" />
           </el-select>
+        </el-form-item>
+        <el-form-item label="活动时长">
+          <el-input v-model="activityInfo.keepTime" type="number" min="0">
+            <el-checkbox slot="suffix" v-model="activityInfo.check" v-if="activityInfo.type === '2'">长期</el-checkbox>
+          </el-input>
         </el-form-item>
         <el-form-item label="起止时间">
           <el-date-picker
@@ -127,44 +132,53 @@
             range-separator="至"
             start-placeholder="开始时间"
             end-placeholder="结束时间"
-            value-format="timestamp"/>
-        </el-form-item>
-        <el-form-item label="活动价格">
-          <el-input v-model="activityInfo.price" type="number"/>
+            value-format="timestamp"
+            v-if="activityInfo.type !== '2'"/>
+          <el-time-picker
+            is-range
+            v-model="activityInfo.time"
+            range-separator="至"
+            start-placeholder="开始时间"
+            end-placeholder="结束时间"
+            value-format="timestamp"
+            v-if="activityInfo.type === '2'">
+          </el-time-picker>
         </el-form-item>
         <el-form-item label="活动描述">
-          <el-input v-model="activityInfo.actDesc" type="textarea"/>
+          <el-input v-model="activityInfo.actDesc" class="act-textarea" type="textarea" maxlength="300" :autosize="{ minRows: 1 }"/>
         </el-form-item>
-        <el-form-item label="活动封面">
-          <el-upload
-            :http-request="handleUpLoadIconImg"
-            :on-preview="handleIconCardPreview"
-            :limit="1"
-            :action="domain"
-            :file-list="iconFilelist"
-            list-type="picture-card"
-          >
-            <el-button>上传图片</el-button>
-          </el-upload>
-          <el-dialog :visible.sync="dialogVisible">
-            <img :src="dialogImageUrl" width="100%" alt="">
-          </el-dialog>
-        </el-form-item>
-        <el-form-item label="活动背景">
-          <el-upload
-            :http-request="handleUpLoadBgImg"
-            :on-preview="handleBgCardPreview"
-            :limit="1"
-            :action="domain"
-            :file-list="bgFileList"
-            list-type="picture-card"
-          >
-            <el-button>上传图片</el-button>
-          </el-upload>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleCreateActivitySubmit">创建活动</el-button>
-        </el-form-item>
+        <div>
+          <el-form-item label="活动封面">
+            <el-upload
+              :http-request="handleUpLoadIconImg"
+              :on-preview="handleIconCardPreview"
+              :limit="1"
+              :action="domain"
+              :file-list="iconFilelist"
+              list-type="picture-card"
+            >
+              <el-button>上传图片</el-button>
+            </el-upload>
+            <el-dialog :visible.sync="dialogVisible">
+              <img :src="dialogImageUrl" width="100%" alt="">
+            </el-dialog>
+          </el-form-item>
+          <el-form-item label="活动背景">
+            <el-upload
+              :http-request="handleUpLoadBgImg"
+              :on-preview="handleBgCardPreview"
+              :limit="1"
+              :action="domain"
+              :file-list="bgFileList"
+              list-type="picture-card"
+            >
+              <el-button>上传图片</el-button>
+            </el-upload>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="handleCreateActivitySubmit">创建活动</el-button>
+          </el-form-item>
+        </div>
       </el-form>
       <hr >
       <div class="job-list">
@@ -217,7 +231,7 @@
             </el-table-column>
             <el-table-column label="操作" align="center" min-width="130" class-name="small-padding fixed-width">
               <template slot-scope="scope">
-                <el-button type="primary">修改</el-button>
+                <el-button type="primary" @click="handleUpdateTask(scope.row)">修改</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -229,7 +243,7 @@
     <!-- 新增题目对话框 start -->
     <el-dialog
       :visible.sync="dialogTaskVisible"
-      title="新增任务"
+      :title="dialogTaskTitle"
       class="activityDialog"
       @close="handleCloseTaskDialog">
       <el-form :model="taskInfo" class="demo-form-inline">
@@ -237,7 +251,7 @@
           <el-input v-model="taskInfo.name" />
         </el-form-item>
         <el-form-item label="题目类型" label-width="100px">
-          <el-select v-model="taskInfo.type">
+          <el-select v-model="taskInfo.type" :disabled="dialogTaskType === 'edit'">
             <el-option label="选择题" value="1" />
             <el-option label="文字题" value="2" />
             <el-option label="图片题" value="3" />
@@ -307,8 +321,11 @@
           </el-form-item>
         </template>
         <el-form-item>
-          <el-button @click="handleCloseTaskDialog">取消</el-button>
-          <el-button type="primary" @click="handelCreateTaskSubmit">添加题目</el-button>
+          <div style="text-align: center">
+            <el-button @click="handleCloseTaskDialog">取消</el-button>
+            <el-button type="primary" @click="handelCreateTaskSubmit" v-if="dialogTaskType === 'add'">添加题目</el-button>
+            <el-button type="primary" @click="handelUpdateTaskSubmit" v-if="dialogTaskType === 'edit'">修改题目</el-button>
+          </div>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -319,12 +336,12 @@
       class="activityDialog"
       fullscreen
       @close="handleCloseCheckDialog">
-      <hr />
+      <hr >
       <div slot="title">
         <h3>
           {{ dialogTitle }}
-          <el-button @click="handelAuditact" v-if="dialogType === 'check'">不通过</el-button>
-          <el-button type="primary" v-if="dialogType === 'check'">通过</el-button>
+          <el-button v-if="dialogType === 'check'" @click="handelAuditact">不通过</el-button>
+          <el-button v-if="dialogType === 'check'" type="primary" @click="handleCheckPass">通过</el-button>
         </h3>
       </div>
       <div class="info clearfix">
@@ -332,31 +349,45 @@
           <h4>活动信息</h4>
           <el-form v-model="checkInfo">
             <el-form-item label="活动名称" label-width="100px">
-              <span v-if="dialogType === 'check'">{{ checkInfo.name }}</span>  
-              <!-- <el-input v-model="checkInfo.name" :disabled="dialogType === 'check'"/> -->
+              <span v-if="dialogType !== 'edit'">{{ checkInfo.name }}</span>
+              <el-input v-if="dialogType === 'edit'" v-model="checkInfo.name" />
             </el-form-item>
             <el-form-item label="活动类型" label-width="100px">
-              <span v-if="dialogType === 'check'">{{ checkInfo.activity_status | activityFilter }}</span>  
-              <!-- <el-input v-model="checkInfo.type" :disabled="dialogType === 'check'"/> -->
+              <span v-if="dialogType !== 'edit'">{{ checkInfo.activity_status | activityFilter }}</span>
+              <el-select v-if="dialogType === 'edit'" v-model="checkInfo.activity_status">
+                <el-option label="团队-基础版" value="1" />
+                <el-option label="个人-基础版" value="2" />
+              </el-select>
             </el-form-item>
             <el-form-item label="开始时间" label-width="100px">
-              <span v-if="dialogType === 'check'">{{ checkInfo.set_start_time | timeFilter }}</span>
-              <!-- <el-input v-model="checkInfo.set_start_time" :disabled="dialogType === 'check'"/> -->
+              <span v-if="dialogType !== 'edit'">{{ checkInfo.set_start_time | timeFilter }}</span>
+              <el-date-picker
+                v-if="dialogType === 'edit'"
+                v-model="set_start_time"
+                type="datetime"
+                value-format="timestamp" />
             </el-form-item>
             <el-form-item label="开始时间" label-width="100px">
-              <span v-if="dialogType === 'check'">{{ checkInfo.set_stop_time | timeFilter }}</span>
-              <!-- <el-input v-model="checkInfo.set_stop_time" :disabled="dialogType === 'check'"/> -->
+              <span v-if="dialogType !== 'edit'">{{ checkInfo.set_stop_time | timeFilter }}</span>
+              <el-date-picker
+                v-if="dialogType === 'edit'"
+                v-model="set_stop_time"
+                type="datetime"
+                value-format="timestamp" />
+              <el-button type="primary" v-if="dialogType === 'edit'" @click="handleUpdateActivity">修改活动</el-button>
             </el-form-item>
           </el-form>
         </div>
         <div class="info-tab-right" style="width: 50%; float: right;">
           <h4>活动二维码</h4>
-          <div class="er-img" style="width: 140px; height: 140px; margin: 0 auto; border: 1px solid #ccc; margin-top: 40px">
-            <span style="color: red; font-size: 18px;">活动审批完成后创建二维码</span>
+          <div class="er-img" style="width: 160px; height: 160px; margin: 0 auto; border: 1px solid #ccc; margin-top: 20px;">
+            <span style="color: red; font-size: 18px;" v-if="!checkInfo.qcode_url">活动审批完成后创建二维码</span>
+            <img :src="checkInfo.qcode_url" alt="" style="height: 158px; width: 158px;">
+            <p style="text-align: center; color: red;font-weight: 500;">{{checkInfo.name}}</p>
           </div>
         </div>
       </div>
-      <hr />
+      <hr >
       <div class="job-list">
         <div class="job-title">
           <h3 style="display: inline-block">任务列表</h3>
@@ -403,9 +434,10 @@
                 <span>{{ scope.row.answer_type | answerTypeFilter }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="操作" align="center" min-width="130" class-name="small-padding fixed-width" v-if="dialogType !== 'check'">
+            <el-table-column v-if="dialogType == 'edit' " label="操作" align="center" min-width="130" class-name="small-padding fixed-width">
               <template slot-scope="scope">
-                <el-button type="primary">修改</el-button>
+                <el-button type="primary" @click="handleUpdateTask(scope.row)">修改</el-button>
+                <el-button type="danger" @click="handleClickTask(scope.row.id)">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -413,14 +445,15 @@
       </div>
     </el-dialog>
 
-    <el-dialog 
+    <!-- 审批不通过弹窗 -->
+    <el-dialog
       :visible.sync="dialogReasonVisible"
       class="activityDialog"
       title="不通过原因"
       @close="handleCloseReasonDialog">
       <el-form>
         <el-form-item>
-          <el-input v-model="reason" type="textarea" /> 
+          <el-input v-model="reason" type="textarea" />
         </el-form-item>
         <el-form-item>
           <el-button @click="handleCloseReasonDialog">取消</el-button>
@@ -428,11 +461,60 @@
         </el-form-item>
       </el-form>
     </el-dialog>
+    <!-- 审批不通过弹窗 -->
+
+    <!-- 审批通过弹窗 -->
+    <el-dialog
+      :visible.sync="dialogPayVisible"
+      class="activityDialog"
+      title="活动付费(点击确定扫描右侧二维码)"
+      @close="handleClosePayDialog">
+      <hr />
+      <div class="clearfix">
+        <div style="float: left">
+          <el-form v-model="checkInfo">
+            <el-form-item label="支付方式" label-width="100px">
+              <span>微信支付</span>
+            </el-form-item>
+            <el-form-item label="活动名称" label-width="100px">
+              <span>{{ checkInfo.name }}</span>
+            </el-form-item>
+            <el-form-item label="活动类型" label-width="100px">
+              <span>{{ checkInfo.activity_status | activityFilter }}</span>
+            </el-form-item>
+            <el-form-item label="活动金额" label-width="100px">
+              <span style="color: red">{{ checkInfo.money / 100 }}元</span>
+            </el-form-item>
+          </el-form>
+          <div style="text-align: center">
+            <el-button type="primary" @click="handleGetPayEr">确定</el-button>
+            <el-button type="primary" @click="handleGobackActivityList">支付完成返回列表</el-button>
+          </div>
+        </div>
+        <div style="float:right; width: 50%;">
+          <div class="er" style="height: 180px; width: 180px; margin: 0 auto; margin-top: 40px">
+            <img :src="pay_er_img" alt="">
+          </div>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchCoachList, addActivity, fetchActivityList, deleteActivity, fetchTaskList, addTask, fetchActivityInfo, auditact } from './../../service/activity'
+import { fetchCoachList,
+  addActivity,
+  fetchActivityList,
+  deleteActivity,
+  fetchTaskList,
+  addTask,
+  fetchActivityInfo,
+  auditact,
+  creatOrder,
+  getPayInfo,
+  updateActivity,
+  delTask,
+  editTask } from './../../service/activity'
 import { fetchQiNiuToken } from './../../service/common'
 import { getAgentName, getAgentId } from '@/utils/auth'
 import { qiniuAddress } from './../../config'
@@ -484,14 +566,14 @@ export default {
       return typeMap[type]
     },
     timeFilter(timestamp) {
-      var date = new Date(timestamp*1000);//如果date为10位不需要乘1000
+      var date = new Date(timestamp * 1000)// 如果date为10位不需要乘1000
       var Y = date.getFullYear() + '-'
-      var M = (+date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-'
+      var M = (+date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
       var D = (+date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' '
       var h = (+date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
-      var m = (+date.getMinutes() <10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
-      var s = (+date.getSeconds() <10 ? '0' + date.getSeconds() : date.getSeconds())
-      return Y+M+D+h+m+s
+      var m = (+date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
+      var s = (+date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
+      return Y + M + D + h + m + s
     }
   },
   data() {
@@ -507,19 +589,22 @@ export default {
         name: null,
         status: null
       },
-      activities: [{ label: '团队-基础版', key: 1 }, { label: '团队-精英版', key: 2 }, { label: '个人-基础版', key: 3 }, { label: '个人-基础版', key: 4 }],
+      activities: [{ label: '团队-基础版', key: 1 }, { label: '个人-基础版', key: 2 }],
       status: [{ label: '待审批', key: '1' }, { label: '准备中', key: '2' }, { label: '进行中', key: '3' }, { label: '暂停中', key: '4' }, { label: '已完成', key: '5' }, { label: '未通过', key: '6' }],
       dialogFormVisible: false, // 添加活动对话框展示
       dialogFormDisable: false, // 添加活动对话框表单禁用
       taskList: [],
       dialogTaskVisible: false, // 添加任务对话框展示
+      dialogTaskTitle: '',
+      dialogTaskType: '',
       dialogTaskImgVisible: false, // 添加任务对话框中图片对话框展示
       dialogTaskImageUrl: '',
-      dialogCheckVisible: false,   // 活动审批对话框展示
+      dialogCheckVisible: false, // 活动审批对话框展示
       dialogTitle: '',
       dialogType: '',
       dialogReasonVisible: false, // reason对话框
       reason: '',
+      dialogPayVisible: false, //支付弹窗
       activityInfo: {
         agentName: getAgentName(), // 代理商名称
         type: '', // 活动类型
@@ -533,7 +618,8 @@ export default {
         actDesc: '', // 活动描述
         bgImgUrl: '', // 背景图片URl
         iconUrl: '', // 活动封面Url
-        price: '' // 活动价格
+        price: '', // 活动价格
+        check: '', // 是够长期
       },
       activityId: null,
       taskInfo: {
@@ -563,7 +649,11 @@ export default {
         activity_status: null,
         set_start_time: null,
         set_stop_time: null,
-      }
+        money: null
+      },
+      pay_er_img: null,
+      set_start_time: '',
+      set_stop_time: ''
     }
   },
   created() {
@@ -600,9 +690,152 @@ export default {
       const type = 'task'
       this._uploadQiNiu(req, type)
     },
-    // 打开审批不通过通过弹窗
+    async handelUpdateTaskSubmit() {
+      const { name, score, seq, answer_limit } = this.taskInfo
+      if (!name || !score || !seq || !answer_limit) {
+        this.$message({ message: '必填项不能为空', type: 'error'})
+        return
+      }
+      const data = Object.assign({}, this.taskInfo)
+      if (Array.isArray(data.answer)){
+        data.answer = JSON.stringify(data.answer.sort())
+      }
+      data.options = JSON.stringify(data.options)
+      try {
+        const res = await editTask(JSON.stringify(data))
+        this.$message({ message: '修改成功', type: 'success' })
+      } catch (e) {
+      }
+      this.dialogTaskVisible = false
+      this._fetchTaskList(this.activityId)
+    },
+    // 修改任务
+    handleUpdateTask(row) {
+      console.log(row)
+      this.dialogTaskType = 'edit'
+      this.dialogTaskTitle = '修改任务'
+      this.dialogTaskVisible = true
+      // 填充弹窗
+      this.taskInfo.id = row.id
+      this.taskInfo.name = row.name
+      this.taskInfo.type = row.type
+      this.taskInfo.desc = row.task_desc
+      this.taskInfo.score = row.score
+      this.taskInfo.seq = row.seq
+      this.taskInfo.answer_limit = row.answer_limit
+      if (row.question_img) {
+        this.taskInfo.question_img = row.question_img
+        this.taskQFileList = [{ name: row.name, url: row.question_img }]
+      }
+      //选择题
+      if (row.type === '1') {
+        this.taskInfo.answer = JSON.parse(row.answer)
+        // this.taskInfo.options = JSON.parse(row.options)
+        this.taskInfo.options = {
+          A: 1,
+          B: 2,
+          C: 3,
+          D: 4
+        }
+      }
+    },
+    // 支付完成返回列表
+    handleGobackActivityList() {
+      this.handleClosePayDialog()
+      this.handleCloseCheckDialog()
+    },
+    // 获取支付二维码
+    async handleGetPayEr() {
+      let str
+      if (this.checkInfo.activity_status === '1') {
+        str ='team'
+      } else if (this.checkInfo.activity_status === '2') {
+        str = 'person'
+      }
+      const res = await creatOrder({ type_id: this.activityId, order_type: str })
+      const { data } = res
+      this.pay_er_img = `/i/topteam/api/getpayinfo?order_sn=${data.order_sn}&pay_type=1`
+    },
+    // 打开活动通过弹窗
+    handleCheckPass() {
+      this.dialogPayVisible = true
+    },
+    // 关闭活动付费弹窗
+    handleClosePayDialog() {
+      this.dialogPayVisible = false
+      this.pay_er_img = ''
+    },
+    // 打开审批不通过弹窗
     handelAuditact() {
       this.dialogReasonVisible = true
+    },
+    // 修改活动
+    async handleUpdateActivity() {
+      this.checkInfo.set_start_time = this.set_start_time / 1000
+      this.checkInfo.set_stop_time = this.set_stop_time / 1000
+      const { name, activity_status, set_start_time, set_stop_time } = this.checkInfo
+      if (!name || !activity_status || !set_start_time || !set_stop_time) {
+        this.$message({ message: '必填项不能为空', type: 'success' })
+        return
+      }
+      const param = {
+        act_id: this.activityId,
+        name,
+        type: activity_status,
+        set_start_time: set_start_time,
+        set_stop_time: set_stop_time
+      }
+      try {
+        await updateActivity(param)
+        this.$message({ message: '修改成功', type: 'success' })
+        const res = await fetchActivityInfo({ act_id: this.activityId })
+        await this._fetchTaskList(this.activityId)
+        const { data } = res
+        const { name, activity_status, set_start_time, set_stop_time, money, qcode_url } = data
+        this.checkInfo = { name, activity_status, money, qcode_url }
+        this.set_start_time = set_start_time * 1000
+        this.set_stop_time = set_stop_time * 1000
+        this.checkInfo.set_start_time = set_start_time * 1000
+        this.checkInfo.set_stop_time = set_stop_time * 1000
+      } catch (e) {
+        const res = await fetchActivityInfo({ act_id: this.activityId })
+        await this._fetchTaskList(this.activityId)
+        const { data } = res
+        const { name, activity_status, set_start_time, set_stop_time, money, qcode_url } = data
+        this.checkInfo = { name, activity_status, money, qcode_url }
+        this.set_start_time = set_start_time * 1000
+        this.set_stop_time = set_stop_time * 1000
+        this.checkInfo.set_start_time = set_start_time * 1000
+        this.checkInfo.set_stop_time = set_stop_time * 1000
+      }
+    },
+    // 打开修改弹窗
+    async handleEditActivity(row) {
+      this.activityId = row.id
+      const res = await fetchActivityInfo({ act_id: row.id })
+      await this._fetchTaskList(row.id)
+      const { data } = res
+      const { name, activity_status, set_start_time, set_stop_time, money, qcode_url } = data
+      this.checkInfo = { name, activity_status, money, qcode_url }
+      this.set_start_time = set_start_time * 1000
+      this.set_stop_time = set_stop_time * 1000
+      this.checkInfo.set_start_time = set_start_time * 1000
+      this.checkInfo.set_stop_time = set_stop_time * 1000
+      this.dialogCheckVisible = true
+      this.dialogTitle = '活动修改'
+      this.dialogType = 'edit'
+    },
+    // 打开查看弹窗
+    async handleShowActivityInfo(row) {
+      this.activityId = row.id
+      const res = await fetchActivityInfo({ act_id: row.id })
+      await this._fetchTaskList(row.id)
+      const { data } = res
+      const { name, activity_status, set_start_time, set_stop_time, money, qcode_url } = data
+      this.checkInfo = { name, activity_status, set_start_time, set_stop_time, money, qcode_url }
+      this.dialogCheckVisible = true
+      this.dialogTitle = '活动查看'
+      this.dialogType = 'show'
     },
     // 打开审批活动弹窗
     async handleCheckActivity(row) {
@@ -610,8 +843,8 @@ export default {
       const res = await fetchActivityInfo({ act_id: row.id })
       await this._fetchTaskList(row.id)
       const { data } = res
-      const { name, activity_status, set_start_time, set_stop_time } = data
-      this.checkInfo = { name, activity_status, set_start_time, set_stop_time }
+      const { name, activity_status, set_start_time, set_stop_time, money } = data
+      this.checkInfo = { name, activity_status, set_start_time, set_stop_time, money }
       this.dialogCheckVisible = true
       this.dialogTitle = '活动审批'
       this.dialogType = 'check'
@@ -629,10 +862,14 @@ export default {
     handleCloseDialog() {
       this.dialogFormDisable = false
       this.activityId = null
+      this.taskList = []
       this._resetActivityInfo()
+      this._fetchActivityList()
     },
     // 打开添加任务对话框
     handleOpenTaskDialog() {
+      this.dialogTaskType = 'add'
+      this.dialogTaskTitle = '添加任务'
       this.dialogTaskVisible = true
     },
     // 关闭添加任务对话框
@@ -643,7 +880,10 @@ export default {
     // 关闭活动审批对话框
     handleCloseCheckDialog() {
       this.dialogCheckVisible = false
-      this.activityId = ''
+      this.activityId = null
+      this.taskList = []
+      this._restCheckInfo()
+      this._fetchActivityList()
     },
     // 删除活动
     handleDeleteActivity(id) {
@@ -657,6 +897,17 @@ export default {
           })
         })
         .catch(_ => {})
+    },
+    // 删除任务
+    handleClickTask(id) {
+      this.$confirm('确认删除该任务？')
+        .then(async _ => {
+          await delTask(id)
+          await this._fetchTaskList(this.activityId)
+          this.$message({ message: '删除成功', type: 'success' })
+        })
+        .catch(_ => {
+        })
     },
     // 审批活动不通过
     handleCancelActivity() {
@@ -721,12 +972,20 @@ export default {
       const data = {}
       const {
         time, name, keepTime, score, coachId,
-        actDesc, scoreType, scoreShowType, type, bgImgUrl, iconUrl, price
+        actDesc, scoreType, scoreShowType, type, bgImgUrl, iconUrl, price, check
       } = this.activityInfo
-      if (!time.length || !name || !keepTime || !score || !coachId || !type || !price) {
-        this.$message({ message: '必填项不能为空', type: 'error' })
-        return
+      if (type === '1') {
+        if (!time.length || !name || !keepTime || !score || !coachId || !type || !price) {
+          this.$message({ message: '必填项不能为空', type: 'error' })
+          return
+        }
+      } else {
+        if (!time.length || !name || !type || !price) {
+          this.$message({ message: '必填项不能为空', type: 'error' })
+          return
+        }
       }
+      
       // 时间
       data.set_start_time = time[0] / 1000
       data.set_stop_time = time[1] / 1000
@@ -754,13 +1013,23 @@ export default {
       data.icon = iconUrl
       // 金额
       data.money = price
+      if (check) {
+        data.keep_time = 0
+      }
+      if (data.type === '2') {
+        data.score = 0
+        data.coach_id = 0
+        data.score_show_type = 0
+      }
+      console.log(data)
       try {
         const res = await addActivity(data)
         // 创建活动成功form禁用
         this.dialogFormDisable = true
         // 创建活动成功保存活动id
-        this.activityId = res.data
+        this.activityId = res
         await this._fetchTaskList(res.data)
+        this.$message({ message: '创建成功', type: 'success' })
       } catch (e) {
         // 添加活动失败隐藏添加弹窗
         this.handleCloseDialog()
@@ -782,6 +1051,7 @@ export default {
       data.options = JSON.stringify(data.options)
       try {
         const res = await addTask(JSON.stringify(data))
+        this.$message({ message: '添加成功', type: 'success' })
       } catch (e) {
       }
       this.dialogTaskVisible = false
@@ -821,7 +1091,8 @@ export default {
         actDesc: '', // 活动描述
         bgImgUrl: '', // 背景图片URl
         iconUrl: '', // 活动封面Url
-        price: '' // 活动价格
+        price: '', // 活动价格
+        check: '', // 是够长期
       }
       this.iconFilelist = []
       this.bgFileList = []
@@ -847,6 +1118,17 @@ export default {
       }
       this.taskQFileList = []
     },
+    _restCheckInfo() {
+      this.checkInfo = {
+        name: null,
+        activity_status: null,
+        set_start_time: null,
+        set_stop_time: null,
+        money: null
+      }
+      this.set_start_time = ''
+      this.set_stop_time = ''
+    },
     init() {
       this._fetchCoachList()
       this._fetchActivityList()
@@ -857,6 +1139,9 @@ export default {
 <style lang="scss">
 .activityDialog .el-dialog__body {
   padding-top: 0;
+}
+.act-textarea .el-textarea__inner{
+  width: 400px;
 }
 .clearfix::after {
   display: block;
