@@ -102,7 +102,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button>取消</el-button>
+        <el-button @click="handleClose">取消</el-button>
         <el-button type="primary" @click="handleCreateAgent" v-if="dialogType === 'add'">保存</el-button>
         <el-button type="primary" @click="handleEditAgent" v-if="dialogType === 'edit'">修改</el-button>
       </div>
@@ -140,7 +140,7 @@ export default {
         agent_name: null,
         province_id: null
       },
-      allDaili: [{ label: '一级代理', key: 2 }, { label: '二级代理', key: 3 }, { label: '三级代理', key: 4 }], // 代理商等级
+      allDaili: [{ label: '一级代理', key: '2' }, { label: '二级代理', key: '3' }, { label: '三级代理', key: '4' }], // 代理商等级
       dialogFormVisible: false,
       dialogTitle: '',
       dialogType: '',
@@ -172,6 +172,7 @@ export default {
     },
     handleClose() {
       // TODO: resetForm
+      this.dialogFormVisible = false
       this._resetForm()
     },
     _resetForm() {

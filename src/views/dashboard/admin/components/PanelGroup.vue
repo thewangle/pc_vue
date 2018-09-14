@@ -7,7 +7,7 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">一级代理商数量</div>
-          <count-to :start-val="0" :end-val="102400" :duration="2600" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="info.level_1" :duration="2000" class="card-panel-num"/>
           <span class="unit-color">家</span>
         </div>
       </div>
@@ -19,7 +19,7 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">二级代理商数量</div>
-          <count-to :start-val="0" :end-val="81212" :duration="3000" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="info.level_2" :duration="2000" class="card-panel-num"/>
           <span class="unit-color">家</span>
         </div>
       </div>
@@ -31,7 +31,7 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">三级代理商数量</div>
-          <count-to :start-val="0" :end-val="9280" :duration="3200" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="info.level_3" :duration="2000" class="card-panel-num"/>
           <span class="unit-color">家</span>
         </div>
       </div>
@@ -43,7 +43,7 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">运营商数量</div>
-          <count-to :start-val="0" :end-val="13600" :duration="3600" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="+info.level_4" :duration="2000" class="card-panel-num"/>
           <span class="unit-color">家</span>
         </div>
       </div>
@@ -57,6 +57,14 @@ import CountTo from 'vue-count-to'
 export default {
   components: {
     CountTo
+  },
+  props: {
+    info: {
+      type: Object,
+      default: function() {
+        return {}
+      }
+    }
   }
 }
 </script>

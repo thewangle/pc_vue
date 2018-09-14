@@ -10,7 +10,6 @@
         start-placeholder="开始日期"
         end-placeholder="结束日期"
         value-format="timestamp"
-        @change="handleFilter"
       />
 
       <el-select v-model="listQuery.status" placeholder="全部代理" clearable style="width: 200px" class="filter-item" @change="handleFilter">
@@ -95,7 +94,6 @@
 </template>
 
 <script>
-import {  } from '@/api/article'
 import { fetchCountList } from './../../service/count'
 import waves from '@/directive/waves' // 水波纹指令
 
@@ -130,11 +128,12 @@ export default {
     }
   },
   created() {
-    const sTime = (new Date()).getTime() - 30 * 24 * 60 * 1000
+    const sTime = (new Date()).getTime() - 30 * 24 * 60 * 60 * 1000
     const eTime = (new Date()).getTime()
-    console.log(sTime)
-    console.log(eTime)
+    this.listQuery.start_time = sTime
+    this.listQuery.end_time = eTime
     this.listQuery.dateValue = [sTime, eTime]
+    this._fetchCountList()
   },
   methods: {
     handleFilter() {
@@ -155,6 +154,12 @@ export default {
       }
     },
     async _fetchCountList() {
+      this.listQuery.start_time
+      this.listQuery.end_time
+      try{
+        const res = await fetchCountList(this.listQuery)
+        this.list = res.data
+      } catch(e) {}
     }
   }
 }

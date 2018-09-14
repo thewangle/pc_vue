@@ -1,22 +1,14 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.name" placeholder="请输入代理商/运营商名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-
       <el-date-picker
         v-model="listQuery.dateValue"
         type="daterange"
         range-separator="至"
         start-placeholder="开始日期"
         end-placeholder="结束日期"
-        value-format="yyyy-MM-dd"
-        @change="handleFilter"
+        value-format="timestamp"
       />
-
-      <el-select v-model="listQuery.status" placeholder="全部代理" clearable style="width: 200px" class="filter-item" @change="handleFilter">
-        <el-option v-for="item in status" :key="item.key" :label="item.label" :value="item.key"/>
-      </el-select>
-
       <el-button v-waves style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
     </div>
 
@@ -26,77 +18,37 @@
       border
       fit
       highlight-current-row
-      style="width: 100%;min-height:1000px;">
-      <el-table-column label="序号" align="center" width="65">
+      style="width: 100%;">
+      <el-table-column label="序号" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
+          <span>{{ scope.$index + 1 }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="名称" width="150px" align="center">
+      <el-table-column label="充值金额" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.timestamp }}</span>
+          <span>{{ scope.row.money }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="类型" min-width="150px">
+      <el-table-column label="支付方式">
         <template slot-scope="scope">
-          <span class="link-type">{{ scope.row.title }}</span>
+          <span>{{ scope.row.pay_type | filteType }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="活动场次" width="110px" align="center">
+      <el-table-column label="支付时间" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="总计价格" width="80px">
-        <template slot-scope="scope">
-          <svg-icon v-for="n in +scope.row.importance" :key="n" icon-class="star" class="meta-item__icon"/>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleUpdate(scope.row, 'info')">查看</el-button>
-          <el-button size="mini" type="success" @click="handleUpdate(scope.row,'recharge')">充值记录</el-button>
+          <span>{{ scope.row.pay_time | timeFilter }}</span>
         </template>
       </el-table-column>
     </el-table>
 
     <div class="pagination-container">
-      <el-pagination :current-page="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
+      <el-pagination :current-page="listQuery.page_no" :page-sizes="[10,20,30, 50]" :page-size="listQuery.page_size" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div>
-
-    <el-dialog :visible.sync="dialogInfoVisible" title="财务统计查看" custom-class="count-dialog">
-      <el-table :data="gridData" border fit highlight-current-row>
-        <el-table-column property="id" label="序号" align="center" width="65"/>
-        <el-table-column property="name" label="名称" width="150"/>
-        <el-table-column property="aname" label="活动名称" width="250"/>
-        <el-table-column property="num" label="活动次数"/>
-        <el-table-column property="stime" label="开始时间" width="120"/>
-        <el-table-column property="etime" label="结束时间" width="120"/>
-        <el-table-column property="money" label="活动价"/>
-        <el-table-column property="status" label="活动状态"/>
-        <el-table-column property="pay" label="支付方式"/>
-      </el-table>
-    </el-dialog>
-
-    <el-dialog :visible.sync="dialogRechargeVisible" title="充值记录" custom-class="count-dialog">
-      <el-table :data="gridData" border fit highlight-current-row>
-        <el-table-column property="id" label="序号" align="center" width="65"/>
-        <el-table-column property="name" label="名称" width="150"/>
-        <el-table-column property="aname" label="活动名称" width="250"/>
-        <el-table-column property="num" label="活动次数"/>
-        <el-table-column property="stime" label="开始时间" width="120"/>
-        <el-table-column property="etime" label="结束时间" width="120"/>
-        <el-table-column property="money" label="活动价"/>
-        <el-table-column property="status" label="活动状态"/>
-        <el-table-column property="pay" label="支付方式"/>
-      </el-table>
-    </el-dialog>
-
   </div>
 </template>
 
 <script>
-import { fetchList } from '@/api/article'
+import { fetchChargeList } from './../../service/count'
 import waves from '@/directive/waves' // 水波纹指令
 
 export default {
@@ -104,285 +56,73 @@ export default {
   directives: {
     waves
   },
+  filters: {
+    filteType(type) {
+      if (type === '1') {
+        return '微信'
+      }
+    },
+    timeFilter(timestamp) {
+      var date = new Date(timestamp * 1000)// 如果date为10位不需要乘1000
+      var Y = date.getFullYear() + '-'
+      var M = (+date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
+      var D = (+date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' '
+      var h = (+date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
+      var m = (+date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
+      var s = (+date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
+      return Y + M + D + h + m + s
+    }
+  },
   data() {
     return {
       list: null,
       total: null,
-      listLoading: true,
+      listLoading: false,
       listQuery: {
-        page: 1,
-        limit: 20,
-        status: undefined,
-        name: undefined,
-        dateValue: ''
-      },
-      status: [{ label: '代理商', key: 1 }, { label: '运营商', key: 2 }],
-      dialogInfoVisible: false,
-      dialogRechargeVisible: false,
-      rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
-      },
-      gridData: [{
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }, {
-        id: 1,
-        num: 20,
-        etime: '2016-05-02',
-        name: '王小虎',
-        aname: '上海市普陀区金沙江路 1518 弄',
-        stime: '2016-05-01',
-        money: 1000,
-        status: '开始',
-        pay: '余额'
-      }]
-
+        page_no: 1,
+        page_size: 20,
+        dateValue: [],
+        start_time: '',
+        end_time: ''
+      }
     }
   },
   created() {
-    this.getList()
+    const sTime = (new Date()).getTime() - 30 * 24 * 60 * 60 * 1000
+    const eTime = (new Date()).getTime()
+    this.listQuery.start_time = sTime
+    this.listQuery.end_time = eTime
+    this.listQuery.dateValue = [sTime, eTime]
+    this._fetchCountList()
   },
   methods: {
-    getList() {
-      this.listLoading = true
-      fetchList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
-
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
-      })
-    },
     handleFilter() {
-      this.listQuery.page = 1
-      this.getList()
+      this.listQuery.page_no = 1
+      this._fetchCountList()
     },
     handleSizeChange(val) {
-      this.listQuery.limit = val
-      this.getList()
+      this.listQuery.page_size = val
+      this._fetchCountList()
     },
     handleCurrentChange(val) {
-      this.listQuery.page = val
-      this.getList()
+      this.listQuery.page_no = val
+      this._fetchCountList()
     },
     handleUpdate(rowm, type) {
       if (type === 'info') {
         this.dialogInfoVisible = true
       }
-      if (type === 'recharge') {
-        this.dialogRechargeVisible = true
-      }
+    },
+    async _fetchCountList() {
+      this.listQuery.start_time = this.listQuery.dateValue[0]
+      this.listQuery.end_time = this.listQuery.dateValue[1]
+      this.listQuery.start_time = Math.floor(this.listQuery.start_time / 1000)
+      this.listQuery.end_time = Math.floor(this.listQuery.end_time / 1000)
+      try{
+        const res = await fetchChargeList(this.listQuery)
+        this.list = res.data.data
+        this.total = res.data.total
+      } catch(e) {}
     }
   }
 }

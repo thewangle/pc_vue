@@ -353,8 +353,8 @@
               <el-input v-if="dialogType === 'edit'" v-model="checkInfo.name" />
             </el-form-item>
             <el-form-item label="活动类型" label-width="100px">
-              <span v-if="dialogType !== 'edit'">{{ checkInfo.activity_status | activityFilter }}</span>
-              <el-select v-if="dialogType === 'edit'" v-model="checkInfo.activity_status">
+              <span v-if="dialogType !== 'edit'">{{ checkInfo.type | activityFilter }}</span>
+              <el-select v-if="dialogType === 'edit'" v-model="checkInfo.type">
                 <el-option label="团队-基础版" value="1" />
                 <el-option label="个人-基础版" value="2" />
               </el-select>
@@ -480,7 +480,7 @@
               <span>{{ checkInfo.name }}</span>
             </el-form-item>
             <el-form-item label="活动类型" label-width="100px">
-              <span>{{ checkInfo.activity_status | activityFilter }}</span>
+              <span>{{ checkInfo.type | activityFilter }}</span>
             </el-form-item>
             <el-form-item label="活动金额" label-width="100px">
               <span style="color: red">{{ checkInfo.money / 100 }}元</span>
@@ -646,7 +646,7 @@ export default {
       qiniuAddress: qiniuAddress,
       checkInfo: {
         name: null,
-        activity_status: null,
+        type: null,
         set_start_time: null,
         set_stop_time: null,
         money: null
@@ -747,9 +747,9 @@ export default {
     // 获取支付二维码
     async handleGetPayEr() {
       let str
-      if (this.checkInfo.activity_status === '1') {
+      if (this.checkInfo.type === '1') {
         str ='team'
-      } else if (this.checkInfo.activity_status === '2') {
+      } else if (this.checkInfo.type === '2') {
         str = 'person'
       }
       const res = await creatOrder({ type_id: this.activityId, order_type: str })
@@ -773,15 +773,15 @@ export default {
     async handleUpdateActivity() {
       this.checkInfo.set_start_time = this.set_start_time / 1000
       this.checkInfo.set_stop_time = this.set_stop_time / 1000
-      const { name, activity_status, set_start_time, set_stop_time } = this.checkInfo
-      if (!name || !activity_status || !set_start_time || !set_stop_time) {
+      const { name, type, set_start_time, set_stop_time } = this.checkInfo
+      if (!name || !type || !set_start_time || !set_stop_time) {
         this.$message({ message: '必填项不能为空', type: 'success' })
         return
       }
       const param = {
         act_id: this.activityId,
         name,
-        type: activity_status,
+        type,
         set_start_time: set_start_time,
         set_stop_time: set_stop_time
       }
@@ -791,8 +791,8 @@ export default {
         const res = await fetchActivityInfo({ act_id: this.activityId })
         await this._fetchTaskList(this.activityId)
         const { data } = res
-        const { name, activity_status, set_start_time, set_stop_time, money, qcode_url } = data
-        this.checkInfo = { name, activity_status, money, qcode_url }
+        const { name, type, set_start_time, set_stop_time, money, qcode_url } = data
+        this.checkInfo = { name, type, money, qcode_url }
         this.set_start_time = set_start_time * 1000
         this.set_stop_time = set_stop_time * 1000
         this.checkInfo.set_start_time = set_start_time * 1000
@@ -801,8 +801,8 @@ export default {
         const res = await fetchActivityInfo({ act_id: this.activityId })
         await this._fetchTaskList(this.activityId)
         const { data } = res
-        const { name, activity_status, set_start_time, set_stop_time, money, qcode_url } = data
-        this.checkInfo = { name, activity_status, money, qcode_url }
+        const { name, type, set_start_time, set_stop_time, money, qcode_url } = data
+        this.checkInfo = { name, type, money, qcode_url }
         this.set_start_time = set_start_time * 1000
         this.set_stop_time = set_stop_time * 1000
         this.checkInfo.set_start_time = set_start_time * 1000
@@ -815,8 +815,8 @@ export default {
       const res = await fetchActivityInfo({ act_id: row.id })
       await this._fetchTaskList(row.id)
       const { data } = res
-      const { name, activity_status, set_start_time, set_stop_time, money, qcode_url } = data
-      this.checkInfo = { name, activity_status, money, qcode_url }
+      const { name, type, set_start_time, set_stop_time, money, qcode_url } = data
+      this.checkInfo = { name, type, money, qcode_url }
       this.set_start_time = set_start_time * 1000
       this.set_stop_time = set_stop_time * 1000
       this.checkInfo.set_start_time = set_start_time * 1000
@@ -831,8 +831,8 @@ export default {
       const res = await fetchActivityInfo({ act_id: row.id })
       await this._fetchTaskList(row.id)
       const { data } = res
-      const { name, activity_status, set_start_time, set_stop_time, money, qcode_url } = data
-      this.checkInfo = { name, activity_status, set_start_time, set_stop_time, money, qcode_url }
+      const { name, type, set_start_time, set_stop_time, money, qcode_url } = data
+      this.checkInfo = { name, type, set_start_time, set_stop_time, money, qcode_url }
       this.dialogCheckVisible = true
       this.dialogTitle = '活动查看'
       this.dialogType = 'show'
@@ -843,8 +843,8 @@ export default {
       const res = await fetchActivityInfo({ act_id: row.id })
       await this._fetchTaskList(row.id)
       const { data } = res
-      const { name, activity_status, set_start_time, set_stop_time, money } = data
-      this.checkInfo = { name, activity_status, set_start_time, set_stop_time, money }
+      const { name, type, set_start_time, set_stop_time, money } = data
+      this.checkInfo = { name, type, set_start_time, set_stop_time, money }
       this.dialogCheckVisible = true
       this.dialogTitle = '活动审批'
       this.dialogType = 'check'
