@@ -13,6 +13,18 @@ export function fetchCountList(data) {
 }
 
 /**
+ * 获取财务详情
+ */
+
+export function fetchpayList(data) {
+  return request({
+    url: '/i/topteam/admin/getactpaylist',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * 获取充值记录
  * @param {*} data
  */

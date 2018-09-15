@@ -57,7 +57,7 @@
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleEditOperator(scope.row)">修改</el-button>
-          <el-button size="mini" type="success">转移</el-button>
+          <el-button size="mini" type="success" @click="handleListTrans(scope.row)">转移</el-button>
           <el-button size="mini" type="danger" @click="handleDeleteOperator(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -102,6 +102,51 @@
         <el-button type="primary" @click="handleEditAgent" v-if="dialotType === 'edit'">保存</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog :title="transTitle" :visible.sync="dialogTransVisible" @close="handleTransClose" class="transDialog">
+      <div class="clearfix">
+        <div style="float:left; width: 40%;">
+          <el-form label-position="left">
+            <el-form-item label="运营商编号" label-width="100px">
+              <span>{{ rowInfo.id }}</span>
+            </el-form-item>
+            <el-form-item label="运营商名称" label-width="100px">
+              <span>{{ rowInfo.name }}</span>
+            </el-form-item>
+            <el-form-item label="联系人" label-width="100px">
+              <span>{{ rowInfo.contacts }}</span>
+            </el-form-item>
+            <el-form-item label="联系电话" label-width="100px">
+              <span>{{ rowInfo.phone }}</span>
+            </el-form-item>
+            <el-form-item label="现代理商名称" label-width="100px">
+              <span>{{ rowInfo.agent_name }}</span>
+            </el-form-item>
+            <el-form-item label="活动价" label-width="100px">
+              <span>{{ rowInfo.price }}</span>
+            </el-form-item>
+            <el-form-item label="所在地区" label-width="100px">
+              <span>{{ rowInfo.address }}</span>
+            </el-form-item>
+          </el-form>
+        </div>
+        <div style="float: left; width: 18%; margin-top: 16%;">
+          <div>
+            <i class="el-icon-d-arrow-right" style="font-size: 36px; color: #409EFF;"></i>
+            <p style="color: #409EFF;">转移</p>
+          </div>
+        </div>
+        <div style="float: right; width: 40%; margin-top: 16%;">
+          <el-form>
+            <el-form-item label="选择代理商" label-width="100px">
+              <el-select v-model="superAgentId" clearable>
+                <el-option v-for="item in daliList" :key="item.id" :label="item.name" :value="item.id"/>
+              </el-select>
+            </el-form-item>
+          </el-form>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -144,7 +189,6 @@ export default {
       dialogTitle: '',
       dialotType: '',
       id: '',
-      dialogFormVisible: false,
       dialogCityList: [],
       daliList: [],
       agentInfo: {
@@ -160,7 +204,11 @@ export default {
         value: 'id',
         label: 'name',
         children: 'childs'
-      }
+      },
+      transTitle: '', //转移对话框标题
+      dialogTransVisible: false, // 转移弹窗
+      superAgentId: '',
+      rowInfo: {}
     }
   },
   created() {
@@ -174,6 +222,25 @@ export default {
       this.dialogTitle = '创建运营商'
       this.dialotType = 'add'
       this.dialogFormVisible = true
+    },
+    // 关闭转移弹窗
+    handleTransClose() {
+      this.dialogTransVisible = false
+      this.transTitle = ''
+      this.rowInfo = {}
+    },
+    // 转移弹窗
+    async handleListTrans(row) {
+      this.transTitle = '转移代理信息'
+      console.log(row)
+      const res = await getSubordinateAgent({ level: row.level - 1 })
+      const { data } = res
+      // if (!data.length) {
+      //   this.$message({ message: '该用户没有下属机构，不能转移', type: 'error' })
+      //   return
+      // }
+      this.rowInfo = row
+      this.dialogTransVisible = true
     },
     handleEditOperator(row) {
       this.dialogTitle = '修改运营商'
@@ -337,3 +404,16 @@ export default {
   }
 }
 </script>
+
+<style rel="stylesheet/scss" lang="scss">
+.transDialog .el-dialog, .transDialog .el-dialog__body{
+  width: 800px;
+}
+.clearfix::after {
+  display: block;
+  content: '';
+  overflow: hidden;
+  height: 0;
+  clear: both;
+}
+</style>

@@ -25,7 +25,7 @@
           <span>{{ scope.$index + 1 }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="编号" width="150px" align="center">
+      <el-table-column label="编号" width="70px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
@@ -40,7 +40,7 @@
           <span>{{ scope.row.contacts }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="联系电话" width="80px">
+      <el-table-column label="联系电话" width="120px">
         <template slot-scope="scope">
           <span>{{ scope.row.phone }}</span>
         </template>
@@ -55,7 +55,7 @@
           <span>{{ scope.row.price / 100 }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="所在地区" class-name="status-col" width="100">
+      <el-table-column label="所在地区" class-name="status-col" width="180">
         <template slot-scope="scope">
           <span>{{ scope.row.address }}</span>
         </template>

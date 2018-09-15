@@ -12,7 +12,7 @@
         value-format="timestamp"
       />
 
-      <el-select v-model="listQuery.status" placeholder="全部代理" clearable style="width: 200px" class="filter-item" @change="handleFilter">
+      <el-select v-model="listQuery.agent_type" placeholder="全部代理" clearable style="width: 200px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in status" :key="item.key" :label="item.label" :value="item.key"/>
       </el-select>
 
@@ -26,29 +26,29 @@
       fit
       highlight-current-row
       style="width: 100%;">
-      <el-table-column label="序号" align="center" width="65">
+      <el-table-column label="序号" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
+          <span>{{ scope.$index + 1 }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="名称" width="150px" align="center">
+      <el-table-column label="名称" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.timestamp }}</span>
+          <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="类型" min-width="150px">
+      <el-table-column label="类型">
         <template slot-scope="scope">
-          <span class="link-type">{{ scope.row.title }}</span>
+          <span>{{ scope.row.type }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="活动场次" width="110px" align="center">
+      <el-table-column label="活动场次" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
+          <span>{{ scope.row.act_num }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="总计价格" width="80px">
+      <el-table-column label="总计价格">
         <template slot-scope="scope">
-          <svg-icon v-for="n in +scope.row.importance" :key="n" icon-class="star" class="meta-item__icon"/>
+          <span>{{ scope.row.total_price }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
@@ -64,43 +64,74 @@
 
     <el-dialog :visible.sync="dialogInfoVisible" title="财务统计查看" custom-class="count-dialog">
       <el-table :data="gridData" border fit highlight-current-row>
-        <el-table-column property="id" label="序号" align="center" width="65"/>
-        <el-table-column property="name" label="名称" width="150"/>
-        <el-table-column property="aname" label="活动名称" width="250"/>
-        <el-table-column property="num" label="活动次数"/>
-        <el-table-column property="stime" label="开始时间" width="120"/>
-        <el-table-column property="etime" label="结束时间" width="120"/>
-        <el-table-column property="money" label="活动价"/>
-        <el-table-column property="status" label="活动状态"/>
-        <el-table-column property="pay" label="支付方式"/>
+        <el-table-column label="活动名称">
+          <template slot-scope="scope">
+            <span>{{ scope.row.name }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="活动次数">
+          <template slot-scope="scope">
+            <span>{{ scope.row.act_num }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="开始时间" width="170px">
+          <template slot-scope="scope">
+            <span>{{ scope.row.set_start_time | timeFilter }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="结束时间" width="170px">
+          <template slot-scope="scope">
+            <span>{{ scope.row.set_stop_time | timeFilter }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="活动价">
+          <template slot-scope="scope">
+            <span>{{ scope.row.price }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="支付方式">
+          <template slot-scope="scope">
+            <span>{{ scope.row.pay_type | payTypeFilter }}</span>
+          </template>
+        </el-table-column>
       </el-table>
-    </el-dialog>
-
-    <el-dialog :visible.sync="dialogRechargeVisible" title="充值记录" custom-class="count-dialog">
-      <el-table :data="gridData" border fit highlight-current-row>
-        <el-table-column property="id" label="序号" align="center" width="65"/>
-        <el-table-column property="name" label="名称" width="150"/>
-        <el-table-column property="aname" label="活动名称" width="250"/>
-        <el-table-column property="num" label="活动次数"/>
-        <el-table-column property="stime" label="开始时间" width="120"/>
-        <el-table-column property="etime" label="结束时间" width="120"/>
-        <el-table-column property="money" label="活动价"/>
-        <el-table-column property="status" label="活动状态"/>
-        <el-table-column property="pay" label="支付方式"/>
-      </el-table>
+      <div class="pagination-container">
+        <el-pagination
+          :current-page="dilogQuery.page_no"
+          :total="dialogTotal"
+          background layout="total, sizes, prev, pager, next, jumper"
+          @current-change="handledialogCurrentChange"/>
+      </div>
     </el-dialog>
 
   </div>
 </template>
 
 <script>
-import { fetchCountList } from './../../service/count'
+import { fetchCountList, fetchpayList } from './../../service/count'
 import waves from '@/directive/waves' // 水波纹指令
 
 export default {
   name: 'Show',
   directives: {
     waves
+  },
+  filters: {
+    timeFilter(timestamp) {
+      var date = new Date(timestamp * 1000)// 如果date为10位不需要乘1000
+      var Y = date.getFullYear() + '-'
+      var M = (+date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
+      var D = (+date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' '
+      var h = (+date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
+      var m = (+date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
+      var s = (+date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
+      return Y + M + D + h + m + s
+    },
+    payTypeFilter(type) {
+      if (type === '1') {
+        return '微信'
+      }
+    }
   },
   data() {
     return {
@@ -111,19 +142,19 @@ export default {
         page_no: 1,
         page_size: 20,
         agent_name: undefined,
-        agent_type: 0,
+        agent_type: '',
         dateValue: [],
         start_time: '',
         end_time: ''
       },
+      dialogTotal: null,
+      dilogQuery: {
+        page_no: 1,
+        page_size: 10,
+        agent_id: ''
+      },
       status: [{ label: '代理商', key: 1 }, { label: '运营商', key: 2 }],
       dialogInfoVisible: false,
-      dialogRechargeVisible: false,
-      rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
-      },
       gridData: []
     }
   },
@@ -148,17 +179,40 @@ export default {
       this.listQuery.page_no = val
       this._fetchCountList()
     },
-    handleUpdate(rowm, type) {
+    handledialogCurrentChange(val) {
+      this.dilogQuery.page_no = val
+      this._fetactlist()
+    },
+    handleUpdate(row, type) {
+      this.dilogQuery.agent_id = row.id
       if (type === 'info') {
         this.dialogInfoVisible = true
       }
+      this._fetactlist()
+    },
+    async _fetactlist() {
+      const stime = this.listQuery.dateValue[0] || (new Date()).getTime() - 30 * 24 * 60 * 60 * 1000
+      const etime = this.listQuery.dateValue[1] || (new Date()).getTime()
+      const param = Object.assign({}, this.dilogQuery)
+      param.start_time = Math.floor(stime / 1000)
+      param.end_time = Math.floor(etime / 1000)
+      try {
+        const res = await fetchpayList(param)
+        this.gridData = res.data.data
+        this.dialogTotal = res.data.total
+      } catch (e) {}
     },
     async _fetchCountList() {
-      this.listQuery.start_time
-      this.listQuery.end_time
+      const stime = this.listQuery.dateValue[0] || (new Date()).getTime() - 30 * 24 * 60 * 60 * 1000
+      const etime = this.listQuery.dateValue[1] || (new Date()).getTime()
+      this.listQuery.start_time = Math.floor(stime / 1000)
+      this.listQuery.end_time = Math.floor(etime / 1000)
+      const param = Object.assign({}, this.listQuery)
+      param.agent_type = param.agent_type || 0
       try{
-        const res = await fetchCountList(this.listQuery)
-        this.list = res.data
+        const res = await fetchCountList(param)
+        this.list = res.data.data
+        this.total = res.data.total
       } catch(e) {}
     }
   }
@@ -173,8 +227,11 @@ export default {
   padding: 7px 0;
   text-align: center;
 }
-.count-dialog .el-dialog__body {
-  max-height: 600px;
-  overflow-y: auto;
+// .count-dialog .el-dialog__body {
+//   max-height: 600px;
+//   overflow-y: auto;
+// }
+.count-dialog.el-dialog, .count-dialog .el-dialog__body{
+  width: 900px;
 }
 </style>
