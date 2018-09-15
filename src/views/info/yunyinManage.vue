@@ -140,18 +140,21 @@
           <el-form>
             <el-form-item label="选择代理商" label-width="100px">
               <el-select v-model="superAgentId" clearable>
-                <el-option v-for="item in daliList" :key="item.id" :label="item.name" :value="item.id"/>
+                <el-option v-for="item in supList" :key="item.id" :label="item.name" :value="item.id" v-if="item.level < 5"/>
               </el-select>
             </el-form-item>
           </el-form>
         </div>
+      </div>
+      <div class="button-area" style="text-align: center">
+        <el-button type="primary" @click="handleTransAgent">确定</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getOperatorList, getSubordinateAgent, addOperator, delOperator, editOperator } from './../../service/info'
+import { getOperatorList, getSubordinateAgent, addOperator, delOperator, editOperator, transAgent } from './../../service/info'
 import { fetchCityList } from './../../service/common'
 import { getProvinceId, getLevel, getAgentId } from '@/utils/auth'
 import waves from '@/directive/waves' // 水波纹指令
@@ -208,7 +211,8 @@ export default {
       transTitle: '', //转移对话框标题
       dialogTransVisible: false, // 转移弹窗
       superAgentId: '',
-      rowInfo: {}
+      rowInfo: {},
+      supList: []
     }
   },
   created() {
@@ -227,18 +231,35 @@ export default {
     handleTransClose() {
       this.dialogTransVisible = false
       this.transTitle = ''
+      this.superAgentId = ''
       this.rowInfo = {}
+      this.supList = []
+    },
+    // 转移
+    async handleTransAgent() {
+      if (!this.superAgentId) {
+        this.$message({ message: '请选择一个代理商', type: 'error' })
+        return
+      }
+      try {
+        const res = await transAgent({ agent_id: this.rowInfo.id, superior_agent_id: this.superAgentId })
+        this.$message({ message: '转移成功', type: 'success' })
+      } catch (e) {
+      }
+      this.handleTransClose()
+      this._fetchOperatorList()
     },
     // 转移弹窗
     async handleListTrans(row) {
       this.transTitle = '转移代理信息'
       console.log(row)
-      const res = await getSubordinateAgent({ level: row.level - 1 })
+      const res = await getSubordinateAgent({})
       const { data } = res
-      // if (!data.length) {
-      //   this.$message({ message: '该用户没有下属机构，不能转移', type: 'error' })
-      //   return
-      // }
+      if (!data.length) {
+        this.$message({ message: '该用户没有下属机构，不能转移', type: 'error' })
+        return
+      }
+      this.supList = data
       this.rowInfo = row
       this.dialogTransVisible = true
     },

@@ -63,8 +63,8 @@
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdateAgent(scope.row)">修改</el-button>
-          <el-button size="mini" type="success">转移</el-button>
-          <el-button size="mini" type="danger" @click="handleDeleteAgent(scope.row.id)">删除</el-button>
+          <el-button size="mini" type="success" @click="handleListTrans(scope.row)">转移</el-button>
+          <el-button size="mini" type="danger" @click="handleDeleteAgent(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -78,8 +78,14 @@
           <el-input v-model="agentInfo.username"/>
         </el-form-item>
         <el-form-item label="代理级别">
-          <el-select v-model="agentInfo.level" clearable>
-            <el-option v-for="item in allDaili" :key="item.key" :label="item.label" :value="item.key"/>
+          <el-select v-model="agentInfo.level" clearable v-if="dialogType === 'add'">
+            <el-option
+              v-if="(dialogType === 'add' && (+compareLevel + 1 === +item.key))"
+              v-for="item in allDaili" :key="item.key" :label="item.label" :value="item.key"/>
+          </el-select>
+          <el-select v-model="agentInfo.level" clearable v-if="dialogType === 'edit'" disabled="">
+            <el-option
+              v-for="item in allDaili" :key="item.key" :label="item.label" :value="item.key"/>
           </el-select>
         </el-form-item>
         <el-form-item label="联系人">
@@ -108,12 +114,61 @@
       </div>
     </el-dialog>
 
+    <el-dialog :title="transTitle" :visible.sync="dialogTransVisible" @close="handleTransClose" class="transDialog">
+      <div class="clearfix">
+        <div style="float:left; width: 40%;">
+          <el-form label-position="left">
+            <el-form-item label="代理商编号" label-width="100px">
+              <span>{{ rowInfo.id }}</span>
+            </el-form-item>
+            <el-form-item label="代理商名称" label-width="100px">
+              <span>{{ rowInfo.name }}</span>
+            </el-form-item>
+            <el-form-item label="联系人" label-width="100px">
+              <span>{{ rowInfo.contacts }}</span>
+            </el-form-item>
+            <el-form-item label="联系电话" label-width="100px">
+              <span>{{ rowInfo.phone }}</span>
+            </el-form-item>
+            <el-form-item label="代理级别" label-width="100px">
+              <span>{{ rowInfo.level | statusFilter }}</span>
+            </el-form-item>
+            <el-form-item label="活动价" label-width="100px">
+              <span>{{ rowInfo.price }}</span>
+            </el-form-item>
+            <el-form-item label="所在地区" label-width="100px">
+              <span>{{ rowInfo.address }}</span>
+            </el-form-item>
+          </el-form>
+        </div>
+        <div style="float: left; width: 18%; margin-top: 16%;">
+          <div>
+            <i class="el-icon-d-arrow-right" style="font-size: 36px; color: #409EFF;"></i>
+            <p style="color: #409EFF;">转移</p>
+          </div>
+        </div>
+        <div style="float: right; width: 40%; margin-top: 16%;">
+          <el-form>
+            <el-form-item label="选择代理商" label-width="100px">
+              <el-select v-model="superAgentId" clearable>
+                <el-option v-for="item in supList" :key="item.id" :label="item.name" :value="item.id"/>
+              </el-select>
+            </el-form-item>
+          </el-form>
+        </div>
+      </div>
+      <div class="button-area" style="text-align: center">
+        <el-button type="primary" @click="handleTransAgent">确定</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
-import { createAgent, editAgent, deleteAgent, fetchAgentList, transAgent, transSubordinateAgent } from './../../service/info'
+import { createAgent, editAgent, deleteAgent, fetchAgentList, transAgent, transSubordinateAgent, getSubordinateAgent } from './../../service/info'
 import { fetchCityList } from './../../service/common'
+import { getLevel } from '@/utils/auth'
 import waves from '@/directive/waves' // 水波纹指令
 
 export default {
@@ -160,7 +215,13 @@ export default {
         value: 'id',
         label: 'name',
         children: 'childs'
-      }
+      },
+      transTitle: '', //转移对话框标题
+      dialogTransVisible: false, // 转移弹窗
+      superAgentId: '',
+      rowInfo: {},
+      supList: [],
+      compareLevel: getLevel()
     }
   },
   created() {
@@ -174,6 +235,42 @@ export default {
       // TODO: resetForm
       this.dialogFormVisible = false
       this._resetForm()
+    },
+    // 关闭转移弹窗
+    handleTransClose() {
+      this.dialogTransVisible = false
+      this.transTitle = ''
+      this.superAgentId = ''
+      this.rowInfo = {}
+      this.supList = []
+    },
+    // 转移
+    async handleTransAgent() {
+      if (!this.superAgentId) {
+        this.$message({ message: '请选择一个代理商', type: 'error' })
+        return
+      }
+      try {
+        const res = await transAgent({ agent_id: this.rowInfo.id, superior_agent_id: this.superAgentId })
+        this.$message({ message: '转移成功', type: 'success' })
+      } catch (e) {
+      }
+      this.handleTransClose()
+      this._fetchAgentList()
+    },
+    // 转移弹窗
+    async handleListTrans(row, type) {
+      this.transTitle = '转移代理信息'
+      console.log(row)
+      const res = await getSubordinateAgent({ level: type ? row.level : row.level - 1 })
+      const { data } = res
+      if (!data.length) {
+        this.$message({ message: '该用户没有下属机构，不能转移', type: 'error' })
+        return
+      }
+      this.supList = data
+      this.rowInfo = row
+      this.dialogTransVisible = true
     },
     _resetForm() {
       this.agentInfo = {
@@ -238,7 +335,6 @@ export default {
         str += item
       })
       this.agentInfo.address = str
-      console.log(this.agentInfo)
     },
     async handleCreate() {
       this.dialogTitle = '新增代理商'
@@ -265,10 +361,16 @@ export default {
       this.dialogCityList = this._changeCityList(row.province_id)
     },
     // 删除代理商
-    handleDeleteAgent(id) {
+    handleDeleteAgent(row) {
       this.$confirm('确认删除该代理商？')
         .then(async _ => {
-          await deleteAgent({ agent_id: id })
+          try {
+            await deleteAgent({ agent_id: row.id })
+          } catch (e) {
+            if (e.error_code === 60001) {
+              this.handleListTrans(row, 'delete')
+            } 
+          }
           await this._fetchAgentList()
         })
         .catch(_ => {})
@@ -342,3 +444,16 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.transDialog .el-dialog, .transDialog .el-dialog__body{
+  width: 800px;
+}
+.clearfix::after {
+  display: block;
+  content: '';
+  overflow: hidden;
+  height: 0;
+  clear: both;
+}
+</style>

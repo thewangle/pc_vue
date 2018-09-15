@@ -78,8 +78,7 @@
     <el-dialog
       :visible.sync="dialogFormVisible"
       title="新增活动"
-      fullscreen
-      class="activityDialog"
+      class="aDialog"
       @close="handleCloseDialog">
       <hr >
       <el-form :inline="true" :model="activityInfo" :disabled="dialogFormDisable" class="demo-form-inline">
@@ -100,12 +99,6 @@
         <el-form-item label="活动名称">
           <el-input v-model="activityInfo.name" />
         </el-form-item>
-        <el-form-item label="起始分值">
-          <el-input v-model="activityInfo.score" type="number" min="0" :disabled="!activityInfo.type || activityInfo.type === '2'" />
-        </el-form-item>
-        <el-form-item label="活动价格">
-          <el-input v-model="activityInfo.price" type="number"/>
-        </el-form-item>
         <el-form-item label="分值形式">
           <el-select v-model="activityInfo.scoreType">
             <el-option label="积分" value="1" />
@@ -120,10 +113,16 @@
             <el-option label="否" value="2" />
           </el-select>
         </el-form-item>
+        <el-form-item label="起始分值">
+          <el-input v-model="activityInfo.score" type="number" min="0" :disabled="!activityInfo.type || activityInfo.type === '2'" />
+        </el-form-item>
         <el-form-item label="活动时长">
           <el-input v-model="activityInfo.keepTime" type="number" min="0">
             <el-checkbox slot="suffix" v-model="activityInfo.check" v-if="activityInfo.type === '2'">长期</el-checkbox>
           </el-input>
+        </el-form-item>
+        <el-form-item label="活动价格" v-if="activityInfo.type === '2'">
+          <el-input v-model="activityInfo.price" type="number"/>
         </el-form-item>
         <el-form-item label="起止时间">
           <el-date-picker
@@ -184,7 +183,14 @@
       <div class="job-list">
         <div class="job-title">
           <h3 style="display: inline-block">任务列表</h3>
-          <el-button :disabled="!activityId" type="success" style="float: right">导入任务</el-button>
+          <div :disabled="!activityId" class="filePicker" style="float: right">
+            <label>导入任务</label>
+            <input
+              :disabled="!activityId"
+              @change="handleFileChange"
+              id="fileInput" type="file" name="file"
+              accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+          </div>
           <el-button :disabled="!activityId" type="primary" style="float: right; margin-right: 20px;" @click="handleOpenTaskDialog">添加任务</el-button>
         </div>
         <div class="job-table">
@@ -253,11 +259,11 @@
         <el-form-item label="题目类型" label-width="100px">
           <el-select v-model="taskInfo.type" :disabled="dialogTaskType === 'edit'">
             <el-option label="选择题" value="1" />
-            <el-option label="文字题" value="2" />
+            <el-option label="文字题" value="2" v-if="activityInfo.type === '1' || checkInfo.type === '1'" />
             <el-option label="图片题" value="3" />
-            <el-option label="视频题" value="4" />
-            <el-option label="语音题" value="5" />
-            <el-option label="拍照题" value="6" />
+            <el-option label="视频题" value="4" v-if="activityInfo.type === '1' || checkInfo.type === '1'"/>
+            <el-option label="语音题" value="5" v-if="activityInfo.type === '1' || checkInfo.type === '1'"/>
+            <el-option label="拍照题" value="6" v-if="activityInfo.type === '1' || checkInfo.type === '1'"/>
           </el-select>
         </el-form-item>
         <el-form-item label="题目描述" label-width="100px">
@@ -270,8 +276,8 @@
           <el-select v-model="taskInfo.answer_type">
             <el-option label="普通题" value="1" />
             <el-option label="关卡题" value="2" />
-            <el-option label="团队限时题" value="3" />
-            <el-option label="活动抢答题" value="4" />
+            <el-option label="团队限时题" value="3" v-if="activityInfo.type === '1' || checkInfo.type === '1'" />
+            <el-option label="活动抢答题" value="4" v-if="activityInfo.type === '1' || checkInfo.type === '1'"/>
           </el-select>
         </el-form-item>
         <el-form-item label="题目顺序" label-width="100px">
@@ -349,31 +355,16 @@
           <h4>活动信息</h4>
           <el-form v-model="checkInfo">
             <el-form-item label="活动名称" label-width="100px">
-              <span v-if="dialogType !== 'edit'">{{ checkInfo.name }}</span>
-              <el-input v-if="dialogType === 'edit'" v-model="checkInfo.name" />
+              <span>{{ checkInfo.name }}</span>
             </el-form-item>
             <el-form-item label="活动类型" label-width="100px">
-              <span v-if="dialogType !== 'edit'">{{ checkInfo.type | activityFilter }}</span>
-              <el-select v-if="dialogType === 'edit'" v-model="checkInfo.type">
-                <el-option label="团队-基础版" value="1" />
-                <el-option label="个人-基础版" value="2" />
-              </el-select>
+              <span>{{ checkInfo.type | activityFilter }}</span>
             </el-form-item>
             <el-form-item label="开始时间" label-width="100px">
-              <span v-if="dialogType !== 'edit'">{{ checkInfo.set_start_time | timeFilter }}</span>
-              <el-date-picker
-                v-if="dialogType === 'edit'"
-                v-model="set_start_time"
-                type="datetime"
-                value-format="timestamp" />
+              <span>{{ checkInfo.set_start_time | timeFilter }}</span>
             </el-form-item>
             <el-form-item label="开始时间" label-width="100px">
-              <span v-if="dialogType !== 'edit'">{{ checkInfo.set_stop_time | timeFilter }}</span>
-              <el-date-picker
-                v-if="dialogType === 'edit'"
-                v-model="set_stop_time"
-                type="datetime"
-                value-format="timestamp" />
+              <span>{{ checkInfo.set_stop_time | timeFilter }}</span>
               <el-button type="primary" v-if="dialogType === 'edit'" @click="handleUpdateActivity">修改活动</el-button>
             </el-form-item>
           </el-form>
@@ -660,6 +651,26 @@ export default {
     this.init()
   },
   methods: {
+    // 导入任务
+    handleFileChange(file) {
+      const activityId = this.activityId
+      const fileInput =  document.querySelector('#fileInput')
+      const formData = new FormData()
+      const config = {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      }
+      formData.append('file', fileInput.files[0])
+      formData.append('activity_id', activityId)
+      axios.post('/i/topteam/admin/importTask', formData, config).then(res => {
+        const data = res.data
+        if (data.error_code !== 0) {
+          this.$message({ message: data.error_msg, type: 'error' })
+        } else {
+          this.$message({ message: '导入成功', type: 'success' })
+          this._fetchTaskList(activityId)
+        }
+      })
+    },
     handleFilter() {
       this._fetchActivityList()
     },
@@ -975,12 +986,12 @@ export default {
         actDesc, scoreType, scoreShowType, type, bgImgUrl, iconUrl, price, check
       } = this.activityInfo
       if (type === '1') {
-        if (!time.length || !name || !keepTime || !score || !coachId || !type || !price) {
+        if (!time.length || !name || !keepTime || !score || !coachId || !type) {
           this.$message({ message: '必填项不能为空', type: 'error' })
           return
         }
       } else {
-        if (!time.length || !name || !type || !price) {
+        if (!time.length || !name || !type || !price || !bgImgUrl || !iconUrl ) {
           this.$message({ message: '必填项不能为空', type: 'error' })
           return
         }
@@ -1013,15 +1024,21 @@ export default {
       data.icon = iconUrl
       // 金额
       data.money = price
+      // 长期时间
       if (check) {
         data.keep_time = 0
       }
+      // 个人版本
       if (data.type === '2') {
         data.score = 0
         data.coach_id = 0
         data.score_show_type = 0
       }
-      console.log(data)
+      // 团队版本
+      if (data.type === '1') {
+        data.money = 0
+      }
+
       try {
         const res = await addActivity(data)
         // 创建活动成功form禁用
@@ -1149,6 +1166,51 @@ export default {
   overflow: hidden;
   height: 0;
   clear: both;
+}
+
+.aDialog .el-dialog, .aDialog .el-dialog__body{
+  width: 900px;
+}
+.clearfix::after {
+  display: block;
+  content: '';
+  overflow: hidden;
+  height: 0;
+  clear: both;
+}
+.filePicker{
+  border-radius: 4px;
+  width: 100px;
+  height: 36px;
+  line-height: 36px;
+  text-align: center;
+  color: #fff;
+  background: #00b7ee;        
+}
+.filePicker input[type="file"] {
+  position: relative;
+  top: -44px;
+  left: 0px;
+  width: 100px;
+  height: 36px;
+  opacity: 0;
+  cursor: pointer;
+  overflow: hidden;
+  z-index: 0;
+}
+.filePicker[disabled] {
+  color: #fff;
+  background-color: #a0cfff;
+  border-color: #a0cfff;
+}
+
+.filePicker input[disabled] {
+  cursor: not-allowed;
+  background-image: none;
+}
+.container{
+  width: 160px;
+  margin: 30px auto;
 }
 </style>
 
