@@ -26,7 +26,7 @@
       </el-table-column>
       <el-table-column label="充值金额" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.money }}</span>
+          <span>{{ scope.row.money / 100 }}</span>
         </template>
       </el-table-column>
       <el-table-column label="支付方式">

@@ -157,12 +157,7 @@ export default {
             type: 'success'
           })
         })
-        .catch(_ => {
-          this.$message({
-            message: '删除失败',
-            type: 'error'
-          })
-        })
+        .catch(_ => {})
     },
     // 创建教练
     async handleCreateCoach() {

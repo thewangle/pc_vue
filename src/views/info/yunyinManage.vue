@@ -303,10 +303,6 @@ export default {
       } catch (e) {
         this.dialogFormVisible = false
         await this._fetchOperatorList()
-        this.$message({
-          message: '创建失败',
-          type: 'error'
-        })
       }
       this._restForm()
     },
@@ -325,10 +321,6 @@ export default {
       } catch (e) {
         this.dialogFormVisible = false
         await this._fetchOperatorList()
-        this.$message({
-          message: '修改失败',
-          type: 'error'
-        })
       }
       this._restForm()
     },

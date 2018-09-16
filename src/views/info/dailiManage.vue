@@ -305,10 +305,6 @@ export default {
       } catch (e) {
         this.dialogFormVisible = false
         await this._fetchAgentList()
-        this.$message({
-          message: '创建失败',
-          type: 'error'
-        })
       }
     },
     // 修改代理商
@@ -326,10 +322,6 @@ export default {
       } catch (e) {
         this.dialogFormVisible = false
         await this._fetchAgentList()
-        this.$message({
-          message: '创建失败',
-          type: 'error'
-        })
       }
     },
     handleCityListChange(value) {

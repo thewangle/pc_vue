@@ -104,6 +104,7 @@ export default {
     async _getSubAgentNum() {
       const res = await getSubAgentNum()
       this.info = res.data
+      this.info.balance  = this.info.balance / 100
     },
     async _getTeamActivityNum(data) {
       const { type, value } = data

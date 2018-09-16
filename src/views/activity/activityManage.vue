@@ -173,10 +173,22 @@
               <el-button>上传图片</el-button>
             </el-upload>
           </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="handleCreateActivitySubmit">创建活动</el-button>
+          <el-form-item label="活动提示" v-if="activityInfo.type === '2'">
+            <el-upload
+              :http-request="handleUpLoadGifImg"
+              :on-preview="handleGifCardPreview"
+              :limit="1"
+              :action="domain"
+              :file-list="gifFileList"
+              list-type="picture-card"
+            >
+              <el-button>上传图片</el-button>
+            </el-upload>
           </el-form-item>
         </div>
+        <el-form-item>
+          <el-button type="primary" @click="handleCreateActivitySubmit">创建活动</el-button>
+        </el-form-item>
       </el-form>
       <hr >
       <div class="job-list">
@@ -558,7 +570,8 @@
         <div style="float: left">
           <el-form v-model="checkInfo">
             <el-form-item label="支付方式" label-width="100px">
-              <span>微信支付</span>
+              <el-radio v-model="payType" label="1">微信支付</el-radio>
+              <el-radio v-model="payType" label="4">余额支付</el-radio>
             </el-form-item>
             <el-form-item label="活动名称" label-width="100px">
               <span>{{ checkInfo.name }}</span>
@@ -567,7 +580,7 @@
               <span>{{ checkInfo.type | activityFilter }}</span>
             </el-form-item>
             <el-form-item label="活动金额" label-width="100px">
-              <span style="color: red">{{ checkInfo.money / 100 }}元</span>
+              <span style="color: red">{{ payMoney }}元</span>
             </el-form-item>
           </el-form>
           <div style="text-align: center">
@@ -600,7 +613,7 @@ import { fetchCoachList,
   delTask,
   editTask } from './../../service/activity'
 import { fetchQiNiuToken } from './../../service/common'
-import { getAgentName, getAgentId } from '@/utils/auth'
+import { getAgentName, getAgentId, getPrice } from '@/utils/auth'
 import { qiniuAddress } from './../../config'
 import axios from 'axios'
 import waves from '@/directive/waves' // 水波纹指令
@@ -689,6 +702,7 @@ export default {
       dialogType: '',
       dialogReasonVisible: false, // reason对话框
       reason: '',
+      payMoney: getPrice(),
       dialogPayVisible: false, // 支付弹窗
       activityInfo: {
         agentName: getAgentName(), // 代理商名称
@@ -703,6 +717,7 @@ export default {
         actDesc: '', // 活动描述
         bgImgUrl: '', // 背景图片URl
         iconUrl: '', // 活动封面Url
+        gif_url: '', //个人版本gifUrl
         price: '', // 活动价格
         check: '' // 是够长期
       },
@@ -744,7 +759,9 @@ export default {
       },
       pay_er_img: null,
       set_start_time: '',
-      set_stop_time: ''
+      set_stop_time: '',
+      payType: '1',
+      gifFileList: []
     }
   },
   created() {
@@ -793,6 +810,10 @@ export default {
       this.dialogImageUrl = this.activityInfo.iconUrl
       this.dialogVisible = true
     },
+    handleGifCardPreview() {
+      this.dialogImageUrl = this.activityInfo.gif_url
+      this.dialogVisible = true
+    },
     handleTaskImgPreview() {
       this.dialogTaskImageUrl = this.taskInfo.question_img
       this.dialogTaskImgVisible = true
@@ -811,6 +832,10 @@ export default {
     },
     handleUpLoadIconImg(req) {
       const type = 'icon'
+      this._uploadQiNiu(req, type)
+    },
+    handleUpLoadGifImg(req) {
+      const type = 'gif'
       this._uploadQiNiu(req, type)
     },
     handleUpLoadTaksImg(req) {
@@ -940,7 +965,15 @@ export default {
       }
       const res = await creatOrder({ type_id: this.activityId, order_type: str })
       const { data } = res
-      this.pay_er_img = `/i/topteam/api/getpayinfo?order_sn=${data.order_sn}&pay_type=1`
+      if (this.payType === '1') {
+        this.pay_er_img = `/i/topteam/api/getpayinfo?order_sn=${data.order_sn}&pay_type=1`
+      } else if (this.payType === '4') {
+        try {
+          const response = await getPayInfo({ order_sn: data.order_sn, pay_type: this.payType })
+          this.$message({ message: '支付成功', type: 'success' })
+          this.handleClosePayDialog()
+        } catch (e) {}
+      }
     },
     // 打开活动通过弹窗
     handleCheckPass() {
@@ -950,6 +983,7 @@ export default {
     handleClosePayDialog() {
       this.dialogPayVisible = false
       this.pay_er_img = ''
+      this.payType = '1'
     },
     // 打开审批不通过弹窗
     handelAuditact() {
@@ -1130,6 +1164,9 @@ export default {
         if (type === 'icon') {
           this.activityInfo.iconUrl = url
         }
+        if (type === 'gif') {
+          this.activityInfo.gif_url = url
+        }
         if (type === 'task') {
           this.taskInfo.question_img = url
         }
@@ -1159,7 +1196,7 @@ export default {
       const data = {}
       const {
         time, name, keepTime, score, coachId,
-        actDesc, scoreType, scoreShowType, type, bgImgUrl, iconUrl, price, check
+        actDesc, scoreType, scoreShowType, type, bgImgUrl, iconUrl, price, check, gif_url
       } = this.activityInfo
       if (type === '1') {
         if (!time.length || !name || !keepTime || !score || !coachId || !type) {
@@ -1171,6 +1208,7 @@ export default {
           this.$message({ message: '必填项不能为空', type: 'error' })
           return
         }
+        data.gif_url = gif_url
       }
 
       // 时间
@@ -1314,10 +1352,12 @@ export default {
         bgImgUrl: '', // 背景图片URl
         iconUrl: '', // 活动封面Url
         price: '', // 活动价格
-        check: '' // 是够长期
+        check: '', // 是够长期
+        gif_url: ''
       }
       this.iconFilelist = []
       this.bgFileList = []
+      this.gifFileList = []
     },
     // 重置添加任务
     _resetTaskInfo() {
