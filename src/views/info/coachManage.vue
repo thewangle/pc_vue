@@ -43,7 +43,7 @@
       </el-table-column>
       <el-table-column label="创建日期" align="center" width="170">
         <template slot-scope="scope">
-          <span>{{ scope.row.update_time | timeFilter}}</span>
+          <span>{{ scope.row.update_time | timeFilter }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">

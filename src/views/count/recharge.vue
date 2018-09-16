@@ -118,11 +118,11 @@ export default {
       this.listQuery.end_time = this.listQuery.dateValue[1]
       this.listQuery.start_time = Math.floor(this.listQuery.start_time / 1000)
       this.listQuery.end_time = Math.floor(this.listQuery.end_time / 1000)
-      try{
+      try {
         const res = await fetchChargeList(this.listQuery)
         this.list = res.data.data
         this.total = res.data.total
-      } catch(e) {}
+      } catch (e) {}
     }
   }
 }

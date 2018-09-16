@@ -56,9 +56,9 @@
       </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleEditOperator(scope.row)">修改</el-button>
-          <el-button size="mini" type="success" @click="handleListTrans(scope.row)">转移</el-button>
-          <el-button size="mini" type="danger" @click="handleDeleteOperator(scope.row.id)">删除</el-button>
+          <el-button :disabled="compareId === scope.row.id" type="primary" size="mini" @click="handleEditOperator(scope.row)">修改</el-button>
+          <el-button :disabled="compareId === scope.row.id" size="mini" type="success" @click="handleListTrans(scope.row)">转移</el-button>
+          <el-button :disabled="compareId === scope.row.id" size="mini" type="danger" @click="handleDeleteOperator(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -98,12 +98,12 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button>取消</el-button>
-        <el-button type="primary" @click="handleCreateAgent" v-if="dialotType === 'add'">保存</el-button>
-        <el-button type="primary" @click="handleEditAgent" v-if="dialotType === 'edit'">保存</el-button>
+        <el-button v-if="dialotType === 'add'" type="primary" @click="handleCreateAgent">保存</el-button>
+        <el-button v-if="dialotType === 'edit'" type="primary" @click="handleEditAgent">保存</el-button>
       </div>
     </el-dialog>
 
-    <el-dialog :title="transTitle" :visible.sync="dialogTransVisible" @close="handleTransClose" class="transDialog">
+    <el-dialog :title="transTitle" :visible.sync="dialogTransVisible" class="transDialog" @close="handleTransClose">
       <div class="clearfix">
         <div style="float:left; width: 40%;">
           <el-form label-position="left">
@@ -132,7 +132,7 @@
         </div>
         <div style="float: left; width: 18%; margin-top: 16%;">
           <div>
-            <i class="el-icon-d-arrow-right" style="font-size: 36px; color: #409EFF;"></i>
+            <i class="el-icon-d-arrow-right" style="font-size: 36px; color: #409EFF;"/>
             <p style="color: #409EFF;">转移</p>
           </div>
         </div>
@@ -140,7 +140,7 @@
           <el-form>
             <el-form-item label="选择代理商" label-width="100px">
               <el-select v-model="superAgentId" clearable>
-                <el-option v-for="item in supList" :key="item.id" :label="item.name" :value="item.id" v-if="item.level < 5"/>
+                <el-option v-for="item in supList" v-if="item.level < 5" :key="item.id" :label="item.name" :value="item.id"/>
               </el-select>
             </el-form-item>
           </el-form>
@@ -208,11 +208,12 @@ export default {
         label: 'name',
         children: 'childs'
       },
-      transTitle: '', //转移对话框标题
+      transTitle: '', // 转移对话框标题
       dialogTransVisible: false, // 转移弹窗
       superAgentId: '',
       rowInfo: {},
-      supList: []
+      supList: [],
+      compareId: getAgentId()
     }
   },
   created() {

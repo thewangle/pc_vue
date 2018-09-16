@@ -86,7 +86,7 @@
           <el-input v-model="activityInfo.agentName" disabled />
         </el-form-item>
         <el-form-item label="活动类型">
-          <el-select v-model="activityInfo.type" @change="activityInfo.coachId = null">
+          <el-select v-model="activityInfo.type" @change="handleActivityChange">
             <el-option label="团队-基础版" value="1" />
             <el-option label="个人-基础版" value="2" />
           </el-select>
@@ -114,37 +114,36 @@
           </el-select>
         </el-form-item>
         <el-form-item label="起始分值">
-          <el-input v-model="activityInfo.score" type="number" min="0" :disabled="!activityInfo.type || activityInfo.type === '2'" />
+          <el-input v-model="activityInfo.score" :disabled="!activityInfo.type || activityInfo.type === '2'" type="number" min="0" />
         </el-form-item>
         <el-form-item label="活动时长">
           <el-input v-model="activityInfo.keepTime" type="number" min="0">
-            <el-checkbox slot="suffix" v-model="activityInfo.check" v-if="activityInfo.type === '2'">长期</el-checkbox>
+            <el-checkbox v-if="activityInfo.type === '2'" slot="suffix" v-model="activityInfo.check">长期</el-checkbox>
           </el-input>
         </el-form-item>
-        <el-form-item label="活动价格" v-if="activityInfo.type === '2'">
+        <el-form-item v-if="activityInfo.type === '2'" label="活动价格">
           <el-input v-model="activityInfo.price" type="number"/>
         </el-form-item>
         <el-form-item label="起止时间">
           <el-date-picker
+            v-if="activityInfo.type !== '2'"
             v-model="activityInfo.time"
             type="datetimerange"
             range-separator="至"
             start-placeholder="开始时间"
             end-placeholder="结束时间"
-            value-format="timestamp"
-            v-if="activityInfo.type !== '2'"/>
+            value-format="timestamp"/>
           <el-time-picker
-            is-range
+            v-if="activityInfo.type === '2'"
             v-model="activityInfo.time"
+            is-range
             range-separator="至"
             start-placeholder="开始时间"
             end-placeholder="结束时间"
-            value-format="timestamp"
-            v-if="activityInfo.type === '2'">
-          </el-time-picker>
+            value-format="timestamp"/>
         </el-form-item>
         <el-form-item label="活动描述">
-          <el-input v-model="activityInfo.actDesc" class="act-textarea" type="textarea" maxlength="300" :autosize="{ minRows: 1 }"/>
+          <el-input v-model="activityInfo.actDesc" :autosize="{ minRows: 1 }" class="act-textarea" type="textarea" maxlength="300"/>
         </el-form-item>
         <div>
           <el-form-item label="活动封面">
@@ -186,12 +185,15 @@
           <div :disabled="!activityId" class="filePicker" style="float: right">
             <label>导入任务</label>
             <input
+              id="fileInput"
               :disabled="!activityId"
-              @change="handleFileChange"
-              id="fileInput" type="file" name="file"
-              accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+              type="file"
+              name="file"
+              accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+              @change="handleFileChange">
           </div>
-          <el-button :disabled="!activityId" type="primary" style="float: right; margin-right: 20px;" @click="handleOpenTaskDialog">添加任务</el-button>
+          <el-button type="primary" style="float: right; margin-right: 20px;" @click="handleOpenTaskDialog">添加任务</el-button>
+          <!-- <el-button :disabled="!activityId" type="primary" style="float: right; margin-right: 20px;" @click="handleOpenTaskDialog">添加任务</el-button> -->
         </div>
         <div class="job-table">
           <el-table
@@ -257,13 +259,13 @@
           <el-input v-model="taskInfo.name" />
         </el-form-item>
         <el-form-item label="题目类型" label-width="100px">
-          <el-select v-model="taskInfo.type" :disabled="dialogTaskType === 'edit'">
+          <el-select v-model="taskInfo.type" :disabled="dialogTaskType === 'edit'" @change="taskInfo.answer_type = '1'">
             <el-option label="选择题" value="1" />
-            <el-option label="文字题" value="2" v-if="activityInfo.type === '1' || checkInfo.type === '1'" />
+            <el-option v-if="activityInfo.type === '1' || checkInfo.type === '1'" label="文字题" value="2" />
             <el-option label="图片题" value="3" />
-            <el-option label="视频题" value="4" v-if="activityInfo.type === '1' || checkInfo.type === '1'"/>
-            <el-option label="语音题" value="5" v-if="activityInfo.type === '1' || checkInfo.type === '1'"/>
-            <el-option label="拍照题" value="6" v-if="activityInfo.type === '1' || checkInfo.type === '1'"/>
+            <el-option v-if="activityInfo.type === '1' || checkInfo.type === '1'" label="视频题" value="4"/>
+            <el-option v-if="activityInfo.type === '1' || checkInfo.type === '1'" label="语音题" value="5"/>
+            <el-option v-if="activityInfo.type === '1' || checkInfo.type === '1'" label="拍照题" value="6"/>
           </el-select>
         </el-form-item>
         <el-form-item label="题目描述" label-width="100px">
@@ -273,36 +275,36 @@
           <el-input v-model="taskInfo.score" type="number" />
         </el-form-item>
         <el-form-item label="答题类型" label-width="100px">
-          <el-select v-model="taskInfo.answer_type">
+          <el-select v-model="taskInfo.answer_type" :disabled="dialogTaskType === 'edit'">
             <el-option label="普通题" value="1" />
-            <el-option label="关卡题" value="2" />
-            <el-option label="团队限时题" value="3" v-if="activityInfo.type === '1' || checkInfo.type === '1'" />
-            <el-option label="活动抢答题" value="4" v-if="activityInfo.type === '1' || checkInfo.type === '1'"/>
+            <el-option label="关卡题" v-if="taskInfo.type === '1' || taskInfo.type === '3'" value="2" />
+            <el-option v-if="(activityInfo.type === '1' || checkInfo.type === '1') && (taskInfo.type === '1' || taskInfo.type === '3')" label="团队限时题" value="3" />
+            <el-option v-if="(activityInfo.type === '1' || checkInfo.type === '1') && (taskInfo.type === '1' || taskInfo.type === '3')" label="活动抢答题" value="4"/>
           </el-select>
         </el-form-item>
         <el-form-item label="题目顺序" label-width="100px">
           <el-input v-model="taskInfo.seq" type="number" />
         </el-form-item>
         <el-form-item label="答题人数" label-width="100px">
-          <el-input v-model="taskInfo.answer_limit" type="number" />
+          <el-input v-model="taskInfo.answer_limit" type="number" :disabled="activityInfo.type === '2'" />
         </el-form-item>
-        <!-- 文字题目 -->
+        <el-form-item label="题目图片" label-width="100px">
+          <el-upload
+            :http-request="handleUpLoadTaksImg"
+            :on-preview="handleTaskImgPreview"
+            :limit="1"
+            :action="domain"
+            :file-list="taskQFileList"
+            list-type="picture-card"
+          >
+            <el-button>上传图片</el-button>
+          </el-upload>
+          <el-dialog :visible.sync="dialogTaskImgVisible">
+            <img :src="dialogTaskImageUrl" width="100%" alt="">
+          </el-dialog>
+        </el-form-item>
+        <!-- 选择题 -->
         <template v-if="taskInfo.type === '1'">
-          <el-form-item label="题目图片" label-width="100px">
-            <el-upload
-              :http-request="handleUpLoadTaksImg"
-              :on-preview="handleTaskImgPreview"
-              :limit="1"
-              :action="domain"
-              :file-list="taskQFileList"
-              list-type="picture-card"
-            >
-              <el-button>上传图片</el-button>
-            </el-upload>
-            <el-dialog :visible.sync="dialogTaskImgVisible">
-              <img :src="dialogTaskImageUrl" width="100%" alt="">
-            </el-dialog>
-          </el-form-item>
           <el-form-item label="题目选项" label-width="100px">
             <el-input v-model="taskInfo.options.A" placeholder="请输入选项内容">
               <template slot="prepend">A</template>
@@ -326,11 +328,72 @@
             </el-checkbox-group>
           </el-form-item>
         </template>
+        <!-- 文字题目 -->
+        <template v-if="taskInfo.type === '2'">
+          <el-form-item label="答案" label-width="100px">
+            <el-input v-model="taskInfo.answer2" />
+          </el-form-item>
+        </template>
+        <!-- 图片题 -->
+        <template v-if="taskInfo.type === '3'"/>
+        <!-- 视频题 -->
+        <template v-if="taskInfo.type === '4'">
+          <el-form-item label="题目视频" label-width="100px">
+            <el-upload
+              :http-request="handleUpLoadAnswerImg"
+              :on-preview="handleAnswerImgPreview"
+              :limit="1"
+              :action="domain"
+              :file-list="taskAFileList"
+            >
+              <el-button>上传视频</el-button>
+            </el-upload>
+            <el-dialog :visible.sync="dialogAnswerImgVisible">
+              <video :src="dialogAnswerImageUrl" controls autoplay width="100%" />
+            </el-dialog>
+          </el-form-item>
+        </template>
+        <!-- 语音题 -->
+        <template v-if="taskInfo.type === '5'">
+          <el-form-item label="题目语音" label-width="100px">
+            <el-upload
+              :http-request="handleUpLoadAnswerImg"
+              :on-preview="handleAnswerImgPreview"
+              :limit="1"
+              :action="domain"
+              :file-list="taskAFileList"
+            >
+              <el-button>上传音频</el-button>
+            </el-upload>
+            <el-dialog :visible.sync="dialogAnswerImgVisible">
+              <video :src="dialogAnswerImageUrl" controls autoplay width="100%" />
+            </el-dialog>
+          </el-form-item>
+        </template>
+        <!-- 拍照题 -->
+        <template v-if="taskInfo.type === '6'">
+          <el-form-item label="拍照图片" label-width="100px">
+            <el-upload
+              :http-request="handleUpLoadAnswerImg"
+              :on-preview="handleAnswerImgPreview"
+              :limit="1"
+              :action="domain"
+              :file-list="taskAFileList"
+              list-type="picture-card"
+            >
+              <el-button>上传图片</el-button>
+            </el-upload>
+          </el-form-item>
+          <el-dialog :visible.sync="dialogAnswerImgVisible">
+            <img :src="dialogAnswerImageUrl" width="100%" alt="">
+          </el-dialog>
+        </template>
+
         <el-form-item>
           <div style="text-align: center">
             <el-button @click="handleCloseTaskDialog">取消</el-button>
-            <el-button type="primary" @click="handelCreateTaskSubmit" v-if="dialogTaskType === 'add'">添加题目</el-button>
-            <el-button type="primary" @click="handelUpdateTaskSubmit" v-if="dialogTaskType === 'edit'">修改题目</el-button>
+            <el-button v-if="dialogTaskType === 'add'" type="primary" @click="handelCreateTaskSubmit">添加题目</el-button>
+            <el-button v-if="dialogTaskType === 'edit'" type="primary" @click="handelUpdateTaskSubmit">修改题目</el-button>
           </div>
         </el-form-item>
       </el-form>
@@ -365,16 +428,16 @@
             </el-form-item>
             <el-form-item label="开始时间" label-width="100px">
               <span>{{ checkInfo.set_stop_time | timeFilter }}</span>
-              <el-button type="primary" v-if="dialogType === 'edit'" @click="handleUpdateActivity">修改活动</el-button>
+              <el-button v-if="dialogType === 'edit'" type="primary" @click="handleUpdateActivity">修改活动</el-button>
             </el-form-item>
           </el-form>
         </div>
         <div class="info-tab-right" style="width: 50%; float: right;">
           <h4>活动二维码</h4>
           <div class="er-img" style="width: 160px; height: 160px; margin: 0 auto; border: 1px solid #ccc; margin-top: 20px;">
-            <span style="color: red; font-size: 18px;" v-if="!checkInfo.qcode_url">活动审批完成后创建二维码</span>
+            <span v-if="!checkInfo.qcode_url" style="color: red; font-size: 18px;">活动审批完成后创建二维码</span>
             <img :src="checkInfo.qcode_url" alt="" style="height: 158px; width: 158px;">
-            <p style="text-align: center; color: red;font-weight: 500;">{{checkInfo.name}}</p>
+            <p style="text-align: center; color: red;font-weight: 500;">{{ checkInfo.name }}</p>
           </div>
         </div>
       </div>
@@ -460,7 +523,7 @@
       class="activityDialog"
       title="活动付费(点击确定扫描右侧二维码)"
       @close="handleClosePayDialog">
-      <hr />
+      <hr >
       <div class="clearfix">
         <div style="float: left">
           <el-form v-model="checkInfo">
@@ -572,6 +635,7 @@ export default {
       iconFilelist: [],
       bgFileList: [],
       taskQFileList: [],
+      taskAFileList: [],
       list: null,
       listLoading: false,
       listQuery: {
@@ -595,7 +659,7 @@ export default {
       dialogType: '',
       dialogReasonVisible: false, // reason对话框
       reason: '',
-      dialogPayVisible: false, //支付弹窗
+      dialogPayVisible: false, // 支付弹窗
       activityInfo: {
         agentName: getAgentName(), // 代理商名称
         type: '', // 活动类型
@@ -610,7 +674,7 @@ export default {
         bgImgUrl: '', // 背景图片URl
         iconUrl: '', // 活动封面Url
         price: '', // 活动价格
-        check: '', // 是够长期
+        check: '' // 是够长期
       },
       activityId: null,
       taskInfo: {
@@ -627,11 +691,15 @@ export default {
           D: null
         },
         answer: [],
+        answer2: '', // 文字题答案
+        answer_url: '',
         score: null,
         answer_limit: 1
       },
       dialogImageUrl: '',
       dialogVisible: false,
+      dialogAnswerImageUrl: '',
+      dialogAnswerImgVisible: false,
       coachList: [], // 教练列表
       domain: 'http://upload.qiniup.com/',
       qiniuAddress: qiniuAddress,
@@ -651,10 +719,18 @@ export default {
     this.init()
   },
   methods: {
+    // 活动类型修改
+    handleActivityChange(val) {
+      if (val === '2') {
+        this.activityInfo.price = 10
+        this.activityInfo.answer_limit = 1
+      }
+      this.activityInfo.coachId = null
+    },
     // 导入任务
     handleFileChange(file) {
       const activityId = this.activityId
-      const fileInput =  document.querySelector('#fileInput')
+      const fileInput = document.querySelector('#fileInput')
       const formData = new FormData()
       const config = {
         headers: { 'Content-Type': 'multipart/form-data' }
@@ -689,6 +765,10 @@ export default {
       this.dialogTaskImageUrl = this.taskInfo.question_img
       this.dialogTaskImgVisible = true
     },
+    handleAnswerImgPreview() {
+      this.dialogAnswerImageUrl = this.taskInfo.answer_url
+      this.dialogAnswerImgVisible = true
+    },
     handleUpLoadBgImg(req) {
       const type = 'bgImg'
       this._uploadQiNiu(req, type)
@@ -701,17 +781,39 @@ export default {
       const type = 'task'
       this._uploadQiNiu(req, type)
     },
+    handleUpLoadAnswerImg(req) {
+      const type = 'answer'
+      this._uploadQiNiu(req, type)
+    },
     async handelUpdateTaskSubmit() {
       const { name, score, seq, answer_limit } = this.taskInfo
       if (!name || !score || !seq || !answer_limit) {
-        this.$message({ message: '必填项不能为空', type: 'error'})
+        this.$message({ message: '必填项不能为空', type: 'error' })
         return
       }
       const data = Object.assign({}, this.taskInfo)
-      if (Array.isArray(data.answer)){
+      if (Array.isArray(data.answer)) {
         data.answer = JSON.stringify(data.answer.sort())
       }
       data.options = JSON.stringify(data.options)
+
+      // 文字题
+      if (data.type === '2') {
+        if (!data.answer2) {
+          this.$message({ message: '答案不能为空', type: 'error' })
+          return
+        }
+        data.answer = data.answer2
+      }
+      // 拍照题
+      if (data.type === '6') {
+        if (!data.answer_url) {
+          this.$message({ message: '请上传拍照图片', type: 'error' })
+          return
+        }
+        data.answer = data.answer_url
+      }
+
       try {
         const res = await editTask(JSON.stringify(data))
         this.$message({ message: '修改成功', type: 'success' })
@@ -734,11 +836,12 @@ export default {
       this.taskInfo.score = row.score
       this.taskInfo.seq = row.seq
       this.taskInfo.answer_limit = row.answer_limit
+      this.taskInfo.answer_type = row.answer_type
       if (row.question_img) {
         this.taskInfo.question_img = row.question_img
         this.taskQFileList = [{ name: row.name, url: row.question_img }]
       }
-      //选择题
+      // 选择题
       if (row.type === '1') {
         this.taskInfo.answer = JSON.parse(row.answer)
         // this.taskInfo.options = JSON.parse(row.options)
@@ -748,6 +851,14 @@ export default {
           C: 3,
           D: 4
         }
+      }
+      // 文字题
+      if (row.type === '2') {
+        this.taskInfo.answer2 = row.answer
+      }
+      if (row.type === '4' || row.type === '5' || row.type === '6') {
+        this.taskInfo.answer_url = row.answer
+        this.taskAFileList = [{ name: row.name, url: row.answer }]
       }
     },
     // 支付完成返回列表
@@ -759,7 +870,7 @@ export default {
     async handleGetPayEr() {
       let str
       if (this.checkInfo.type === '1') {
-        str ='team'
+        str = 'team'
       } else if (this.checkInfo.type === '2') {
         str = 'person'
       }
@@ -940,14 +1051,8 @@ export default {
       const config = {
         headers: { 'Content-Type': 'multipart/form-data' }
       }
-      let filetype = ''
-      if (req.file.type === 'image/png') {
-        filetype = 'png'
-      } else {
-        filetype = 'jpg'
-      }
       // 重命名要上传的文件
-      const keyname = 'top-team' + Date.now() + Math.floor(Math.random() * 100) + '.' + filetype
+      const keyname = 'top-team' + Date.now() + Math.floor(Math.random() * 100) + req.file.name
       const token = await this._fetchQiNiuToken()
       const formData = new FormData()
       formData.append('file', req.file)
@@ -963,6 +1068,9 @@ export default {
         }
         if (type === 'task') {
           this.taskInfo.question_img = url
+        }
+        if (type === 'answer') {
+          this.taskInfo.answer_url = url
         }
       })
     },
@@ -991,12 +1099,12 @@ export default {
           return
         }
       } else {
-        if (!time.length || !name || !type || !price || !bgImgUrl || !iconUrl ) {
+        if (!time.length || !name || !type || !price || !bgImgUrl || !iconUrl) {
           this.$message({ message: '必填项不能为空', type: 'error' })
           return
         }
       }
-      
+
       // 时间
       data.set_start_time = time[0] / 1000
       data.set_stop_time = time[1] / 1000
@@ -1055,6 +1163,8 @@ export default {
     },
     // 添加任务
     async handelCreateTaskSubmit() {
+      // const activityId = this.activityId
+      const activityId = 62
       const { name, score, seq } = this.taskInfo
       if (!name || !score || !seq) {
         this.$message({
@@ -1063,16 +1173,44 @@ export default {
         })
         return
       }
-      const data = Object.assign({}, this.taskInfo, { activity_id: this.activityId })
+      const data = Object.assign({}, this.taskInfo, { activity_id: activityId })
       data.answer = JSON.stringify(data.answer)
       data.options = JSON.stringify(data.options)
+      if (data.type === '2') {
+        if (!data.answer2) {
+          this.$message({ message: '答案不能为空', type: 'error' })
+          return
+        }
+        data.answer = data.answer2
+      }
+      if (data.type === '4') {
+        if (!data.answer_url) {
+          this.$message({ message: '请上传视频', type: 'error' })
+          return
+        }
+        data.answer = data.answer_url
+      }
+      if (data.type === '5') {
+        if (!data.answer_url) {
+          this.$message({ message: '请上传音频', type: 'error' })
+          return
+        }
+        data.answer = data.answer_url
+      }
+      if (data.type === '6') {
+        if (!data.answer_url) {
+          this.$message({ message: '请上传拍照图片', type: 'error' })
+          return
+        }
+        data.answer = data.answer_url
+      }
       try {
         const res = await addTask(JSON.stringify(data))
         this.$message({ message: '添加成功', type: 'success' })
       } catch (e) {
       }
       this.dialogTaskVisible = false
-      this._fetchTaskList(this.activityId)
+      this._fetchTaskList(activityId)
     },
     // 获取活动列表
     async _fetchActivityList() {
@@ -1109,7 +1247,7 @@ export default {
         bgImgUrl: '', // 背景图片URl
         iconUrl: '', // 活动封面Url
         price: '', // 活动价格
-        check: '', // 是够长期
+        check: '' // 是够长期
       }
       this.iconFilelist = []
       this.bgFileList = []
@@ -1130,10 +1268,13 @@ export default {
           D: null
         },
         answer: [],
+        answer2: '',
+        answer_url: '',
         score: null,
         answer_limit: 1
       }
       this.taskQFileList = []
+      this.taskAFileList = []
     },
     _restCheckInfo() {
       this.checkInfo = {
@@ -1185,7 +1326,7 @@ export default {
   line-height: 36px;
   text-align: center;
   color: #fff;
-  background: #00b7ee;        
+  background: #00b7ee;
 }
 .filePicker input[type="file"] {
   position: relative;

@@ -99,7 +99,8 @@
         <el-pagination
           :current-page="dilogQuery.page_no"
           :total="dialogTotal"
-          background layout="total, sizes, prev, pager, next, jumper"
+          background
+          layout="total, sizes, prev, pager, next, jumper"
           @current-change="handledialogCurrentChange"/>
       </div>
     </el-dialog>
@@ -209,11 +210,11 @@ export default {
       this.listQuery.end_time = Math.floor(etime / 1000)
       const param = Object.assign({}, this.listQuery)
       param.agent_type = param.agent_type || 0
-      try{
+      try {
         const res = await fetchCountList(param)
         this.list = res.data.data
         this.total = res.data.total
-      } catch(e) {}
+      } catch (e) {}
     }
   }
 }

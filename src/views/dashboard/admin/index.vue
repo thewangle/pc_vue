@@ -4,20 +4,20 @@
 
     <el-row :gutter="8">
       <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="padding-right:8px;margin-bottom:30px;">
-        <transaction-table @timeChange="handleGetNum" :num="teamNum"/>
+        <transaction-table :num="teamNum" @timeChange="handleGetNum"/>
       </el-col>
       <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="padding-right:8px;margin-bottom:30px;">
-        <transaction-table type="player" @timeChange="handleGetNum" :num="playerNum" />
+        <transaction-table :num="playerNum" type="player" @timeChange="handleGetNum" />
       </el-col>
     </el-row>
 
     <el-row>
       <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="padding-right:8px;margin-bottom:30px;">
-        <box-card @recharge="handleRecharge" :num="info.balance || 0"/>
+        <box-card :num="info.balance || 0" @recharge="handleRecharge"/>
       </el-col>
     </el-row>
 
-    <el-dialog title="账户充值" :visible.sync="dialogFormVisible" @close="handleClose" class="payDialog">
+    <el-dialog :visible.sync="dialogFormVisible" title="账户充值" class="payDialog" @close="handleClose">
       <div style="height: 200px">
         <div style="float:left; width: 48%;">
           <el-form label-position="left">
@@ -38,11 +38,11 @@
         </div>
         <div style="float: right; width: 50%; height: 100%;">
           <div style="height: 140px; width: 140px; margin: 0 auto;">
-            <img style="height: 138px; width: 138px;" :src="pay_er_url" alt="">
+            <img :src="pay_er_url" style="height: 138px; width: 138px;" alt="">
           </div>
         </div>
       </div>
-      
+
     </el-dialog>
   </div>
 </template>

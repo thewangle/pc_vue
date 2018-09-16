@@ -62,9 +62,9 @@
       </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleUpdateAgent(scope.row)">修改</el-button>
-          <el-button size="mini" type="success" @click="handleListTrans(scope.row)">转移</el-button>
-          <el-button size="mini" type="danger" @click="handleDeleteAgent(scope.row)">删除</el-button>
+          <el-button :disabled="scope.row.id === compareId" type="primary" size="mini" @click="handleUpdateAgent(scope.row)">修改</el-button>
+          <el-button :disabled="scope.row.id === compareId" size="mini" type="success" @click="handleListTrans(scope.row)">转移</el-button>
+          <el-button :disabled="scope.row.id === compareId" size="mini" type="danger" @click="handleDeleteAgent(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -78,14 +78,20 @@
           <el-input v-model="agentInfo.username"/>
         </el-form-item>
         <el-form-item label="代理级别">
-          <el-select v-model="agentInfo.level" clearable v-if="dialogType === 'add'">
+          <el-select v-if="dialogType === 'add'" v-model="agentInfo.level" clearable>
             <el-option
+              v-for="item in allDaili"
               v-if="(dialogType === 'add' && (+compareLevel + 1 === +item.key))"
-              v-for="item in allDaili" :key="item.key" :label="item.label" :value="item.key"/>
+              :key="item.key"
+              :label="item.label"
+              :value="item.key"/>
           </el-select>
-          <el-select v-model="agentInfo.level" clearable v-if="dialogType === 'edit'" disabled="">
+          <el-select v-if="dialogType === 'edit'" v-model="agentInfo.level" clearable disabled="">
             <el-option
-              v-for="item in allDaili" :key="item.key" :label="item.label" :value="item.key"/>
+              v-for="item in allDaili"
+              :key="item.key"
+              :label="item.label"
+              :value="item.key"/>
           </el-select>
         </el-form-item>
         <el-form-item label="联系人">
@@ -109,12 +115,12 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="handleClose">取消</el-button>
-        <el-button type="primary" @click="handleCreateAgent" v-if="dialogType === 'add'">保存</el-button>
-        <el-button type="primary" @click="handleEditAgent" v-if="dialogType === 'edit'">修改</el-button>
+        <el-button v-if="dialogType === 'add'" type="primary" @click="handleCreateAgent">保存</el-button>
+        <el-button v-if="dialogType === 'edit'" type="primary" @click="handleEditAgent">修改</el-button>
       </div>
     </el-dialog>
 
-    <el-dialog :title="transTitle" :visible.sync="dialogTransVisible" @close="handleTransClose" class="transDialog">
+    <el-dialog :title="transTitle" :visible.sync="dialogTransVisible" class="transDialog" @close="handleTransClose">
       <div class="clearfix">
         <div style="float:left; width: 40%;">
           <el-form label-position="left">
@@ -143,7 +149,7 @@
         </div>
         <div style="float: left; width: 18%; margin-top: 16%;">
           <div>
-            <i class="el-icon-d-arrow-right" style="font-size: 36px; color: #409EFF;"></i>
+            <i class="el-icon-d-arrow-right" style="font-size: 36px; color: #409EFF;"/>
             <p style="color: #409EFF;">转移</p>
           </div>
         </div>
@@ -168,7 +174,7 @@
 <script>
 import { createAgent, editAgent, deleteAgent, fetchAgentList, transAgent, transSubordinateAgent, getSubordinateAgent } from './../../service/info'
 import { fetchCityList } from './../../service/common'
-import { getLevel } from '@/utils/auth'
+import { getLevel, getAgentId } from '@/utils/auth'
 import waves from '@/directive/waves' // 水波纹指令
 
 export default {
@@ -216,12 +222,13 @@ export default {
         label: 'name',
         children: 'childs'
       },
-      transTitle: '', //转移对话框标题
+      transTitle: '', // 转移对话框标题
       dialogTransVisible: false, // 转移弹窗
       superAgentId: '',
       rowInfo: {},
       supList: [],
-      compareLevel: getLevel()
+      compareLevel: getLevel(),
+      compareId: getAgentId()
     }
   },
   created() {
@@ -369,7 +376,7 @@ export default {
           } catch (e) {
             if (e.error_code === 60001) {
               this.handleListTrans(row, 'delete')
-            } 
+            }
           }
           await this._fetchAgentList()
         })
