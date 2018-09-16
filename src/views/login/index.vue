@@ -101,8 +101,6 @@ export default {
           try {
             const res = await login({ user_name: username, passwd: password })
             setUserInfo(res.data)
-            const menuList = await fetchRoleMenulist({ role_id: getRoleId() })
-            console.log(menuList)
             this.loading = false
             this.$router.push({ path: '/' })
           } catch (e) {

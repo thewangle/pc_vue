@@ -51,23 +51,25 @@ export const constantRouterMap = [
     path: '/401',
     component: () => import('@/views/errorPage/401'),
     hidden: true
-  },
+  }
+]
+
+export const asyncRouterMap = [
   {
     path: '',
+    id: 1,
     component: Layout,
     redirect: 'dashboard',
+    hidden: true,
     children: [
       {
         path: 'dashboard',
         component: () => import('@/views/dashboard/index'),
         name: 'Dashboard',
-        meta: { title: 'dashboard', icon: 'dashboard', noCache: true }
+        meta: { title: '首页', icon: 'dashboard', noCache: true }
       }
     ]
-  }
-]
-
-export const asyncRouterMap = [
+  },
   {
     path: '/documentation',
     component: Layout,
@@ -78,25 +80,14 @@ export const asyncRouterMap = [
         path: 'index',
         component: () => import('@/views/documentation/index'),
         name: 'Documentation',
-        meta: { title: 'documentation', icon: 'documentation', noCache: true }
-      }
-    ]
-  },
-  {
-    path: '/icon',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/svg-icons/index'),
-        name: 'Icons',
-        meta: { title: 'icons', icon: 'icon', noCache: true }
+        meta: { title: '文档', icon: 'documentation', noCache: true }
       }
     ]
   },
   tableRouter,
   infoRouter,
   {
+    id: 4,
     path: '/count',
     component: Layout,
     redirct: '/count/show',
@@ -105,22 +96,28 @@ export const asyncRouterMap = [
       title: '财务统计',
       icon: 'money'
     },
+    hidden: true,
     children: [
       {
+        id: 14,
         path: 'show',
         component: () => import('@/views/count/index'),
         name: 'Show',
-        meta: { title: '财务统计', icon: 'money' }
+        meta: { title: '财务统计', icon: 'money' },
+        hidden: true
       },
       {
+        id: 15,
         path: 'recharge',
         component: () => import('@/views/count/recharge'),
         name: 'Recharge',
-        meta: { title: '充值记录', icon: 'money' }
+        meta: { title: '充值记录', icon: 'money' },
+        hidden: true
       }
     ]
   },
   {
+    id: 5,
     path: '/system',
     component: Layout,
     redirect: '/system/activitystatusmanage',
@@ -129,24 +126,23 @@ export const asyncRouterMap = [
       title: '系统设置',
       icon: 'edit'
     },
+    hidden: true,
     children: [
       {
-        path: 'activitystatusmanage',
-        component: () => import('@/views/system/activityStatusManage'),
-        name: 'ActivityStatusManage',
-        meta: { title: '活动类型管理', icon: 'component', noCache: true }
-      },
-      {
+        id: 12,
         path: 'usermanage',
         component: () => import('@/views/system/userManage'),
         name: 'UserManage',
-        meta: { title: '用户管理', icon: 'user', noCache: true }
+        meta: { title: '用户管理', icon: 'user', noCache: true },
+        hidden: true
       },
       {
+        id: 13,
         path: 'rolemanage',
         component: () => import('@/views/system/roleManage'),
         name: 'RoleManage',
-        meta: { title: '角色管理', icon: 'edit', noCache: true }
+        meta: { title: '角色管理', icon: 'edit', noCache: true },
+        hidden: true
       }
     ]
   },

@@ -58,7 +58,7 @@ export default {
   data() {
     return {
       roleList: [],
-      role: getRoleId(),
+      role: '',
       menuList: [],
       allMenuList: [],
       checkedMenuList: [],
@@ -81,7 +81,7 @@ export default {
   async created() {
     await this._getMenuList()
     this._initRoleList()
-    this._initMenuList()
+    // this._initMenuList()
   },
   methods: {
     // 获得选中菜单项
@@ -112,7 +112,6 @@ export default {
       this.menuList = data
       this.checkedMenuList = []
       this._getcheckedMenuIds(this.menuList)
-      console.log(this.checkedMenuList)
     },
     // 添加角色 || 修改角色
     async _addRole() {

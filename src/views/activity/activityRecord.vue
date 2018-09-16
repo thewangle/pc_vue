@@ -1,16 +1,12 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.businessName" placeholder="请输入运营商名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-input v-model="listQuery.activityName" placeholder="请输入活动名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-select v-model="listQuery.activity" placeholder="请选择活动类型" clearable style="width: 200px" class="filter-item" @change="handleFilter">
+      <el-input v-model="listQuery.agent_name" placeholder="请输入运营商名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.name" placeholder="请输入活动名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-select v-model="listQuery.type" placeholder="请选择活动类型" clearable style="width: 200px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in activities" :key="item.key" :label="item.label" :value="item.key"/>
       </el-select>
-      <el-select v-model="listQuery.status" placeholder="请选择活动状态" style="width: 200px" class="filter-item" @change="handleFilter" >
-        <el-option v-for="item in status" :key="item.key" :label="item.label" :value="item.key"/>
-      </el-select>
       <el-button v-waves style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">新增活动</el-button>
     </div>
 
     <el-table
@@ -19,112 +15,121 @@
       border
       fit
       highlight-current-row
-      style="width: 100%;min-height:1000px;">
+      style="width: 100%;">
       <el-table-column label="序号" align="center" width="65">
         <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
+          <span>{{ scope.$index + 1 }}</span>
         </template>
       </el-table-column>
       <el-table-column label="运营商" width="150px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.timestamp }}</span>
+          <span>{{ scope.row.agent_name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="活动名称" min-width="150px">
         <template slot-scope="scope">
-          <span class="link-type">{{ scope.row.title }}</span>
+          <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="游戏类型" width="110px" align="center">
+      <el-table-column label="游戏类型" width="100px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
+          <span>{{ scope.row.type | activityFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="开始时间" width="80px">
+      <el-table-column label="开始时间" width="155">
         <template slot-scope="scope">
-          <svg-icon v-for="n in +scope.row.importance" :key="n" icon-class="star" class="meta-item__icon"/>
+          <span>{{ scope.row.set_start_time | timeFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="结束时间" align="center" width="95">
+      <el-table-column label="结束时间" align="center" width="155">
         <template slot-scope="scope">
-          <span v-if="scope.row.pageviews" class="link-type">{{ scope.row.pageviews }}</span>
-          <span v-else>0</span>
+          <span>{{ scope.row.set_stop_time | timeFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="队伍数量" align="center" width="95">
+      <el-table-column label="队伍数量" align="center" width="80">
         <template slot-scope="scope">
-          <span v-if="scope.row.pageviews" class="link-type">{{ scope.row.pageviews }}</span>
-          <span v-else>0</span>
+          <span>{{ scope.row.team_num }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="玩家数量" class-name="status-col" width="100">
+      <el-table-column label="玩家数量" class-name="status-col" width="80">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.status | statusFilter">{{ scope.row.status }}</el-tag>
+          <span>{{ scope.row.player_num }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="300" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <el-button v-if="scope.row.status!='published'" size="mini" type="success" @click="handleModifyStatus(scope.row,'published')">{{ $t('table.publish') }}
+          <el-button type="primary" size="small" @click="handleShowDetial(scope.row)">查看</el-button>
+          <el-button  type="success" size="small">
+            <a :href="scope.row.img_pakage_url">下载图片</a>
           </el-button>
-          <el-button v-if="scope.row.status!='draft'" size="mini" @click="handleModifyStatus(scope.row,'draft')">{{ $t('table.draft') }}
-          </el-button>
-          <el-button v-if="scope.row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(scope.row,'deleted')">{{ $t('table.delete') }}
+          <el-button size="small">
+            <a :href="'/i/topteam/admin/exporttask?activity_id='+scope.row.id">下载任务</a>
           </el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <div class="pagination-container">
-      <el-pagination :current-page="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
-    </div>
-
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item :label="$t('table.type')" prop="type">
-          <el-select v-model="temp.type" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key"/>
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('table.date')" prop="timestamp">
-          <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.title')" prop="title">
-          <el-input v-model="temp.title"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.status')">
-          <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item"/>
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('table.importance')">
-          <el-rate v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top:8px;"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.remark')">
-          <el-input :autosize="{ minRows: 2, maxRows: 4}" v-model="temp.remark" type="textarea" placeholder="Please input"/>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
-        <el-button v-else type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
-      </div>
+    <el-dialog :visible.sync="dialogInfoVisible" title="活动详情查看" custom-class="detaildialog">
+      <el-table :data="gridData" border fit highlight-current-row>
+        <el-table-column label="序号">
+          <template slot-scope="scope">
+            <span>{{ scope.$index + 1 }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="队伍编号">
+          <template slot-scope="scope">
+            <span>{{ scope.row.id }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="队伍名称">
+          <template slot-scope="scope">
+            <span>{{ scope.row.name }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="开始时间" width="170px">
+          <template slot-scope="scope">
+            <span>{{ scope.row.start_time | timeFilter }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="结束时间" width="170px">
+          <template slot-scope="scope">
+            <span>{{ scope.row.end_time | timeFilter }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="得分">
+          <template slot-scope="scope">
+            <span>{{ scope.row.price }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="队伍得分率" width="130px">
+          <template slot-scope="scope">
+            <span>{{ scope.row.score_rate }}%</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="队伍正确率" width="130px">
+          <template slot-scope="scope">
+            <span>{{ scope.row.c_task_num_rate }}%</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="整体得分率" width="130px">
+          <template slot-scope="scope">
+            <span>{{ all_score_rate }}%</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="整体正确率" width="130px">
+          <template slot-scope="scope">
+            <span>{{ all_task_rate }}%</span>
+          </template>
+        </el-table-column>
+      </el-table>
     </el-dialog>
-
   </div>
 </template>
 
 <script>
-import { fetchList, createArticle, updateArticle } from '@/api/article'
+import { fetchList, getActivityDetial } from './../../service/activity'
 import waves from '@/directive/waves' // 水波纹指令
-// import { parseTime } from '@/utils'
-
-const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
+import { parseTime } from '@/utils'
 
 export default {
   name: 'AtivityRecord',
@@ -132,169 +137,76 @@ export default {
     waves
   },
   filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
+    activityFilter(status) {
+      const activityMap = {
+        1: '团队-基础版',
+        2: '个人-基础版'
       }
-      return statusMap[status]
+      return activityMap[status]
+    },
+    timeFilter(timestamp) {
+      var date = new Date(timestamp * 1000)// 如果date为10位不需要乘1000
+      var Y = date.getFullYear() + '-'
+      var M = (+date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
+      var D = (+date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' '
+      var h = (+date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
+      var m = (+date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
+      var s = (+date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
+      return Y + M + D + h + m + s
     }
   },
   data() {
     return {
       list: null,
-      total: null,
-      listLoading: true,
+      listLoading: false,
       listQuery: {
-        page: 1,
-        limit: 20,
-        activity: undefined,
-        businessName: undefined,
-        activityName: undefined,
-        status: undefined
+        type: undefined,
+        agent_name: undefined,
+        name: undefined,
+        status: 5
       },
-      activities: [{ label: '团队-基础版', key: 1 }, { label: '团队-精英版', key: 2 }, { label: '个人-基础版', key: 3 }, { label: '个人-基础版', key: 4 }],
-      calendarTypeOptions,
-      status: [{ label: '待审批', key: '1' }, { label: '准备中', key: '2' }, { label: '进行中', key: '3' }, { label: '暂停中', key: '4' }, { label: '已完成', key: '5' }, { label: '未通过', key: '6' }],
-      statusOptions: ['published', 'draft', 'deleted'],
-      temp: {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
-      },
-      dialogFormVisible: false,
-      dialogStatus: '',
-      textMap: {
-        update: 'Edit',
-        create: 'Create'
-      },
-      rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
-      }
+      activities: [{ label: '团队-基础版', key: 1 },{ label: '个人-基础版', key: 2 }],
+      dialogInfoVisible: false,
+      gridData: [],
+      all_task_rate: '',
+      all_score_rate: ''
     }
   },
   created() {
-    this.getList()
+    this._fetchList()
   },
   methods: {
-    getList() {
-      this.listLoading = true
-      fetchList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
-
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
-      })
-    },
     handleFilter() {
-      this.listQuery.page = 1
-      this.getList()
+      this._fetchList()
     },
-    handleSizeChange(val) {
-      this.listQuery.limit = val
-      this.getList()
+    handleShowDetial(row) {
+      this.dialogInfoVisible = true
+      this.gridData = []
+      this._fetchDetial(row.id)
     },
-    handleCurrentChange(val) {
-      this.listQuery.page = val
-      this.getList()
+    async _fetchDetial(id) {
+      const res = await getActivityDetial(id)
+      const { data } = res
+      this.gridData = data.list
+      this.all_task_rate = data.all_task_rate
+      this.all_score_rate = data.all_score_rate
     },
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: '操作成功',
-        type: 'success'
-      })
-      row.status = status
-    },
-    resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
-      }
-    },
-    handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
-    createData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '创建成功',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
-      })
-    },
-    handleUpdate(row) {
-      this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
-    updateData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(tempData).then(() => {
-            for (const v of this.list) {
-              if (v.id === this.temp.id) {
-                const index = this.list.indexOf(v)
-                this.list.splice(index, 1, this.temp)
-                break
-              }
-            }
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
-      })
-    },
-    handleDelete(row) {
-      this.$notify({
-        title: '成功',
-        message: '删除成功',
-        type: 'success',
-        duration: 2000
-      })
-      const index = this.list.indexOf(row)
-      this.list.splice(index, 1)
+    async _fetchList() {
+      this.listLoading = true
+      try {
+        const res = await fetchList(this.listQuery)
+        const {data} = res
+        this.list = data
+      } catch (e) {}
+      this.listLoading = false
     }
   }
 }
 </script>
+
+<style lang="scss">
+.detaildialog.el-dialog, .detaildialog .el-dialog__body{
+  width: 900px;
+}
+</style>
+

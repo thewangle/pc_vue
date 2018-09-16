@@ -148,3 +148,24 @@ export function editTask(data) {
     data
   })
 }
+
+/**
+ * 活动记录
+ */
+export function fetchList(data) {
+  return request({
+    url: '/i/topteam/admin/GetActivityList',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 活动详情查看
+ */
+export function getActivityDetial(id) {
+  return request({
+    url: `/i/topteam/admin/getactteamloginfo?act_id=${id}`,
+    method: 'get'
+  })
+}

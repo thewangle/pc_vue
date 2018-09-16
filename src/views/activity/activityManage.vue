@@ -204,6 +204,16 @@
               accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
               @change="handleFileChange">
           </div>
+          <div :disabled="!activityId" class="filePicker" style="float: right; margin-right: 20px">
+            <label>导入图片</label>
+            <input
+              :disabled="!activityId"
+              id="ImgInput"
+              type="file"
+              name="file"
+              multiple
+              @change="handleImgChange">
+          </div>
           <el-button :disabled="!activityId" type="primary" style="float: right; margin-right: 20px;" @click="handleOpenTaskDialog">添加任务</el-button>
         </div>
         <div class="job-table">
@@ -352,6 +362,7 @@
             <el-upload
               :http-request="handleUpLoadNineImg"
               :on-preview="handleNineImgPreview"
+              :on-remove="handleRemove"
               multiple
               :limit="9"
               :action="domain"
@@ -768,6 +779,44 @@ export default {
     this.init()
   },
   methods: {
+    handleImgChange(file) {
+      const ImgObj = {}
+      const ImgInput = document.querySelector('#ImgInput')
+      const length = ImgInput.files.length
+      const config = {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      }
+      Object.keys(ImgInput.files).forEach(async temp => {
+        const item = ImgInput.files[temp]
+        console.log(item)
+        const keyname = 'top-team' + Date.now() + Math.floor(Math.random() * 100) + item.name
+        const token = await this._fetchQiNiuToken()
+        const formData = new FormData()
+        formData.append('file', item)
+        formData.append('token', token)
+        formData.append('key', keyname)
+
+        const res = await axios.post(this.domain, formData, config)
+        const url = this.qiniuAddress + '/' + res.data.key
+        const name = item.name.split('.')[0]
+        ImgObj[name] = url
+        if (Object.keys(ImgObj).length === length) {
+          const res = await axios.post(
+            '/i/topteam/admin/MatchTaskPic',
+            { activity_id: this.activityId, match_list: JSON.stringify(ImgObj) }
+          )
+          if (!res.data.error_code) {
+            this.$message({ message: '上传成功', type: 'success' })
+          }
+        }
+      })
+      
+    },
+    handleRemove(file, fileList) {
+      console.log('file===>', file)
+      console.log(fileList)
+      this.taskAFileList = fileList
+    },
     // 活动类型修改
     handleActivityChange(val) {
       if (val === '2') {
@@ -861,6 +910,23 @@ export default {
       if (Array.isArray(data.answer)) {
         data.answer = JSON.stringify(data.answer.sort())
       }
+      if (data.type === '1') {
+        if (!data.options.A || !data.options.B || data.options.C || data.options.D ) {
+          this.$message({ message: '选项不能我空', type: 'error' })
+          return
+        }
+      }
+      if (data.type === '3') {
+        data.options = []
+        this.taskAFileList.forEach(item => {
+          data.options.push(item.url)
+        })
+        console.log(data.options)
+        if (data.options.length < 9) {
+          this.$message({ message: '请上传九张图片', type: 'error' })
+          return
+        }
+      }
       data.options = JSON.stringify(data.options)
 
       // 文字题
@@ -925,12 +991,6 @@ export default {
       if (row.type === '1') {
         this.taskInfo.answer = JSON.parse(row.answer)
         this.taskInfo.options = JSON.parse(row.options)
-        // this.taskInfo.options = {
-        //   A: 1,
-        //   B: 2,
-        //   C: 3,
-        //   D: 4
-        // }
       }
       // 文字题
       if (row.type === '2') {
@@ -1174,8 +1234,10 @@ export default {
           this.taskInfo.answer_url = url
         }
         if (type === 'nine') {
-          if (!this.taskInfo.options.A && !this.taskInfo.options.length) { this.taskInfo.options = [] }
-          this.taskInfo.options.push(url)
+          this.taskAFileList.push({
+            name: res.data.key.slice(0, 23),
+            url: url
+          })
         }
       })
     },
@@ -1280,6 +1342,23 @@ export default {
       }
       const data = Object.assign({}, this.taskInfo, { activity_id: activityId })
       data.answer = JSON.stringify(data.answer)
+      if (data.type === '1') {
+        if (!data.options.A || !data.options.B || data.options.C || data.options.D ) {
+          this.$message({ message: '选项不能我空', type: 'error' })
+          return
+        }
+      }
+      if (data.type === '3') {
+        data.options = []
+        this.taskAFileList.forEach(item => {
+          data.options.push(item.url)
+        })
+        console.log(data.options)
+        if (data.options.length < 9) {
+          this.$message({ message: '请上传九张图片', type: 'error' })
+          return
+        }
+      }
       data.options = JSON.stringify(data.options)
       if (data.type === '2') {
         if (!data.answer2) {

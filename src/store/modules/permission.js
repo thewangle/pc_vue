@@ -18,18 +18,34 @@ import { asyncRouterMap, constantRouterMap } from '@/router'
  * @param asyncRouterMap
  * @param roles
  */
-// function filterAsyncRouter(asyncRouterMap, roles) {
-//   const accessedRouters = asyncRouterMap.filter(route => {
-//     if (hasPermission(roles, route)) {
-//       if (route.children && route.children.length) {
-//         route.children = filterAsyncRouter(route.children, roles)
-//       }
-//       return true
-//     }
-//     return false
-//   })
-//   return accessedRouters
-// }
+const checkedId = []
+function getCheckedId(menulist) {
+  menulist.forEach(item => {
+    if (item.checked) {
+      checkedId.push(item.id)
+    }
+    if (item.childs.length) {
+      getCheckedId(item.childs)
+    }
+  })
+}
+
+function findIdRoute(asyncRouterMap, id) {
+  asyncRouterMap.forEach(item => {
+    if (id === item.id) {
+      item.hidden = false
+    }
+    if (item.children) {
+      findIdRoute(item.children, id)
+    }
+  })
+}
+
+function getRoutes(asyncRouterMap) {
+  checkedId.forEach(id => {
+    findIdRoute(asyncRouterMap, +id)
+  })
+}
 
 const permission = {
   state: {
@@ -43,7 +59,10 @@ const permission = {
     }
   },
   actions: {
-    GenerateRoutes({ commit }) {
+    GenerateRoutes({ commit }, menulist) {
+      getCheckedId(menulist)
+      getRoutes(asyncRouterMap)
+      console.log(asyncRouterMap)
       return new Promise(resolve => {
         const accessedRouters = asyncRouterMap
         commit('SET_ROUTERS', accessedRouters)
