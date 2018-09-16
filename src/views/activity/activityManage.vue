@@ -192,8 +192,7 @@
               accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
               @change="handleFileChange">
           </div>
-          <el-button type="primary" style="float: right; margin-right: 20px;" @click="handleOpenTaskDialog">添加任务</el-button>
-          <!-- <el-button :disabled="!activityId" type="primary" style="float: right; margin-right: 20px;" @click="handleOpenTaskDialog">添加任务</el-button> -->
+          <el-button :disabled="!activityId" type="primary" style="float: right; margin-right: 20px;" @click="handleOpenTaskDialog">添加任务</el-button>
         </div>
         <div class="job-table">
           <el-table
@@ -303,6 +302,7 @@
             <img :src="dialogTaskImageUrl" width="100%" alt="">
           </el-dialog>
         </el-form-item>
+
         <!-- 选择题 -->
         <template v-if="taskInfo.type === '1'">
           <el-form-item label="题目选项" label-width="100px">
@@ -335,7 +335,37 @@
           </el-form-item>
         </template>
         <!-- 图片题 -->
-        <template v-if="taskInfo.type === '3'"/>
+        <template v-if="taskInfo.type === '3'">
+          <el-form-item label="九宫格图片" label-width="100px">
+            <el-upload
+              :http-request="handleUpLoadNineImg"
+              :on-preview="handleNineImgPreview"
+              multiple
+              :limit="9"
+              :action="domain"
+              :file-list="taskAFileList"
+              list-type="picture"
+            >
+              <el-button>上传图片</el-button>
+            </el-upload>
+            <el-dialog :visible.sync="dialogNineVisible">
+              <img :src="nineImageUrl" width="100%" alt="">
+            </el-dialog>
+          </el-form-item>
+          <el-form-item label="答案" label-width="100px">
+            <el-checkbox-group v-model="taskInfo.answer">
+              <el-checkbox label="1"/>
+              <el-checkbox label="2"/>
+              <el-checkbox label="3"/>
+              <el-checkbox label="4"/>
+              <el-checkbox label="5"/>
+              <el-checkbox label="6"/>
+              <el-checkbox label="7"/>
+              <el-checkbox label="8"/>
+              <el-checkbox label="9"/>
+            </el-checkbox-group>
+          </el-form-item>
+        </template>
         <!-- 视频题 -->
         <template v-if="taskInfo.type === '4'">
           <el-form-item label="题目视频" label-width="100px">
@@ -700,6 +730,8 @@ export default {
       dialogVisible: false,
       dialogAnswerImageUrl: '',
       dialogAnswerImgVisible: false,
+      nineImageUrl: '',
+      dialogNineVisible: false,
       coachList: [], // 教练列表
       domain: 'http://upload.qiniup.com/',
       qiniuAddress: qiniuAddress,
@@ -769,6 +801,10 @@ export default {
       this.dialogAnswerImageUrl = this.taskInfo.answer_url
       this.dialogAnswerImgVisible = true
     },
+    handleNineImgPreview(file) {
+      this.nineImageUrl = file.url
+      this.dialogNineVisible = true
+    },
     handleUpLoadBgImg(req) {
       const type = 'bgImg'
       this._uploadQiNiu(req, type)
@@ -785,6 +821,11 @@ export default {
       const type = 'answer'
       this._uploadQiNiu(req, type)
     },
+    handleUpLoadNineImg(req) {
+      const type = 'nine'
+      this._uploadQiNiu(req, type)
+    },
+    // 修改提交任务
     async handelUpdateTaskSubmit() {
       const { name, score, seq, answer_limit } = this.taskInfo
       if (!name || !score || !seq || !answer_limit) {
@@ -804,6 +845,20 @@ export default {
           return
         }
         data.answer = data.answer2
+      }
+      if (data.type === '4') {
+        if (!data.answer_url) {
+          this.$message({ message: '请上传视频', type: 'error' })
+          return
+        }
+        data.answer = data.answer_url
+      }
+      if (data.type === '5') {
+        if (!data.answer_url) {
+          this.$message({ message: '请上音频', type: 'error' })
+          return
+        }
+        data.answer = data.answer_url
       }
       // 拍照题
       if (data.type === '6') {
@@ -844,17 +899,26 @@ export default {
       // 选择题
       if (row.type === '1') {
         this.taskInfo.answer = JSON.parse(row.answer)
-        // this.taskInfo.options = JSON.parse(row.options)
-        this.taskInfo.options = {
-          A: 1,
-          B: 2,
-          C: 3,
-          D: 4
-        }
+        this.taskInfo.options = JSON.parse(row.options)
+        // this.taskInfo.options = {
+        //   A: 1,
+        //   B: 2,
+        //   C: 3,
+        //   D: 4
+        // }
       }
       // 文字题
       if (row.type === '2') {
         this.taskInfo.answer2 = row.answer
+      }
+      // 图片题目
+      if (row.type === '3') {
+        this.taskAFileList = []
+        this.taskInfo.answer = JSON.parse(row.answer)
+        this.taskInfo.options = JSON.parse(row.options)
+        this.taskInfo.options.forEach((item, index) => {
+          this.taskAFileList.push({ name: '图片' + (index + 1), url: item })
+        })
       }
       if (row.type === '4' || row.type === '5' || row.type === '6') {
         this.taskInfo.answer_url = row.answer
@@ -1072,6 +1136,10 @@ export default {
         if (type === 'answer') {
           this.taskInfo.answer_url = url
         }
+        if (type === 'nine') {
+          if (!this.taskInfo.options.A && !this.taskInfo.options.length) { this.taskInfo.options = [] }
+          this.taskInfo.options.push(url)
+        }
       })
     },
     // 获取教练列表
@@ -1163,8 +1231,7 @@ export default {
     },
     // 添加任务
     async handelCreateTaskSubmit() {
-      // const activityId = this.activityId
-      const activityId = 62
+      const activityId = this.activityId
       const { name, score, seq } = this.taskInfo
       if (!name || !score || !seq) {
         this.$message({
