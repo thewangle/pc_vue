@@ -169,3 +169,47 @@ export function getActivityDetial(id) {
     method: 'get'
   })
 }
+
+/**
+ * 获取题库列表
+ */
+export function fetchTaskLibList(data) {
+  return request({
+    url: '/i/topteam/admin/getTaskLibList',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 删除任务
+ * @param {*} id
+ */
+export function delTaskLib(id) {
+  return request({
+    url: `/i/topteam/admin/delTaskLib?id=${id}`,
+    method: 'get'
+  })
+}
+
+/**
+ * 创建任务
+ */
+export function addTaskLib(data) {
+  return request({
+    url: '/i/topteam/admin/addTaskLib',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 修改任务
+ */
+export function updateTaskLib(data) {
+  return request({
+    url: '/i/topteam/admin/addTaskLib',
+    method: 'post',
+    data
+  })
+}

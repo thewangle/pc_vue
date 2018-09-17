@@ -77,7 +77,7 @@
     <!-- 新增活动对话框 start -->
     <el-dialog
       :visible.sync="dialogFormVisible"
-      title="新增活动"
+      :title="dialogActivityTitle"
       class="aDialog"
       @close="handleCloseDialog">
       <hr >
@@ -102,15 +102,15 @@
         <el-form-item label="分值形式">
           <el-select v-model="activityInfo.scoreType">
             <el-option label="积分" value="1" />
-            <el-option label="砖石" value="2" />
-            <el-option label="游戏币" value="3" />
-            <el-option label="花瓣" value="4" />
+            <el-option label="钻石" value="2" />
+            <el-option label="花瓣" value="3" />
+            <el-option label="游戏币" value="4" />
           </el-select>
         </el-form-item>
         <el-form-item label="可见分数">
           <el-select v-model="activityInfo.scoreShowType" :disabled="!activityInfo.type || activityInfo.type === '2'">
-            <el-option label="是" value="1" />
-            <el-option label="否" value="2" />
+            <el-option label="否" value="1" />
+            <el-option label="是" value="2" />
           </el-select>
         </el-form-item>
         <el-form-item label="起始分值">
@@ -187,7 +187,8 @@
           </el-form-item>
         </div>
         <el-form-item>
-          <el-button type="primary" @click="handleCreateActivitySubmit">创建活动</el-button>
+          <el-button type="primary" @click="handleCreateActivitySubmit" v-if="dialogActivitytype === 'add'">创建活动</el-button>
+          <el-button type="primary" @click="handleUpdateActivitySubmit" v-if="dialogActivitytype === 'edit'">修改活动</el-button>
         </el-form-item>
       </el-form>
       <hr >
@@ -686,6 +687,8 @@ export default {
   },
   data() {
     return {
+      dialogActivityTitle: '', //活动对话框标题
+      dialogActivitytype: '',  // 活动对话框类型
       iconFilelist: [],
       bgFileList: [],
       taskQFileList: [],
@@ -772,7 +775,8 @@ export default {
       set_start_time: '',
       set_stop_time: '',
       payType: '1',
-      gifFileList: []
+      gifFileList: [],
+      activity: {}, //活动信息
     }
   },
   created() {
@@ -810,11 +814,8 @@ export default {
           }
         }
       })
-      
     },
     handleRemove(file, fileList) {
-      console.log('file===>', file)
-      console.log(fileList)
       this.taskAFileList = fileList
     },
     // 活动类型修改
@@ -850,6 +851,8 @@ export default {
     },
     handleCreateActivity() {
       this.dialogFormVisible = true
+      this.dialogActivityTitle = '新增活动'
+      this.dialogActivitytype = 'add'
     },
     handleBgCardPreview() {
       this.dialogImageUrl = this.activityInfo.bgImgUrl
@@ -911,8 +914,8 @@ export default {
         data.answer = JSON.stringify(data.answer.sort())
       }
       if (data.type === '1') {
-        if (!data.options.A || !data.options.B || data.options.C || data.options.D ) {
-          this.$message({ message: '选项不能我空', type: 'error' })
+        if (!data.options.A || !data.options.B || !data.options.C || !data.options.D ) {
+          this.$message({ message: '选项不能为空', type: 'error' })
           return
         }
       }
@@ -1051,43 +1054,41 @@ export default {
     },
     // 修改活动
     async handleUpdateActivity() {
-      this.checkInfo.set_start_time = this.set_start_time / 1000
-      this.checkInfo.set_stop_time = this.set_stop_time / 1000
-      const { name, type, set_start_time, set_stop_time } = this.checkInfo
-      if (!name || !type || !set_start_time || !set_stop_time) {
-        this.$message({ message: '必填项不能为空', type: 'success' })
-        return
+      this.dialogActivityTitle = '修改活动'
+      this.dialogFormVisible = true
+      this.dialogActivitytype = 'edit'
+      const {
+        agent_name, agent_id, act_desc, set_start_time,
+        set_stop_time, activity_status, type, coach_id, name,
+        score_type, score_show_type, keep_time, money, bg_img,
+        icon, gif_url
+      } = this.activity
+
+      this.activityInfo.agentName = agent_name // 运营商名
+      this.activityInfo.type = type
+      this.activityInfo.agent_id = agent_id
+      this.activityInfo.coachId = coach_id
+      this.activityInfo.name = name
+      this.activityInfo.scoreType = score_type
+      this.activityInfo.scoreShowType = score_show_type
+      this.activityInfo.keepTime = keep_time
+      if (keep_time === '0') { this.activityInfo.check = true }
+      this.activityInfo.price = money / 100
+      this.activityInfo.time = [ set_start_time * 1000, set_stop_time * 1000 ]
+      this.activityInfo.actDesc = act_desc
+      this.activityInfo.bgImgUrl = bg_img
+      bg_img && (this.bgFileList = [{ name: '活动背景图', url: bg_img }])
+      this.activityInfo.iconUrl = icon
+      icon && (this.iconFilelist = [{ name: '活动封面图', url: icon }])
+      this.activityInfo.gif_url = gif_url
+      gif_url && (this.gifFileList = [{ name: 'gif', url: gif_url }])
+
+      if (this.activityInfo.type === '2') {
+        this.activityInfo.coachId = null
+        this.activityInfo.scoreShowType = null
       }
-      const param = {
-        act_id: this.activityId,
-        name,
-        type,
-        set_start_time: set_start_time,
-        set_stop_time: set_stop_time
-      }
-      try {
-        await updateActivity(param)
-        this.$message({ message: '修改成功', type: 'success' })
-        const res = await fetchActivityInfo({ act_id: this.activityId })
-        await this._fetchTaskList(this.activityId)
-        const { data } = res
-        const { name, type, set_start_time, set_stop_time, money, qcode_url } = data
-        this.checkInfo = { name, type, money, qcode_url }
-        this.set_start_time = set_start_time * 1000
-        this.set_stop_time = set_stop_time * 1000
-        this.checkInfo.set_start_time = set_start_time * 1000
-        this.checkInfo.set_stop_time = set_stop_time * 1000
-      } catch (e) {
-        const res = await fetchActivityInfo({ act_id: this.activityId })
-        await this._fetchTaskList(this.activityId)
-        const { data } = res
-        const { name, type, set_start_time, set_stop_time, money, qcode_url } = data
-        this.checkInfo = { name, type, money, qcode_url }
-        this.set_start_time = set_start_time * 1000
-        this.set_stop_time = set_stop_time * 1000
-        this.checkInfo.set_start_time = set_start_time * 1000
-        this.checkInfo.set_stop_time = set_stop_time * 1000
-      }
+
+      this.activityInfo = Object.assign({}, this.activityInfo)
     },
     // 打开修改弹窗
     async handleEditActivity(row) {
@@ -1095,6 +1096,7 @@ export default {
       const res = await fetchActivityInfo({ act_id: row.id })
       await this._fetchTaskList(row.id)
       const { data } = res
+      this.activity = data
       const { name, type, set_start_time, set_stop_time, money, qcode_url } = data
       this.checkInfo = { name, type, money, qcode_url }
       this.set_start_time = set_start_time * 1000
@@ -1141,10 +1143,15 @@ export default {
     // 关闭添加活动对话框
     handleCloseDialog() {
       this.dialogFormDisable = false
-      this.activityId = null
-      this.taskList = []
-      this._resetActivityInfo()
-      this._fetchActivityList()
+      if (this.dialogActivitytype === 'add') {
+        this.activityId = null
+        this.taskList = []
+        this._resetActivityInfo()
+        this._fetchActivityList()
+      }
+      if (this.dialogActivitytype === 'edit') {
+        this._resetActivityInfo()
+      }
     },
     // 打开添加任务对话框
     handleOpenTaskDialog() {
@@ -1162,6 +1169,7 @@ export default {
       this.dialogCheckVisible = false
       this.activityId = null
       this.taskList = []
+      this.activityInfo = {}
       this._restCheckInfo()
       this._fetchActivityList()
     },
@@ -1253,6 +1261,84 @@ export default {
       const { data } = res
       return data
     },
+    // 修改活动
+    async handleUpdateActivitySubmit() {
+      const data = {}
+      const {
+        time, name, keepTime, score, coachId,
+        actDesc, scoreType, scoreShowType, type, bgImgUrl, iconUrl, price, check, gif_url, agent_id
+      } = this.activityInfo
+      if (type === '1') {
+        if (!time.length || !name || !keepTime || !score || !coachId || !type) {
+          this.$message({ message: '必填项不能为空', type: 'error' })
+          return
+        }
+      } else {
+        if (!time.length || !name || !type || !price || !bgImgUrl || !iconUrl) {
+          this.$message({ message: '必填项不能为空', type: 'error' })
+          return
+        }
+        data.gif_url = gif_url
+      }
+
+      data.set_start_time = time[0] / 1000
+      data.set_stop_time = time[1] / 1000
+
+      data.agent_id = agent_id
+      data.act_id = this.activityId
+
+       // 活动名称
+      data.name = name
+      // 活动时长
+      data.keep_time = keepTime
+      // 起始分值
+      data.score = score
+      // 教练ID
+      data.coach_id = coachId
+      // 活动描述
+      data.act_desc = actDesc
+      // 分值形式
+      data.score_type = scoreType
+      // 是否显示分数
+      data.score_show_type = scoreShowType
+      // 活动类型
+      data.type = type
+      // 背景图片
+      data.bg_img = bgImgUrl
+      // 封面图片
+      data.icon = iconUrl
+      // 金额
+      data.money = price
+      // 长期时间
+      if (check) {
+        data.keep_time = 0
+      }
+      // 个人版本
+      if (data.type === '2') {
+        data.score = 0
+        data.coach_id = 0
+        data.score_show_type = 0
+      }
+      // 团队版本
+      if (data.type === '1') {
+        data.money = 0
+      }
+
+      try {
+        await updateActivity(data)
+        // 创建活动成功form禁用
+        this.dialogFormDisable = true
+        this.$message({ message: '修改成功', type: 'success' })
+        const res = await fetchActivityInfo({ act_id: data.act_id })
+        const { name, type, set_start_time, set_stop_time, money, qcode_url } = res.data
+        this.checkInfo = { name, type, money, qcode_url }
+        this.set_start_time = set_start_time * 1000
+        this.set_stop_time = set_stop_time * 1000
+        this.checkInfo.set_start_time = set_start_time * 1000
+        this.checkInfo.set_stop_time = set_stop_time * 1000
+      } catch (e) {
+      }
+    },
     // 创建活动
     async _addActivity() {
       const data = {}
@@ -1343,8 +1429,8 @@ export default {
       const data = Object.assign({}, this.taskInfo, { activity_id: activityId })
       data.answer = JSON.stringify(data.answer)
       if (data.type === '1') {
-        if (!data.options.A || !data.options.B || data.options.C || data.options.D ) {
-          this.$message({ message: '选项不能我空', type: 'error' })
+        if (!data.options.A || !data.options.B || !data.options.C || !data.options.D ) {
+          this.$message({ message: '选项不能为空', type: 'error' })
           return
         }
       }
