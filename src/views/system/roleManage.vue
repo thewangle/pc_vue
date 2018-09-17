@@ -51,7 +51,6 @@
 </template>
 <script>
 import { fetchRoleList, fetchRoleMenulist, addRole, deleteRole, editRole, setRoleMenulist } from './../../service/role'
-import { fetchMenuList } from './../../service/common'
 import { getRoleId } from '@/utils/auth'
 export default {
   name: 'RoleManage',
@@ -79,9 +78,7 @@ export default {
     }
   },
   async created() {
-    await this._getMenuList()
     this._initRoleList()
-    // this._initMenuList()
   },
   methods: {
     // 获得选中菜单项
@@ -98,12 +95,6 @@ export default {
       const roleList = await fetchRoleList()
       const { data } = roleList
       this.roleList = data
-    },
-    // 获取所有的菜单项
-    async _getMenuList() {
-      const menuList = await fetchMenuList()
-      const { data } = menuList
-      this.allMenuList = data
     },
     // 根据角色获取菜单并获得默认选中项
     async _initMenuList() {

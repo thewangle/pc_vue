@@ -21,9 +21,7 @@ import { asyncRouterMap, constantRouterMap } from '@/router'
 const checkedId = []
 function getCheckedId(menulist) {
   menulist.forEach(item => {
-    if (item.checked) {
-      checkedId.push(item.id)
-    }
+    checkedId.push(item.id)
     if (item.childs.length) {
       getCheckedId(item.childs)
     }
@@ -62,7 +60,6 @@ const permission = {
     GenerateRoutes({ commit }, menulist) {
       getCheckedId(menulist)
       getRoutes(asyncRouterMap)
-      console.log(asyncRouterMap)
       return new Promise(resolve => {
         const accessedRouters = asyncRouterMap
         commit('SET_ROUTERS', accessedRouters)

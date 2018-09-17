@@ -4,6 +4,7 @@ import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css'// progress bar style
 import { getToken, getRoleId } from '@/utils/auth' // getToken from cookie
 import { fetchRoleMenulist } from './service/role'
+import { fetchMenuList } from './service/common'
 NProgress.configure({ showSpinner: false })// NProgress Configuration
 
 const whiteList = ['/login', '/authredirect']// no redirect whitelist
@@ -22,7 +23,7 @@ router.beforeEach(async(to, from, next) => {
       // router.addRoutes(asyncRouterMap) // 动态添加可访问路由表
       // next({ ...to, replace: true })
       if (!menuList) {
-        const res = await fetchRoleMenulist({ role_id: getRoleId() })
+        const res = await fetchMenuList()
         menuList = res.data
         store.dispatch('GenerateRoutes', menuList)
       }
