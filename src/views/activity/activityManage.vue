@@ -125,7 +125,7 @@
           </el-input>
         </el-form-item>
         <el-form-item v-if="activityInfo.type === '2'" label="活动价格">
-          <el-input v-model="activityInfo.price" type="number"/>
+          <el-input v-model="activityInfo.price" type="number" onkeypress="return event.keyCode>=48&&event.keyCode<=57"/>
         </el-form-item>
         <el-form-item label="起止时间">
           <el-date-picker
