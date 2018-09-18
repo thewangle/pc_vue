@@ -67,7 +67,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button>取消</el-button>
+        <el-button @click="dialogFormVisible = false">取消</el-button>
         <el-button type="primary" @click="handleCreateCoach">保存</el-button>
       </div>
     </el-dialog>

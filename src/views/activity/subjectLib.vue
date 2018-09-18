@@ -61,7 +61,7 @@
       </el-table-column>
       <el-table-column label="题目类型" width="110px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.type | typeFilter}}</span>
+          <span>{{ scope.row.type | typeFilter }}</span>
         </template>
       </el-table-column>
       <el-table-column label="分值" align="center" width="95">
@@ -71,7 +71,7 @@
       </el-table-column>
       <el-table-column label="答题类型" align="center" width="95">
         <template slot-scope="scope">
-          <span>{{ scope.row.answer_type | answerTypeFilter}}</span>
+          <span>{{ scope.row.answer_type | answerTypeFilter }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
@@ -111,7 +111,7 @@
         <el-form-item label="答题类型" label-width="100px">
           <el-select v-model="taskInfo.answer_type" :disabled="dialogTaskType === 'edit'">
             <el-option label="普通题" value="1" />
-            <el-option label="关卡题" v-if="taskInfo.type === '1' || taskInfo.type === '3'" value="2" />
+            <el-option v-if="taskInfo.type === '1' || taskInfo.type === '3'" label="关卡题" value="2" />
             <el-option v-if="(taskInfo.type === '1' || taskInfo.type === '3')" label="团队限时题" value="3" />
             <el-option v-if="(taskInfo.type === '1' || taskInfo.type === '3')" label="活动抢答题" value="4"/>
           </el-select>
@@ -176,10 +176,10 @@
               :http-request="handleUpLoadNineImg"
               :on-preview="handleNineImgPreview"
               :on-remove="handleRemove"
-              multiple
               :limit="9"
               :action="domain"
               :file-list="taskAFileList"
+              multiple
               list-type="picture"
             >
               <el-button>上传图片</el-button>
@@ -296,14 +296,14 @@ export default {
         4: '活动抢答题'
       }
       return typeMap[type]
-    },
+    }
   },
   data() {
     return {
       listQuery: {
-        name: null, //人物名字
-        type: null, //任务类型
-        answer_type: null //答题类型
+        name: null, // 人物名字
+        type: null, // 任务类型
+        answer_type: null // 答题类型
       },
       list: null,
       listLoading: false,
@@ -332,13 +332,13 @@ export default {
         answer_limit: 1
       },
       taskQFileList: [], // 题目问题图片文件列表
-      taskAFileList: [],  // 题目答案图片文件列表
+      taskAFileList: [], // 题目答案图片文件列表
       dialogTaskImgVisible: false, // 添加任务对话框中图片对话框展示
       dialogTaskImageUrl: '',
       dialogAnswerImageUrl: '',
       dialogAnswerImgVisible: false,
       nineImageUrl: '',
-      dialogNineVisible: false,
+      dialogNineVisible: false
     }
   },
   created() {
@@ -534,7 +534,7 @@ export default {
       const data = Object.assign({}, this.taskInfo)
       data.answer = JSON.stringify(data.answer)
       if (data.type === '1') {
-        if (!data.options.A || !data.options.B || !data.options.C || !data.options.D ) {
+        if (!data.options.A || !data.options.B || !data.options.C || !data.options.D) {
           this.$message({ message: '选项不能为空', type: 'error' })
           return
         }
@@ -639,7 +639,7 @@ export default {
         data.answer = JSON.stringify(data.answer.sort())
       }
       if (data.type === '1') {
-        if (!data.options.A || !data.options.B || !data.options.C || !data.options.D ) {
+        if (!data.options.A || !data.options.B || !data.options.C || !data.options.D) {
           this.$message({ message: '选项不能为空', type: 'error' })
           return
         }
@@ -694,7 +694,7 @@ export default {
       } catch (e) {
       }
       this.dialogTaskVisible = false
-    },
+    }
   }
 }
 </script>

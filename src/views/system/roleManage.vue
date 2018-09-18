@@ -9,7 +9,7 @@
           </div>
           <div class="content">
             <div v-for="item in roleList" :key="item.id">
-              <el-radio v-model="role" :label="item.id" border width="80px">{{ item.role_name }}</el-radio>
+              <el-radio v-model="role" :label="item.id" :disabled="checkDisable(item)" border width="80px">{{ item.role_name }}</el-radio>
               <div style="float: right;">
                 <el-button type="primary" round @click="handleOpenRole(item.id)">编辑角色</el-button>
                 <el-button type="danger" round style="margin-left: 10px;" @click="handleDeleteRole(item.id)">删除角色</el-button>
@@ -81,6 +81,12 @@ export default {
     this._initRoleList()
   },
   methods: {
+    checkDisable(item) {
+      if (item.id === getRoleId()) {
+        return true
+      }
+      return false
+    },
     // 获得选中菜单项
     _getcheckedMenuIds(menuList) {
       menuList.forEach((item) => {

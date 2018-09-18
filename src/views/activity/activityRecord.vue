@@ -59,7 +59,7 @@
       <el-table-column label="操作" align="center" width="300" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="small" @click="handleShowDetial(scope.row)">查看</el-button>
-          <el-button  type="success" size="small">
+          <el-button type="success" size="small">
             <a :href="scope.row.img_pakage_url">下载图片</a>
           </el-button>
           <el-button size="small">
@@ -165,7 +165,7 @@ export default {
         name: undefined,
         status: 5
       },
-      activities: [{ label: '团队-基础版', key: 1 },{ label: '个人-基础版', key: 2 }],
+      activities: [{ label: '团队-基础版', key: 1 }, { label: '个人-基础版', key: 2 }],
       dialogInfoVisible: false,
       gridData: [],
       all_task_rate: '',
@@ -195,7 +195,7 @@ export default {
       this.listLoading = true
       try {
         const res = await fetchList(this.listQuery)
-        const {data} = res
+        const { data } = res
         this.list = data
       } catch (e) {}
       this.listLoading = false

@@ -132,6 +132,9 @@ export default {
       if (type === '1') {
         return '微信'
       }
+      if (type === '4') {
+        return '余额'
+      }
     }
   },
   data() {

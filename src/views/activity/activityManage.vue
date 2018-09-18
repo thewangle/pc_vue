@@ -10,7 +10,7 @@
         <el-option v-for="item in status" :key="item.key" :label="item.label" :value="item.key"/>
       </el-select>
       <el-button v-waves style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreateActivity">新增活动</el-button>
+      <el-button v-if="showable" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreateActivity">新增活动</el-button>
     </div>
 
     <el-table
@@ -62,7 +62,7 @@
       </el-table-column>
       <el-table-column label="操作" align="center" min-width="130" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button v-if="scope.row.activity_status === '2' || scope.row.activity_status === '6'" type="primary" size="mini" @click="handleEditActivity(scope.row)">修改</el-button>
+          <el-button v-if="(scope.row.activity_status === '2' || scope.row.activity_status === '6') && showable" type="primary" size="mini" @click="handleEditActivity(scope.row)">修改</el-button>
           <el-button v-if="scope.row.activity_status !== '1'" size="mini" type="success" @click="handleShowActivityInfo(scope.row)">查看</el-button>
           <el-button v-if="scope.row.activity_status === '1'" size="mini" @click="handleCheckActivity(scope.row)">去审批</el-button>
           <el-button
@@ -102,9 +102,9 @@
         <el-form-item label="分值形式">
           <el-select v-model="activityInfo.scoreType">
             <el-option label="积分" value="1" />
-            <el-option label="钻石" value="2" />
-            <el-option label="花瓣" value="3" />
-            <el-option label="游戏币" value="4" />
+            <el-option v-if="activityInfo.type === '1'" label="钻石" value="2" />
+            <el-option v-if="activityInfo.type === '1'" label="花瓣" value="3" />
+            <el-option v-if="activityInfo.type === '1'" label="游戏币" value="4" />
           </el-select>
         </el-form-item>
         <el-form-item label="可见分数">
@@ -117,8 +117,11 @@
           <el-input v-model="activityInfo.score" :disabled="!activityInfo.type || activityInfo.type === '2'" type="number" min="0" />
         </el-form-item>
         <el-form-item label="活动时长">
-          <el-input v-model="activityInfo.keepTime" type="number" min="0">
-            <el-checkbox v-if="activityInfo.type === '2'" slot="suffix" v-model="activityInfo.check">长期</el-checkbox>
+          <el-input v-model="activityInfo.keepTime" :disabled="checkdisabled" type="number" min="0" onkeypress="return event.keyCode>=48&&event.keyCode<=57">
+            <div slot="suffix">
+              <el-checkbox v-if="activityInfo.type === '2'" v-model="activityInfo.check" @change="handleCheckedChange">长期</el-checkbox>
+              (分钟)
+            </div>
           </el-input>
         </el-form-item>
         <el-form-item v-if="activityInfo.type === '2'" label="活动价格">
@@ -129,7 +132,7 @@
             v-if="activityInfo.type !== '2'"
             v-model="activityInfo.time"
             type="datetimerange"
-            range-separator="至"
+            range-separator="-"
             start-placeholder="开始时间"
             end-placeholder="结束时间"
             value-format="timestamp"/>
@@ -137,7 +140,7 @@
             v-if="activityInfo.type === '2'"
             v-model="activityInfo.time"
             is-range
-            range-separator="至"
+            range-separator="-"
             start-placeholder="开始时间"
             end-placeholder="结束时间"
             value-format="timestamp"/>
@@ -173,7 +176,7 @@
               <el-button>上传图片</el-button>
             </el-upload>
           </el-form-item>
-          <el-form-item label="活动提示" v-if="activityInfo.type === '2'">
+          <el-form-item v-if="activityInfo.type === '2'" label="活动提示">
             <el-upload
               :http-request="handleUpLoadGifImg"
               :on-preview="handleGifCardPreview"
@@ -187,8 +190,8 @@
           </el-form-item>
         </div>
         <el-form-item>
-          <el-button type="primary" @click="handleCreateActivitySubmit" v-if="dialogActivitytype === 'add'">创建活动</el-button>
-          <el-button type="primary" @click="handleUpdateActivitySubmit" v-if="dialogActivitytype === 'edit'">修改活动</el-button>
+          <el-button v-if="dialogActivitytype === 'add'" type="primary" @click="handleCreateActivitySubmit">创建活动</el-button>
+          <el-button v-if="dialogActivitytype === 'edit'" type="primary" @click="handleUpdateActivitySubmit">修改活动</el-button>
         </el-form-item>
       </el-form>
       <hr >
@@ -208,8 +211,8 @@
           <div :disabled="!activityId" class="filePicker" style="float: right; margin-right: 20px">
             <label>导入图片</label>
             <input
-              :disabled="!activityId"
               id="ImgInput"
+              :disabled="!activityId"
               type="file"
               name="file"
               multiple
@@ -281,7 +284,7 @@
           <el-input v-model="taskInfo.name" />
         </el-form-item>
         <el-form-item label="题目类型" label-width="100px">
-          <el-select v-model="taskInfo.type" :disabled="dialogTaskType === 'edit'" @change="taskInfo.answer_type = '1'">
+          <el-select v-model="taskInfo.type" :disabled="dialogTaskType === 'edit'" @change="taskTypeChange">
             <el-option label="选择题" value="1" />
             <el-option v-if="activityInfo.type === '1' || checkInfo.type === '1'" label="文字题" value="2" />
             <el-option label="图片题" value="3" />
@@ -297,18 +300,23 @@
           <el-input v-model="taskInfo.score" type="number" />
         </el-form-item>
         <el-form-item label="答题类型" label-width="100px">
-          <el-select v-model="taskInfo.answer_type" :disabled="dialogTaskType === 'edit'">
+          <el-select v-model="taskInfo.answer_type" :disabled="dialogTaskType === 'edit'" @change="answerTypeChange">
             <el-option label="普通题" value="1" />
-            <el-option label="关卡题" v-if="taskInfo.type === '1' || taskInfo.type === '3'" value="2" />
+            <el-option v-if="taskInfo.type === '1' || taskInfo.type === '3'" label="关卡题" value="2" />
             <el-option v-if="(activityInfo.type === '1' || checkInfo.type === '1') && (taskInfo.type === '1' || taskInfo.type === '3')" label="团队限时题" value="3" />
             <el-option v-if="(activityInfo.type === '1' || checkInfo.type === '1') && (taskInfo.type === '1' || taskInfo.type === '3')" label="活动抢答题" value="4"/>
           </el-select>
+        </el-form-item>
+        <el-form-item v-if="taskInfo.answer_type === '3'" label="答题时间" label-width="100px">
+          <el-input v-model="taskInfo.limit_time" type="number">
+            <div slot="suffix">(秒)</div>
+          </el-input>
         </el-form-item>
         <el-form-item label="题目顺序" label-width="100px">
           <el-input v-model="taskInfo.seq" type="number" />
         </el-form-item>
         <el-form-item label="答题人数" label-width="100px">
-          <el-input v-model="taskInfo.answer_limit" type="number" :disabled="activityInfo.type === '2'" />
+          <el-input v-model="taskInfo.answer_limit" :disabled="activityInfo.type === '2' || taskInfo.answer_type === '4' || (taskInfo.type !== '1' && taskInfo.type !== '3')" type="number" />
         </el-form-item>
         <el-form-item label="题目图片" label-width="100px">
           <el-upload
@@ -364,10 +372,10 @@
               :http-request="handleUpLoadNineImg"
               :on-preview="handleNineImgPreview"
               :on-remove="handleRemove"
-              multiple
               :limit="9"
               :action="domain"
               :file-list="taskAFileList"
+              multiple
               list-type="picture"
             >
               <el-button>上传图片</el-button>
@@ -480,7 +488,7 @@
             <el-form-item label="开始时间" label-width="100px">
               <span>{{ checkInfo.set_start_time | timeFilter }}</span>
             </el-form-item>
-            <el-form-item label="开始时间" label-width="100px">
+            <el-form-item label="结束时间" label-width="100px">
               <span>{{ checkInfo.set_stop_time | timeFilter }}</span>
               <el-button v-if="dialogType === 'edit'" type="primary" @click="handleUpdateActivity">修改活动</el-button>
             </el-form-item>
@@ -625,7 +633,7 @@ import { fetchCoachList,
   delTask,
   editTask } from './../../service/activity'
 import { fetchQiNiuToken } from './../../service/common'
-import { getAgentName, getAgentId, getPrice } from '@/utils/auth'
+import { getAgentName, getAgentId, getPrice, getLevel } from '@/utils/auth'
 import { qiniuAddress } from './../../config'
 import axios from 'axios'
 import waves from '@/directive/waves' // 水波纹指令
@@ -687,8 +695,8 @@ export default {
   },
   data() {
     return {
-      dialogActivityTitle: '', //活动对话框标题
-      dialogActivitytype: '',  // 活动对话框类型
+      dialogActivityTitle: '', // 活动对话框标题
+      dialogActivitytype: '', // 活动对话框类型
       iconFilelist: [],
       bgFileList: [],
       taskQFileList: [],
@@ -731,7 +739,7 @@ export default {
         actDesc: '', // 活动描述
         bgImgUrl: '', // 背景图片URl
         iconUrl: '', // 活动封面Url
-        gif_url: '', //个人版本gifUrl
+        gif_url: '', // 个人版本gifUrl
         price: '', // 活动价格
         check: '' // 是够长期
       },
@@ -753,7 +761,8 @@ export default {
         answer2: '', // 文字题答案
         answer_url: '',
         score: null,
-        answer_limit: 1
+        answer_limit: 1,
+        limit_time: ''
       },
       dialogImageUrl: '',
       dialogVisible: false,
@@ -776,13 +785,40 @@ export default {
       set_stop_time: '',
       payType: '1',
       gifFileList: [],
-      activity: {}, //活动信息
+      activity: {} // 活动信息
+    }
+  },
+  computed: {
+    showable() {
+      return (+getLevel()) > 4
+    },
+    checkdisabled() {
+      if (this.activityInfo.check) {
+        return true
+      } else {
+        return false
+      }
     }
   },
   created() {
     this.init()
   },
   methods: {
+    taskTypeChange(val) {
+      this.taskInfo.answer_type = '1'
+      this.taskInfo.answer_limit = 1
+    },
+    answerTypeChange(value) {
+      if (value === '4') {
+        this.taskInfo.answer_limit = 1
+      }
+      this.taskInfo.limit_time = ''
+    },
+    handleCheckedChange(value) {
+      if (value) {
+        this.activityInfo.keepTime = ''
+      }
+    },
     handleImgChange(file) {
       const ImgObj = {}
       const ImgInput = document.querySelector('#ImgInput')
@@ -823,7 +859,9 @@ export default {
       if (val === '2') {
         this.activityInfo.price = 10
         this.activityInfo.answer_limit = 1
+        this.activityInfo.scoreType = '1'
       }
+      this.activityInfo.check = false
       this.activityInfo.coachId = null
     },
     // 导入任务
@@ -914,7 +952,7 @@ export default {
         data.answer = JSON.stringify(data.answer.sort())
       }
       if (data.type === '1') {
-        if (!data.options.A || !data.options.B || !data.options.C || !data.options.D ) {
+        if (!data.options.A || !data.options.B || !data.options.C || !data.options.D) {
           this.$message({ message: '选项不能为空', type: 'error' })
           return
         }
@@ -962,7 +1000,9 @@ export default {
         }
         data.answer = data.answer_url
       }
-
+      if (!data.limit_time) {
+        delete data.limit_time
+      }
       try {
         const res = await editTask(JSON.stringify(data))
         this.$message({ message: '修改成功', type: 'success' })
@@ -986,6 +1026,7 @@ export default {
       this.taskInfo.seq = row.seq
       this.taskInfo.answer_limit = row.answer_limit
       this.taskInfo.answer_type = row.answer_type
+      this.taskInfo.limit_time = row.limit_time
       if (row.question_img) {
         this.taskInfo.question_img = row.question_img
         this.taskQFileList = [{ name: row.name, url: row.question_img }]
@@ -1058,12 +1099,13 @@ export default {
       this.dialogFormVisible = true
       this.dialogActivitytype = 'edit'
       const {
-        agent_name, agent_id, act_desc, set_start_time,
+        agent_name, agent_id, act_desc, set_start_time, score,
         set_stop_time, activity_status, type, coach_id, name,
         score_type, score_show_type, keep_time, money, bg_img,
         icon, gif_url
       } = this.activity
 
+      this.activityInfo.score = score
       this.activityInfo.agentName = agent_name // 运营商名
       this.activityInfo.type = type
       this.activityInfo.agent_id = agent_id
@@ -1074,7 +1116,7 @@ export default {
       this.activityInfo.keepTime = keep_time
       if (keep_time === '0') { this.activityInfo.check = true }
       this.activityInfo.price = money / 100
-      this.activityInfo.time = [ set_start_time * 1000, set_stop_time * 1000 ]
+      this.activityInfo.time = [set_start_time * 1000, set_stop_time * 1000]
       this.activityInfo.actDesc = act_desc
       this.activityInfo.bgImgUrl = bg_img
       bg_img && (this.bgFileList = [{ name: '活动背景图', url: bg_img }])
@@ -1099,10 +1141,8 @@ export default {
       this.activity = data
       const { name, type, set_start_time, set_stop_time, money, qcode_url } = data
       this.checkInfo = { name, type, money, qcode_url }
-      this.set_start_time = set_start_time * 1000
-      this.set_stop_time = set_stop_time * 1000
-      this.checkInfo.set_start_time = set_start_time * 1000
-      this.checkInfo.set_stop_time = set_stop_time * 1000
+      this.checkInfo.set_start_time = set_start_time
+      this.checkInfo.set_stop_time = set_stop_time
       this.dialogCheckVisible = true
       this.dialogTitle = '活动修改'
       this.dialogType = 'edit'
@@ -1287,7 +1327,7 @@ export default {
       data.agent_id = agent_id
       data.act_id = this.activityId
 
-       // 活动名称
+      // 活动名称
       data.name = name
       // 活动时长
       data.keep_time = keepTime
@@ -1429,7 +1469,7 @@ export default {
       const data = Object.assign({}, this.taskInfo, { activity_id: activityId })
       data.answer = JSON.stringify(data.answer)
       if (data.type === '1') {
-        if (!data.options.A || !data.options.B || !data.options.C || !data.options.D ) {
+        if (!data.options.A || !data.options.B || !data.options.C || !data.options.D) {
           this.$message({ message: '选项不能为空', type: 'error' })
           return
         }
@@ -1473,6 +1513,9 @@ export default {
           return
         }
         data.answer = data.answer_url
+      }
+      if (!data.limit_time) {
+        delete data.limit_time
       }
       try {
         const res = await addTask(JSON.stringify(data))
@@ -1543,7 +1586,8 @@ export default {
         answer2: '',
         answer_url: '',
         score: null,
-        answer_limit: 1
+        answer_limit: 1,
+        limit_time: ''
       }
       this.taskQFileList = []
       this.taskAFileList = []
