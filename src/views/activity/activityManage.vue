@@ -114,10 +114,10 @@
           </el-select>
         </el-form-item>
         <el-form-item label="起始分值">
-          <el-input v-model="activityInfo.score" :disabled="!activityInfo.type || activityInfo.type === '2'" type="number" min="0" />
+          <el-input v-model="activityInfo.score" :disabled="!activityInfo.type || activityInfo.type === '2'" onkeypress="return event.keyCode>=48&&event.keyCode<=57"/>
         </el-form-item>
         <el-form-item label="活动时长">
-          <el-input v-model="activityInfo.keepTime" :disabled="checkdisabled" type="number" min="0" onkeypress="return event.keyCode>=48&&event.keyCode<=57">
+          <el-input v-model="activityInfo.keepTime" :disabled="checkdisabled" onkeypress="return event.keyCode>=48&&event.keyCode<=57">
             <div slot="suffix">
               <el-checkbox v-if="activityInfo.type === '2'" v-model="activityInfo.check" @change="handleCheckedChange">长期</el-checkbox>
               (分钟)
@@ -125,7 +125,7 @@
           </el-input>
         </el-form-item>
         <el-form-item v-if="activityInfo.type === '2'" label="活动价格">
-          <el-input v-model="activityInfo.price" type="number" onkeypress="return event.keyCode>=48&&event.keyCode<=57"/>
+          <el-input v-model="activityInfo.price" onkeypress="return event.keyCode>=48&&event.keyCode<=57"/>
         </el-form-item>
         <el-form-item label="起止时间">
           <el-date-picker
@@ -1006,10 +1006,11 @@ export default {
       try {
         const res = await editTask(JSON.stringify(data))
         this.$message({ message: '修改成功', type: 'success' })
+        this.dialogTaskVisible = false
+        this._fetchTaskList(this.activityId)
       } catch (e) {
       }
-      this.dialogTaskVisible = false
-      this._fetchTaskList(this.activityId)
+      
     },
     // 修改任务
     handleUpdateTask(row) {
@@ -1520,10 +1521,11 @@ export default {
       try {
         const res = await addTask(JSON.stringify(data))
         this.$message({ message: '添加成功', type: 'success' })
+        this.dialogTaskVisible = false
+        this._fetchTaskList(activityId)
       } catch (e) {
       }
-      this.dialogTaskVisible = false
-      this._fetchTaskList(activityId)
+      
     },
     // 获取活动列表
     async _fetchActivityList() {

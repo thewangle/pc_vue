@@ -39,7 +39,7 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="success" size="mini" @click="handleUpdataStaff(scope.row)">编辑</el-button>
+          <el-button v-if="!scope.row.disable_role === 1" type="success" size="mini" @click="handleUpdataStaff(scope.row)">编辑</el-button>
           <el-button type="primary" size="mini" @click="handleDeleteStaff(scope.row)" >删除</el-button>
         </template>
       </el-table-column>
