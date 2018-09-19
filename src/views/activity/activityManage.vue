@@ -1315,7 +1315,7 @@ export default {
           return
         }
       } else {
-        if (!time.length || !name || !type || !price || !bgImgUrl || !iconUrl) {
+        if (!time.length || !name || !type || !bgImgUrl || !iconUrl) {
           this.$message({ message: '必填项不能为空', type: 'error' })
           return
         }
