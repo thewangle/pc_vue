@@ -86,7 +86,7 @@
         </el-table-column>
         <el-table-column label="活动价">
           <template slot-scope="scope">
-            <span>{{ scope.row.price }}</span>
+            <span>{{ scope.row.price / 100 }}</span>
           </template>
         </el-table-column>
         <el-table-column label="支付方式">
@@ -100,7 +100,7 @@
           :current-page="dilogQuery.page_no"
           :total="dialogTotal"
           background
-          layout="total, sizes, prev, pager, next, jumper"
+          layout="total, prev, pager, next, jumper"
           @current-change="handledialogCurrentChange"/>
       </div>
     </el-dialog>
