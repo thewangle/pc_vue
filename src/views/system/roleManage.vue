@@ -31,6 +31,7 @@
               :props="defaultProps"
               :default-checked-keys="checkedMenuList"
               show-checkbox
+              check-strictly
               node-key="id"/>
           </div>
         </el-card>
@@ -68,7 +69,7 @@ export default {
       defaultProps: {
         children: 'childs',
         label: 'menu_name'
-      }
+      },
     }
   },
   watch: {
