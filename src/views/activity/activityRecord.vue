@@ -98,7 +98,7 @@
         </el-table-column>
         <el-table-column label="得分">
           <template slot-scope="scope">
-            <span>{{ scope.row.price }}</span>
+            <span>{{ scope.row.score }}</span>
           </template>
         </el-table-column>
         <el-table-column label="队伍得分率" width="130px">
