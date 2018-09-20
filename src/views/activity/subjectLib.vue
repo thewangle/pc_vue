@@ -542,7 +542,7 @@ export default {
           this.$message({ message: '选项不能为空', type: 'error' })
           return
         }
-        if (!data.answer.length) {
+        if (data.answer === '[]') {
           this.$message({ message: '请填写答案', type: 'error' })
           return
         }
@@ -552,12 +552,11 @@ export default {
         this.taskAFileList.forEach(item => {
           data.options.push(item.url)
         })
-        console.log(data.options)
         if (data.options.length < 9) {
           this.$message({ message: '请上传九张图片', type: 'error' })
           return
         }
-        if (!data.answer.length) {
+        if (data.answer === '[]') {
           this.$message({ message: '请填写答案', type: 'error' })
           return
         }
@@ -655,7 +654,7 @@ export default {
           this.$message({ message: '选项不能为空', type: 'error' })
           return
         }
-        if (!data.answer.length) {
+        if (data.answer === '[]') {
           this.$message({ message: '请填写答案', type: 'error' })
           return
         }
@@ -670,7 +669,7 @@ export default {
           this.$message({ message: '请上传九张图片', type: 'error' })
           return
         }
-        if (!data.answer.length) {
+        if (data.answer === '[]') {
           this.$message({ message: '请填写答案', type: 'error' })
           return
         }
