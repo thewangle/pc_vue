@@ -819,7 +819,7 @@ export default {
         this.activityInfo.keepTime = ''
       }
     },
-    handleImgChange(file) {
+    handleImgChange(e) {
       const ImgObj = {}
       const ImgInput = document.querySelector('#ImgInput')
       const length = ImgInput.files.length
@@ -848,6 +848,7 @@ export default {
           if (!res.data.error_code) {
             this.$message({ message: '上传成功', type: 'success' })
             e.target.value = ''
+            this._fetchTaskList(this.activityId)
           }
         }
       })
@@ -866,7 +867,7 @@ export default {
       this.activityInfo.coachId = null
     },
     // 导入任务
-    handleFileChange(file) {
+    handleFileChange(e) {
       const activityId = this.activityId
       const fileInput = document.querySelector('#fileInput')
       const formData = new FormData()
@@ -958,15 +959,22 @@ export default {
           this.$message({ message: '选项不能为空', type: 'error' })
           return
         }
+        if (!data.answer.length) {
+          this.$message({ message: '请填写答案', type: 'error' })
+          return
+        }
       }
       if (data.type === '3') {
         data.options = []
         this.taskAFileList.forEach(item => {
           data.options.push(item.url)
         })
-        console.log(data.options)
         if (data.options.length < 9) {
           this.$message({ message: '请上传九张图片', type: 'error' })
+          return
+        }
+        if (!data.answer.length) {
+          this.$message({ message: '请填写答案', type: 'error' })
           return
         }
       }
@@ -1476,15 +1484,23 @@ export default {
           this.$message({ message: '选项不能为空', type: 'error' })
           return
         }
+        console.log(data.answer)
+        if (!data.answer.length) {
+          this.$message({ message: '请填写答案', type: 'error' })
+          return
+        }
       }
       if (data.type === '3') {
         data.options = []
         this.taskAFileList.forEach(item => {
           data.options.push(item.url)
         })
-        console.log(data.options)
         if (data.options.length < 9) {
           this.$message({ message: '请上传九张图片', type: 'error' })
+          return
+        }
+        if (!data.answer.length) {
+          this.$message({ message: '请填写答案', type: 'error' })
           return
         }
       }
