@@ -114,7 +114,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="起始分值">
-          <el-input v-model="activityInfo.score" :disabled="!activityInfo.type || activityInfo.type === '2'" onkeypress="return event.keyCode>=48&&event.keyCode<=57"/>
+          <el-input v-model="activityInfo.score" :disabled="!activityInfo.type || activityInfo.type === '2'" onkeypress="return event.keyCode ? event.keyCode>=48 && event.keyCode<=57 : event.which >= 48 && event.which <= 57"/>
         </el-form-item>
         <el-form-item label="活动时长">
           <el-input v-model="activityInfo.keepTime" :disabled="checkdisabled" onkeypress="return event.keyCode>=48&&event.keyCode<=57">
@@ -847,6 +847,7 @@ export default {
           )
           if (!res.data.error_code) {
             this.$message({ message: '上传成功', type: 'success' })
+            e.target.value = ''
           }
         }
       })
@@ -880,6 +881,7 @@ export default {
           this.$message({ message: data.error_msg, type: 'error' })
         } else {
           this.$message({ message: '导入成功', type: 'success' })
+          e.target.value = ''
           this._fetchTaskList(activityId)
         }
       })

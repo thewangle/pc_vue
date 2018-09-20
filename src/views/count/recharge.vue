@@ -24,7 +24,7 @@
           <span>{{ scope.$index + 1 }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="充值金额" align="center">
+      <el-table-column label="充值金额(元)" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.money / 100 }}</span>
         </template>

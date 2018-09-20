@@ -406,19 +406,22 @@ export default {
         .catch(_ => {})
     },
     // 导入题库
-    handleFileChange(file) {
+    handleFileChange(e) {
+      console.log(e)
       const fileInput = document.querySelector('#fileInput')
       const formData = new FormData()
       const config = {
         headers: { 'Content-Type': 'multipart/form-data' }
       }
       formData.append('file', fileInput.files[0])
+      console.log(formData)
       axios.post('/i/topteam/admin/importTaskLib', formData, config).then(res => {
         const data = res.data
         if (data.error_code !== 0) {
           this.$message({ message: data.error_msg, type: 'error' })
         } else {
           this.$message({ message: '导入成功', type: 'success' })
+          e.target.value = ''
           this._fetchList()
         }
       })
@@ -451,6 +454,7 @@ export default {
           )
           if (!res.data.error_code) {
             this.$message({ message: '上传成功', type: 'success' })
+            e.target.value = ''
           }
         }
       })

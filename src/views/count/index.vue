@@ -36,7 +36,7 @@
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="类型">
+      <el-table-column label="类型" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.type }}</span>
         </template>
@@ -46,7 +46,7 @@
           <span>{{ scope.row.act_num }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="总计价格">
+      <el-table-column label="总计价格(元)" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.total_price }}</span>
         </template>
@@ -84,7 +84,7 @@
             <span>{{ scope.row.set_stop_time | timeFilter }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="活动价">
+        <el-table-column label="活动价(元)">
           <template slot-scope="scope">
             <span>{{ scope.row.price / 100 }}</span>
           </template>
@@ -119,6 +119,9 @@ export default {
   },
   filters: {
     timeFilter(timestamp) {
+      if (+timestamp === 0) {
+        return '无'
+      }
       var date = new Date(timestamp * 1000)// 如果date为10位不需要乘1000
       var Y = date.getFullYear() + '-'
       var M = (+date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
