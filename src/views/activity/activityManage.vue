@@ -117,7 +117,7 @@
           <el-input v-model="activityInfo.score" :disabled="!activityInfo.type || activityInfo.type === '2'" onkeypress="return event.keyCode ? event.keyCode>=48 && event.keyCode<=57 : event.which >= 48 && event.which <= 57"/>
         </el-form-item>
         <el-form-item label="活动时长">
-          <el-input v-model="activityInfo.keepTime" :disabled="checkdisabled" onkeypress="return event.keyCode>=48&&event.keyCode<=57">
+          <el-input v-model="activityInfo.keepTime" :disabled="checkdisabled" onkeypress="return event.keyCode ? event.keyCode>=48 && event.keyCode<=57 : event.which >= 48 && event.which <= 57">
             <div slot="suffix">
               <el-checkbox v-if="activityInfo.type === '2'" v-model="activityInfo.check" @change="handleCheckedChange">长期</el-checkbox>
               (分钟)
@@ -125,7 +125,7 @@
           </el-input>
         </el-form-item>
         <el-form-item v-if="activityInfo.type === '2'" label="活动价格">
-          <el-input v-model="activityInfo.price" onkeypress="return event.keyCode>=48&&event.keyCode<=57"/>
+          <el-input v-model="activityInfo.price" onkeypress="return event.keyCode ? event.keyCode>=48 && event.keyCode<=57 : event.which >= 48 && event.which <= 57"/>
         </el-form-item>
         <el-form-item label="起止时间">
           <el-date-picker
@@ -1220,7 +1220,7 @@ export default {
       this.dialogCheckVisible = false
       this.activityId = null
       this.taskList = []
-      this.activityInfo = {}
+      this._resetActivityInfo()
       this._restCheckInfo()
       this._fetchActivityList()
     },
@@ -1269,7 +1269,7 @@ export default {
         headers: { 'Content-Type': 'multipart/form-data' }
       }
       // 重命名要上传的文件
-      const keyname = 'top-team' + Date.now() + Math.floor(Math.random() * 100) + req.file.name
+      const keyname = 'top-team' + Date.now() + Math.floor(Math.random() * 100)
       const token = await this._fetchQiNiuToken()
       const formData = new FormData()
       formData.append('file', req.file)

@@ -101,7 +101,7 @@
           <el-input v-model="agentInfo.phone" />
         </el-form-item>
         <el-form-item label="活动价">
-          <el-input v-model="agentInfo.price" type="number" onkeypress="return event.keyCode>=48&&event.keyCode<=57" />
+          <el-input v-model="agentInfo.price" type="number" onkeypress="return event.keyCode ? event.keyCode>=48 && event.keyCode<=57 : event.which >= 48 && event.which <= 57" />
         </el-form-item>
         <el-form-item label="所在区域">
           <el-cascader
@@ -140,7 +140,7 @@
               <span>{{ rowInfo.level | statusFilter }}</span>
             </el-form-item>
             <el-form-item label="活动价" label-width="100px">
-              <span>{{ rowInfo.price }}</span>
+              <span>{{ rowInfo.price / 100 }}</span>
             </el-form-item>
             <el-form-item label="所在地区" label-width="100px">
               <span>{{ rowInfo.address }}</span>
