@@ -64,7 +64,7 @@
         <template slot-scope="scope">
           <el-button v-if="(scope.row.activity_status === '2' || scope.row.activity_status === '6') && showable" type="primary" size="mini" @click="handleEditActivity(scope.row)">修改</el-button>
           <el-button v-if="scope.row.activity_status !== '1'" size="mini" type="success" @click="handleShowActivityInfo(scope.row)">查看</el-button>
-          <el-button v-if="scope.row.activity_status === '1'" size="mini" @click="handleCheckActivity(scope.row)">去审批</el-button>
+          <el-button v-if="scope.row.activity_status === '1' && level === '2'" size="mini" @click="handleCheckActivity(scope.row)">去审批</el-button>
           <el-button
             v-if="scope.row.activity_status === 5 || scope.row.activity_status === '6'"
             size="mini"
@@ -866,7 +866,8 @@ export default {
       set_stop_time: '',
       payType: '1',
       gifFileList: [],
-      activity: {} // 活动信息
+      activity: {}, // 活动信息
+      level: getLevel()
     }
   },
   computed: {

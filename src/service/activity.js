@@ -208,7 +208,7 @@ export function addTaskLib(data) {
  */
 export function updateTaskLib(data) {
   return request({
-    url: '/i/topteam/admin/addTaskLib',
+    url: '/i/topteam/admin/ModifyTaskLib',
     method: 'post',
     data
   })
