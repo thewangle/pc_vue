@@ -17,7 +17,7 @@
           <span>{{ scope.$index + 1 }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作名称" align="center">
+      <el-table-column label="操作内容" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.content }}</span>
         </template>
