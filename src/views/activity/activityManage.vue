@@ -79,6 +79,7 @@
     </div>
     <!-- 新增活动对话框 start -->
     <el-dialog
+      :close-on-click-modal="false"
       :visible.sync="dialogFormVisible"
       :title="dialogActivityTitle"
       class="aDialog"
@@ -280,6 +281,7 @@
 
     <!-- 新增题目对话框 start -->
     <el-dialog
+      :close-on-click-modal="false"
       :visible.sync="dialogTaskVisible"
       :title="dialogTaskTitle"
       class="activityDialog"
@@ -468,6 +470,7 @@
     <!-- 新增题目对话框 end -->
 
     <el-dialog
+      :close-on-click-modal="false"
       :visible.sync="dialogCheckVisible"
       class="activityDialog"
       fullscreen
@@ -568,6 +571,7 @@
 
     <!-- 审批不通过弹窗 -->
     <el-dialog
+      :close-on-click-modal="false"
       :visible.sync="dialogReasonVisible"
       class="activityDialog"
       title="不通过原因"
@@ -586,6 +590,7 @@
 
     <!-- 审批通过弹窗 -->
     <el-dialog
+      :close-on-click-modal="false"
       :visible.sync="dialogPayVisible"
       class="activityDialog"
       title="活动付费(点击确定扫描右侧二维码)"
@@ -624,6 +629,7 @@
 
     <!-- 题库列表弹窗 -->
     <el-dialog
+      :close-on-click-modal="false"
       :visible.sync="dialogTaskList"
       class="taskListDialog"
       title="题库导入"

@@ -67,7 +67,7 @@
       <el-pagination :current-page="listQuery.page_no" :page-sizes="[10,20,30, 50]" :page-size="listQuery.page_size" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div>
   
-    <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible" @close="handleClose">
+    <el-dialog :close-on-click-modal="false" :title="dialogTitle" :visible.sync="dialogFormVisible" @close="handleClose">
       <el-form :model="agentInfo" label-position="right" label-width="120px">
         <el-form-item label="运营商名称">
           <el-input v-model="agentInfo.name" />
@@ -107,7 +107,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="transTitle" :visible.sync="dialogTransVisible" class="transDialog" @close="handleTransClose">
+    <el-dialog :close-on-click-modal="false" :title="transTitle" :visible.sync="dialogTransVisible" class="transDialog" @close="handleTransClose">
       <div class="clearfix">
         <div style="float:left; width: 40%;">
           <el-form label-position="left">

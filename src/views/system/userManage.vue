@@ -45,7 +45,7 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible" @close="handleClose">
+    <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible" @close="handleClose" :close-on-click-modal="false">
       <el-form :model="agentInfo" label-position="right" label-width="120px">
         <el-form-item label="员工姓名">
           <el-input v-model="agentInfo.name" />

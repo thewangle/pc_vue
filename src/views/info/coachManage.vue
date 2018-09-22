@@ -58,7 +58,7 @@
       <el-pagination :current-page="listQuery.page_no" :page-sizes="[10,20,30, 50]" :page-size="listQuery.page_size" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div>
 
-    <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible" @close="handleClose">
+    <el-dialog :close-on-click-modal="false" :title="dialogTitle" :visible.sync="dialogFormVisible" @close="handleClose">
       <el-form :model="agentInfo" label-position="right" label-width="120px">
         <el-form-item label="教练姓名">
           <el-input v-model="agentInfo.contacts" />

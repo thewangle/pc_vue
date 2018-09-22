@@ -87,6 +87,7 @@
     </div>
     <!-- 新增题目对话框 start -->
     <el-dialog
+      :close-on-click-modal="false"
       :visible.sync="dialogTaskVisible"
       :title="dialogTaskTitle"
       class="activityDialog"

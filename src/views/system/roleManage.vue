@@ -37,7 +37,7 @@
         </el-card>
       </el-col>
     </el-row>
-    <el-dialog :visible.sync="addRoleVisible" :title="title" @close="handleClose">
+    <el-dialog :visible.sync="addRoleVisible" :title="title" @close="handleClose" :close-on-click-modal="false">
       <el-form>
         <el-form-item label="角色名" label-width="60px">
           <el-input v-model="roleName" auto-complete="off" />

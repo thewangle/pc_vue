@@ -62,7 +62,7 @@
       <el-pagination :current-page="listQuery.page_no" :page-sizes="[10,20,30, 50]" :page-size="listQuery.page_size" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div>
 
-    <el-dialog :visible.sync="dialogInfoVisible" title="财务统计查看" custom-class="count-dialog">
+    <el-dialog :visible.sync="dialogInfoVisible" title="财务统计查看" custom-class="count-dialog" :close-on-click-modal="false">
       <el-table :data="gridData" border fit highlight-current-row>
         <el-table-column label="活动名称">
           <template slot-scope="scope">
