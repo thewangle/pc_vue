@@ -123,3 +123,14 @@ export function deleteStaff(data) {
     data
   })
 }
+
+/**
+ * 获取操作日志
+ */
+export function getOperatorLog(data) {
+  return request({
+    url: '/i/topteam/admin/getloglist',
+    method: 'post',
+    data
+  })
+}

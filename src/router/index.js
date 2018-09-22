@@ -143,6 +143,14 @@ export const asyncRouterMap = [
         name: 'RoleManage',
         meta: { title: '角色管理', icon: 'edit', noCache: true },
         hidden: true
+      },
+      {
+        id: 51,
+        path: 'operatorLog',
+        component: () => import('@/views/system/operatorLog'),
+        name: 'OperatorLog',
+        meta: { title: '操作日志', icon: 'edit', noCache: true },
+        hidden: true
       }
     ]
   },

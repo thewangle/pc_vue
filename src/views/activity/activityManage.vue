@@ -1175,6 +1175,7 @@ export default {
       // 图片题目
       if (row.type === '3') {
         console.log(1111111111)
+        console.log(row.answer)
         this.taskInfo.answer = JSON.parse(row.answer || "[]")
         this.taskInfo.options = JSON.parse(row.options)
         this.taskInfo.options.forEach((item, index) => {
