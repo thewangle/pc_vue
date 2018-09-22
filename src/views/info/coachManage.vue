@@ -54,6 +54,10 @@
       </el-table-column>
     </el-table>
 
+    <div class="pagination-container">
+      <el-pagination :current-page="listQuery.page_no" :page-sizes="[10,20,30, 50]" :page-size="listQuery.page_size" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
+    </div>
+
     <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible" @close="handleClose">
       <el-form :model="agentInfo" label-position="right" label-width="120px">
         <el-form-item label="教练姓名">
@@ -104,7 +108,10 @@ export default {
     return {
       list: null,
       listLoading: false,
+      total: 0,
       listQuery: {
+        page_no: 1,
+        page_size: 10,
         agent_name: null,
         name: null,
         phone: null
@@ -124,6 +131,14 @@ export default {
     this.init()
   },
   methods: {
+    handleSizeChange(size) {
+      this.listQuery.page_size = size
+      this._fetchCoachList()
+    },
+    handleCurrentChange(val) {
+      this.listQuery.page_no = val
+      this._fetchCoachList()
+    },
     handleFilter() {
       this._fetchCoachList()
     },
@@ -192,7 +207,8 @@ export default {
       try {
         const res = await fetchCoachList(this.listQuery)
         const { data } = res
-        this.list = data
+        this.list = data.list
+        this.total = data.total
         this.listLoading = false
       } catch (e) {
         this.listLoading = false

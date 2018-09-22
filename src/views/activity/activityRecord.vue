@@ -69,6 +69,10 @@
       </el-table-column>
     </el-table>
 
+    <div class="pagination-container">
+      <el-pagination :current-page="listQuery.page_no" :page-sizes="[10,20,30, 50]" :page-size="listQuery.page_size" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
+    </div>
+
     <el-dialog :visible.sync="dialogInfoVisible" title="活动详情查看" custom-class="detaildialog">
       <el-table :data="gridData" border fit highlight-current-row>
         <el-table-column label="序号">
@@ -159,7 +163,10 @@ export default {
     return {
       list: null,
       listLoading: false,
+      total: 0,
       listQuery: {
+        page_no: 1,
+        page_size: 10,
         type: undefined,
         agent_name: undefined,
         name: undefined,
@@ -176,6 +183,14 @@ export default {
     this._fetchList()
   },
   methods: {
+    handleSizeChange(size) {
+      this.listQuery.page_size = size
+      this._fetchList()
+    },
+    handleCurrentChange(val) {
+      this.listQuery.page_no = val
+      this._fetchList()
+    },
     handleFilter() {
       this._fetchList()
     },
@@ -196,7 +211,8 @@ export default {
       try {
         const res = await fetchList(this.listQuery)
         const { data } = res
-        this.list = data
+        this.list = data.list
+        this.total = data.total
       } catch (e) {}
       this.listLoading = false
     }

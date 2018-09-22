@@ -69,6 +69,10 @@
       </el-table-column>
     </el-table>
 
+    <div class="pagination-container">
+      <el-pagination :current-page="listQuery.page_no" :page-sizes="[10,20,30, 50]" :page-size="listQuery.page_size" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
+    </div>
+
     <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible" @close="handleClose">
       <el-form :model="agentInfo" label-position="right" label-width="120px">
         <el-form-item label="代理商名称">
@@ -196,7 +200,10 @@ export default {
     return {
       list: null,
       listLoading: false,
+      total: 0,
       listQuery: {
+        page_no: 1,
+        page_size: 10,
         level: null,
         agent_name: null,
         province_id: null
@@ -235,6 +242,14 @@ export default {
     this.init()
   },
   methods: {
+    handleSizeChange(size) {
+      this.listQuery.page_size = size
+      this._fetchAgentList()
+    },
+    handleCurrentChange(val) {
+      this.listQuery.page_no = val
+      this._fetchAgentList()
+    },
     handleFilter() {
       this._fetchAgentList()
     },
@@ -398,7 +413,8 @@ export default {
         const res = await fetchAgentList(this.listQuery)
         const { data } = res
         this.listLoading = false
-        this.list = data
+        this.list = data.list
+        this.total = data.total
       } catch (e) {
         this.listLoading = false
       }

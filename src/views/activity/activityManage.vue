@@ -73,7 +73,10 @@
         </template>
       </el-table-column>
     </el-table>
-
+    
+    <div class="pagination-container">
+      <el-pagination :current-page="listQuery.page_no" :page-sizes="[10,20,30, 50]" :page-size="listQuery.page_size" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
+    </div>
     <!-- 新增活动对话框 start -->
     <el-dialog
       :visible.sync="dialogFormVisible"
@@ -198,6 +201,7 @@
       <div class="job-list">
         <div class="job-title">
           <h3 style="display: inline-block">任务列表</h3>
+          
           <div :disabled="!activityId" class="filePicker" style="float: right">
             <label>导入任务</label>
             <input
@@ -219,6 +223,7 @@
               @change="handleImgChange">
           </div>
           <el-button :disabled="!activityId" type="primary" style="float: right; margin-right: 20px;" @click="handleOpenTaskDialog">添加任务</el-button>
+          <el-button type="success" style="float: right; margin-right: 20px;" @click="handleOpenSubjectList">题库导入</el-button>
         </div>
         <div class="job-table">
           <el-table
@@ -615,6 +620,15 @@
         </div>
       </div>
     </el-dialog>
+    <!-- 审批通过弹窗 -->
+
+    <!-- 题库列表弹窗 -->
+    <el-dialog
+      :visible.sync="dialogTaskList"
+      class="taskListDialog"
+      title="题库导入"
+      @close="handleCloseTaskList"></el-dialog>
+    <!-- 题库列表弹窗 -->
   </div>
 </template>
 
@@ -695,6 +709,7 @@ export default {
   },
   data() {
     return {
+      dialogTaskList: false,
       dialogActivityTitle: '', // 活动对话框标题
       dialogActivitytype: '', // 活动对话框类型
       iconFilelist: [],
@@ -703,7 +718,10 @@ export default {
       taskAFileList: [],
       list: null,
       listLoading: false,
+      total: 0,
       listQuery: {
+        page_no: 1,
+        page_size: 10, 
         type: null,
         agent_name: null,
         name: null,
@@ -804,6 +822,23 @@ export default {
     this.init()
   },
   methods: {
+    // 关闭
+    handleCloseTaskList() {
+      this.dialogTaskList = false
+    },
+    // 题库导入弹窗
+    handleOpenSubjectList() {
+      console.log(1)
+      this.dialogTaskList = true
+    },
+    handleCurrentChange(val) {
+      this.listQuery.page_no = val
+      this._fetchActivityList()
+    },
+    handleSizeChange(size) {
+      this.listQuery.page_size = size
+      this._fetchActivityList()
+    },
     taskTypeChange(val) {
       this.taskInfo.answer_type = '1'
       this.taskInfo.answer_limit = 1
@@ -1550,7 +1585,8 @@ export default {
         const res = await fetchActivityList(this.listQuery)
         const { data } = res
         this.listLoading = false
-        this.list = data
+        this.list = data.list
+        this.total = data.total
       } catch (e) {
         this.listLoading = false
       }
@@ -1645,6 +1681,9 @@ export default {
 
 .aDialog .el-dialog, .aDialog .el-dialog__body{
   width: 900px;
+}
+.taskListDialog .el-dialog, .taskListDialog .el-dialog__body{
+  width: 800px;
 }
 .clearfix::after {
   display: block;

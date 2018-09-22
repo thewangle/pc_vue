@@ -81,7 +81,9 @@
         </template>
       </el-table-column>
     </el-table>
-
+    <div class="pagination-container">
+      <el-pagination :current-page="listQuery.page_no" :page-sizes="[10,20,30, 50]" :page-size="listQuery.page_size" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
+    </div>
     <!-- 新增题目对话框 start -->
     <el-dialog
       :visible.sync="dialogTaskVisible"
@@ -300,7 +302,10 @@ export default {
   },
   data() {
     return {
+      total: '',
       listQuery: {
+        page_no: 1,
+        page_size: 10,
         name: null, // 人物名字
         type: null, // 任务类型
         answer_type: null // 答题类型
@@ -345,6 +350,14 @@ export default {
     this._fetchList()
   },
   methods: {
+    handleCurrentChange(val) {
+      this.listQuery.page_no = val
+      this._fetchList()
+    },
+    handleSizeChange(size) {
+      this.listQuery.page_size = size
+      this._fetchList()
+    },
     handleFilter() {
       this._fetchList()
     },
@@ -521,7 +534,8 @@ export default {
     async _fetchList() {
       this.listLoading = true
       const res = await fetchTaskLibList(this.listQuery)
-      this.list = res.data
+      this.total = res.data.total
+      this.list = res.data.list
       this.listLoading = false
     },
     // 添加任务
