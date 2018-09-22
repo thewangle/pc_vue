@@ -53,7 +53,7 @@
         <el-form-item label="电话">
           <el-input v-model="agentInfo.phone" />
         </el-form-item>
-        <el-form-item label="角色名称">
+        <el-form-item label="角色名称" v-if="!this.disable_role">
           <el-select v-model="agentInfo.role_id" :placeholder="place" clearable>
             <el-option
               v-for="item in roleList"
@@ -107,6 +107,7 @@ export default {
       dialogType: null,
       admin_id: null,
       place: '',
+      disable_role: '',
       agentInfo: {
         name: null,
         phone: null,
@@ -141,11 +142,12 @@ export default {
       this.dialogTitle = '修改员工'
       this.dialogFormVisible = true
       this.dialogType = 'update'
-      const { name, phone, role_id, gender } = row
+      const { name, phone, role_id, gender, disable_role } = row
       const data = { name, phone, role_id, gender }
       this.agentInfo = data
       this.admin_id = row.id
       let flag = false
+      this.disable_role = disable_role
       this.roleList.forEach((item) => {
         if (item.id === role_id) {
           flag  = true
@@ -182,16 +184,13 @@ export default {
         password: null
       }
       this.place = ''
+      this.disable_role = ''
     },
     // 修改员工
     async _editStaff(id) {
       const param = Object.assign({}, this.agentInfo, { admin_id: id })
       if (!param.role_id) {
         param.role_id = 0
-      }
-      if (param.password.length < 6) {
-        this.$message({ message: '密码长度最少六位', type: 'error' })
-        return
       }
       try {
         const res = await editStaff(param)
