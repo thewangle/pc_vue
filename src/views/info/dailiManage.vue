@@ -235,7 +235,8 @@ export default {
       rowInfo: {},
       supList: [],
       compareLevel: getLevel(),
-      compareId: getAgentId()
+      compareId: getAgentId(),
+      transType: ''
     }
   },
   created() {
@@ -265,6 +266,7 @@ export default {
       this.superAgentId = ''
       this.rowInfo = {}
       this.supList = []
+      this.transType = ''
     },
     // 转移
     async handleTransAgent() {
@@ -273,7 +275,12 @@ export default {
         return
       }
       try {
-        const res = await transAgent({ agent_id: this.rowInfo.id, superior_agent_id: this.superAgentId })
+        console.log(this.transType)
+        if (this.transType === 'delete') {
+          const res = await transSubordinateAgent({ agent_id: this.rowInfo.id, superior_agent_id: this.superAgentId })
+        } else {
+          const res = await transAgent({ agent_id: this.rowInfo.id, superior_agent_id: this.superAgentId })
+        }
         this.$message({ message: '转移成功', type: 'success' })
       } catch (e) {
       }
@@ -282,6 +289,7 @@ export default {
     },
     // 转移弹窗
     async handleListTrans(row, type) {
+      this.transType = type
       this.transTitle = '转移代理信息'
       console.log(row)
       const res = await getSubordinateAgent({ level: type ? row.level : row.level - 1 })
@@ -318,8 +326,6 @@ export default {
           type: 'success'
         })
       } catch (e) {
-        this.dialogFormVisible = false
-        await this._fetchAgentList()
       }
     },
     // 修改代理商
@@ -335,8 +341,6 @@ export default {
           type: 'success'
         })
       } catch (e) {
-        this.dialogFormVisible = false
-        await this._fetchAgentList()
       }
     },
     handleCityListChange(value) {
@@ -389,13 +393,6 @@ export default {
         })
         .catch(_ => {})
     },
-    // 获取当前用户下属机构
-    // async _fetchSubordinateAgent(level) {
-    //   const param = level ? { level } : {}
-    //   const res = fetchSubordinateAgent(param)
-    //   const { data } = res
-    //   console.log(data)
-    // },
     // 处理城市
     _changeCityList(provice) {
       const dialogCityList = []

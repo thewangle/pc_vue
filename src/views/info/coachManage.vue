@@ -187,11 +187,11 @@ export default {
         if (this.dialogType === 'update') {
           const res = await updateCoach({ id: this.coachId, contacts: this.agentInfo.contacts, phone: this.agentInfo.phone })
         }
+        this.handleClose()
+        this._fetchCoachList()
       } catch (e) {
         console.log(e)
       }
-      this.handleClose()
-      this._fetchCoachList()
     },
     // 重置对话框列表
     _resetForm() {

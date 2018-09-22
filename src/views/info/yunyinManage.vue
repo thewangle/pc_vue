@@ -310,16 +310,14 @@ export default {
       try {
         const res = await addOperator(this.agentInfo)
         this.dialogFormVisible = false
+        this._restForm()
         await this._fetchOperatorList()
         this.$message({
           message: '创建成功',
           type: 'success'
         })
       } catch (e) {
-        this.dialogFormVisible = false
-        await this._fetchOperatorList()
       }
-      this._restForm()
     },
     // 修改运营商
     async handleEditAgent() {
@@ -328,16 +326,14 @@ export default {
       try {
         const res = await editOperator(param)
         this.dialogFormVisible = false
+        this._restForm()
         await this._fetchOperatorList()
         this.$message({
           message: '修改成功',
           type: 'success'
         })
       } catch (e) {
-        this.dialogFormVisible = false
-        await this._fetchOperatorList()
       }
-      this._restForm()
     },
     handleCityListChange(value) {
       this.agentInfo.province_id = value[0]
