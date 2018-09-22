@@ -125,6 +125,11 @@
         <el-form-item label="答题人数" label-width="100px">
           <el-input v-model="taskInfo.answer_limit" type="number" />
         </el-form-item>
+        <el-form-item v-if="taskInfo.answer_type === '3'" label="答题时间" label-width="100px">
+          <el-input v-model="taskInfo.limit_time" type="number">
+            <div slot="suffix">(秒)</div>
+          </el-input>
+        </el-form-item>
         <el-form-item label="题目图片" label-width="100px">
           <el-upload
             :http-request="handleUpLoadTaksImg"
@@ -335,7 +340,8 @@ export default {
         answer2: '', // 文字题答案
         answer_url: '',
         score: null,
-        answer_limit: 1
+        answer_limit: 1,
+        limit_time: 0
       },
       taskQFileList: [], // 题目问题图片文件列表
       taskAFileList: [], // 题目答案图片文件列表
