@@ -213,3 +213,15 @@ export function updateTaskLib(data) {
     data
   })
 }
+
+/**
+ * 题库导入题目
+ */
+
+export function chooseTasklib(data) {
+  return request({
+    url: '/i/topteam/admin/ChooseTasklib',
+    method: 'post',
+    data
+  })
+}

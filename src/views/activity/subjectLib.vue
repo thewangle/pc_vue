@@ -16,6 +16,7 @@
         <el-option label="团队限时题" value="3" />
         <el-option label="活动抢答题" value="4"/>
       </el-select>
+      <el-button style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleAddTaskLib">添加题目</el-button>
       <div class="filePicker" style="float: right;">
         <label>导入任务</label>
@@ -302,7 +303,7 @@ export default {
   },
   data() {
     return {
-      total: '',
+      total: 0,
       listQuery: {
         page_no: 1,
         page_size: 10,

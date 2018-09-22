@@ -223,7 +223,7 @@
               @change="handleImgChange">
           </div>
           <el-button :disabled="!activityId" type="primary" style="float: right; margin-right: 20px;" @click="handleOpenTaskDialog">添加任务</el-button>
-          <el-button type="success" style="float: right; margin-right: 20px;" @click="handleOpenSubjectList">题库导入</el-button>
+          <el-button :disabled="!activityId" type="success" style="float: right; margin-right: 20px;" @click="handleOpenSubjectList">题库导入</el-button>
         </div>
         <div class="job-table">
           <el-table
@@ -627,7 +627,55 @@
       :visible.sync="dialogTaskList"
       class="taskListDialog"
       title="题库导入"
-      @close="handleCloseTaskList"></el-dialog>
+      @close="handleCloseTaskList">
+       <el-table
+        :data="tasklistData"
+        style="width: 100%"
+        border
+        fit
+        highlight-current-row
+        @selection-change="handleSelectionChange">
+        <el-table-column type="selection" width="55" align="center">
+        </el-table-column>
+        <el-table-column label="序号" width="70" align="center">
+          <template slot-scope="scope">
+            {{ scope.$index + 1 }}
+          </template>
+        </el-table-column>
+        <el-table-column label="题目标题" min-width="150" align="center">
+          <template slot-scope="scope">
+            <span>{{ scope.row.name }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="答案" width="150" align="center">
+          <template slot-scope="scope">
+            <span>{{ scope.row.answer }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="题目类型" width="110" align="center">
+          <template slot-scope="scope">
+            <span>{{ scope.row.type | typeFilter }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="分值" width="95" align="center">
+          <template slot-scope="scope">
+            <span>{{ scope.row.type | typeFilter }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="答题类型" align="center" width="95">
+          <template slot-scope="scope">
+            <span>{{ scope.row.answer_type | answerTypeFilter }}</span>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div class="pagination-container">
+        <el-pagination :current-page="taskListQuery.page_no" :page-size="taskListQuery.page_size" :total="taskTotal" background @current-change="handleaTaskCurrentChange"/>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleCloseTaskList">取 消</el-button>
+        <el-button type="primary" @click="handleSubmitLibTask">确 定</el-button>
+      </span>
+    </el-dialog>
     <!-- 题库列表弹窗 -->
   </div>
 </template>
@@ -645,7 +693,9 @@ import { fetchCoachList,
   getPayInfo,
   updateActivity,
   delTask,
-  editTask } from './../../service/activity'
+  editTask,
+  fetchTaskLibList,
+  chooseTasklib } from './../../service/activity'
 import { fetchQiNiuToken } from './../../service/common'
 import { getAgentName, getAgentId, getPrice, getLevel } from '@/utils/auth'
 import { qiniuAddress } from './../../config'
@@ -709,6 +759,13 @@ export default {
   },
   data() {
     return {
+      taskCheckedList: [],
+      taskTotal: 0,
+      taskListQuery: {
+        page_no: 1,
+        page_size: 10
+      },
+      tasklistData: [],
       dialogTaskList: false,
       dialogActivityTitle: '', // 活动对话框标题
       dialogActivitytype: '', // 活动对话框类型
@@ -822,13 +879,43 @@ export default {
     this.init()
   },
   methods: {
+    async handleSubmitLibTask() {
+      if (!this.taskCheckedList.length) {
+        this.$message({ message: '请选择要导入的题目', type: 'error' })
+        return
+      }
+      try {
+        const res = await chooseTasklib({
+          activity_id: this.activityId,
+          task_lib_ids: JSON.stringify(this.taskCheckedList)
+        })
+        this.$message({ message: '导入成功', type: 'success' })
+        this._fetchTaskList(this.activityId)
+        this.handleCloseTaskList()
+      } catch (e) {}
+    },
+    handleaTaskCurrentChange(val) {
+      this.taskListQuery.page_no = val
+      this._fetchSubTaskList()
+    },
+    handleSelectionChange(val) {
+      this.taskCheckedList = []
+      val.forEach((item) => {
+        this.taskCheckedList.push(item.id)
+      })
+    },
     // 关闭
     handleCloseTaskList() {
       this.dialogTaskList = false
+      this.taskListQuery = {
+        page_no: 1,
+        page_size: 10
+      }
+      this.taskCheckedList = []
     },
     // 题库导入弹窗
-    handleOpenSubjectList() {
-      console.log(1)
+    async handleOpenSubjectList() {
+      await this._fetchSubTaskList()
       this.dialogTaskList = true
     },
     handleCurrentChange(val) {
@@ -1656,6 +1743,13 @@ export default {
       }
       this.set_start_time = ''
       this.set_stop_time = ''
+    },
+    // 获取题库题目列表
+    async _fetchSubTaskList() {
+      const res = await fetchTaskLibList()
+      const { data } = res
+      this.tasklistData = data.list
+      this.taskTotal = data.total
     },
     init() {
       this._fetchCoachList()

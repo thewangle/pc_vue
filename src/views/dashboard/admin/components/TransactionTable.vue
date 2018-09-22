@@ -1,7 +1,7 @@
 <template>
   <el-card style="width: 100%;padding-top: 15px;" shadow="hover">
     <div slot="header" class="clearfix">
-      <span>{{ type === 'team' ? '团队版' : '个人版' }}活动场次</span>
+      <span>{{ type === 'team' ? '团队版' : '个人版' }}活动人次</span>
       <el-date-picker
         v-model="value"
         class="datePicker-wrapper"
@@ -13,7 +13,7 @@
         @change="handleDateChange"/>
     </div>
     <div class="card-content">
-      <h4>一个月内活动场次</h4>
+      <h4>一个月内活动人次</h4>
       <p>{{ num }}场</p>
       <span>点击上方日期可查询场次</span>
     </div>

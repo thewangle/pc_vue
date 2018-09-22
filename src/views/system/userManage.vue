@@ -39,7 +39,7 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button v-if="!(scope.row.disable_role === 1)" type="success" size="mini" @click="handleUpdataStaff(scope.row)">编辑</el-button>
+          <el-button type="success" size="mini" @click="handleUpdataStaff(scope.row)">编辑</el-button>
           <el-button type="primary" size="mini" @click="handleDeleteStaff(scope.row)" >删除</el-button>
         </template>
       </el-table-column>
@@ -54,7 +54,7 @@
           <el-input v-model="agentInfo.phone" />
         </el-form-item>
         <el-form-item label="角色名称">
-          <el-select v-model="agentInfo.role_id" clearable>
+          <el-select v-model="agentInfo.role_id" :placeholder="place" clearable>
             <el-option
               v-for="item in roleList"
               :label="item.role_name"
@@ -72,12 +72,12 @@
         <el-form-item v-if="dialogType === 'create'" label="登录名">
           <el-input v-model="agentInfo.username" />
         </el-form-item>
-        <el-form-item v-if="dialogType === 'create'" label="密码">
+        <el-form-item label="密码">
           <el-input v-model="agentInfo.password" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button>取消</el-button>
+        <el-button @click="dialogFormVisible = false">取消</el-button>
         <el-button type="primary" @click="handleCreateStaff">保存</el-button>
       </div>
     </el-dialog>
@@ -106,6 +106,7 @@ export default {
       dialogTitle: null,
       dialogType: null,
       admin_id: null,
+      place: '',
       agentInfo: {
         name: null,
         phone: null,
@@ -144,14 +145,31 @@ export default {
       const data = { name, phone, role_id, gender }
       this.agentInfo = data
       this.admin_id = row.id
+      let flag = false
+      this.roleList.forEach((item) => {
+        if (item.id === role_id) {
+          flag  = true
+        }
+      })
+      if (!flag) {
+        this.place = '没有对应角色'
+        this.agentInfo.role_id = ''
+      }
     },
     async handleCreateStaff() {
       if (this.dialogType === 'create') {
-        await this._addStaff()
+        try {
+          await this._addStaff()
+          this._resetAgentInfo()
+        } catch (e) {
+        }
       } else if (this.dialogType === 'update') {
-        await this._editStaff(this.admin_id)
+        try {
+          await this._editStaff(this.admin_id)
+          this._resetAgentInfo()
+        } catch (e) {
+        }
       }
-      this._resetAgentInfo()
       await this._fetchStaffList()
     },
     _resetAgentInfo() {
@@ -163,15 +181,22 @@ export default {
         username: null,
         password: null
       }
+      this.place = ''
     },
     // 修改员工
     async _editStaff(id) {
       const param = Object.assign({}, this.agentInfo, { admin_id: id })
+      if (!param.role_id) {
+        param.role_id = 0
+      }
+      if (param.password.length < 6) {
+        this.$message({ message: '密码长度最少六位', type: 'error' })
+        return
+      }
       try {
         const res = await editStaff(param)
         this.dialogFormVisible = false
       } catch (e) {
-        this.dialogFormVisible = false
       }
     },
     // 新增员工
