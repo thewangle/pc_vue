@@ -627,7 +627,7 @@ export default {
       // 图片题目
       if (row.type === '3') {
         this.taskAFileList = []
-        this.taskInfo.answer = JSON.parse(row.answer)
+        this.taskInfo.answer = JSON.parse(row.answer || "[]")
         this.taskInfo.options = JSON.parse(row.options)
         this.taskInfo.options.forEach((item, index) => {
           this.taskAFileList.push({ name: '图片' + (index + 1), url: item })

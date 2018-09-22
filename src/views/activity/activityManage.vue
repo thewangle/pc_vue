@@ -828,7 +828,6 @@ export default {
       }
       Object.keys(ImgInput.files).forEach(async temp => {
         const item = ImgInput.files[temp]
-        console.log(item)
         const keyname = 'top-team' + Date.now() + Math.floor(Math.random() * 100) + item.name
         const token = await this._fetchQiNiuToken()
         const formData = new FormData()
@@ -1053,8 +1052,8 @@ export default {
       }
       // 图片题目
       if (row.type === '3') {
-        this.taskAFileList = []
-        this.taskInfo.answer = JSON.parse(row.answer)
+        console.log(1111111111)
+        this.taskInfo.answer = JSON.parse(row.answer || "[]")
         this.taskInfo.options = JSON.parse(row.options)
         this.taskInfo.options.forEach((item, index) => {
           this.taskAFileList.push({ name: '图片' + (index + 1), url: item })
@@ -1385,8 +1384,8 @@ export default {
         this.checkInfo = { name, type, money, qcode_url }
         this.set_start_time = set_start_time * 1000
         this.set_stop_time = set_stop_time * 1000
-        this.checkInfo.set_start_time = set_start_time * 1000
-        this.checkInfo.set_stop_time = set_stop_time * 1000
+        this.checkInfo.set_start_time = set_start_time
+        this.checkInfo.set_stop_time = set_stop_time
       } catch (e) {
       }
     },
