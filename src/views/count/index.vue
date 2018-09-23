@@ -148,7 +148,7 @@ export default {
       listQuery: {
         page_no: 1,
         page_size: 20,
-        agent_name: undefined,
+        agent_name: '',
         agent_type: '',
         dateValue: [],
         start_time: '',
