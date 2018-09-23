@@ -1,44 +1,44 @@
 <template>
   <div class="login-container">
+    <section class="login_Img">
+      <h3 class="title">伴行服务商管理系统</h3>
+      <div class="logo"></div>
+      <div class="form-container">
+        <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
+          <el-form-item prop="username">
+            <span class="svg-container svg-container_login">
+              <svg-icon icon-class="user" />
+            </span>
+            <el-input
+              v-model="loginForm.username"
+              placeholder="请输入用户名"
+              name="username"
+              type="text"
+              auto-complete="on"
+            />
+          </el-form-item>
 
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
+          <el-form-item prop="password">
+            <span class="svg-container">
+              <svg-icon icon-class="password" />
+            </span>
+            <el-input
+              :type="passwordType"
+              v-model="loginForm.password"
+              placeholder="请输入密码"
+              name="password"
+              auto-complete="on"
+              @keyup.enter.native="handleLogin" />
+            <span class="show-pwd" @click="showPwd">
+              <svg-icon icon-class="eye" />
+            </span>
+          </el-form-item>
 
-      <div class="title-container">
-        <h3 class="title">伴行服务商管理系统</h3>
+          <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
+
+        </el-form>
       </div>
-
-      <el-form-item prop="username">
-        <span class="svg-container svg-container_login">
-          <svg-icon icon-class="user" />
-        </span>
-        <el-input
-          v-model="loginForm.username"
-          placeholder="用户名"
-          name="username"
-          type="text"
-          auto-complete="on"
-        />
-      </el-form-item>
-
-      <el-form-item prop="password">
-        <span class="svg-container">
-          <svg-icon icon-class="password" />
-        </span>
-        <el-input
-          :type="passwordType"
-          v-model="loginForm.password"
-          placeholder="密码"
-          name="password"
-          auto-complete="on"
-          @keyup.enter.native="handleLogin" />
-        <span class="show-pwd" @click="showPwd">
-          <svg-icon icon-class="eye" />
-        </span>
-      </el-form-item>
-
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
-
-    </el-form>
+    </section>
 
   </div>
 </template>
@@ -123,7 +123,7 @@ export default {
   /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
   $bg:#283443;
-  $light_gray:#eee;
+  $light_gray: #1a6ceb;
   $cursor: #fff;
 
   @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
@@ -140,7 +140,7 @@ export default {
     .el-input {
       display: inline-block;
       height: 47px;
-      width: 85%;
+      width: 75%;
       input {
         background: transparent;
         border: 0px;
@@ -174,14 +174,51 @@ $light_gray:#eee;
   position: fixed;
   height: 100%;
   width: 100%;
-  background-color: $bg;
+  background-image: linear-gradient( 153deg, rgb(88,138,251) 0%, rgb(47,55,104) 100%);
+  .login_Img {
+    position: relative;
+    width: 754px;
+    height: 535px;
+    background-image: url("./img/bg.png");
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    .title {
+      position: absolute;
+      top: -50px;
+      left: 20px;
+      font-size: 26px;
+      color: $light_gray;
+      text-align: center;
+      font-weight: bold;
+      text-align: left;
+    }
+    .logo {
+      position: absolute;
+      width: 64px;
+      height: 72px;
+      top: 210px;
+      left: 180px;
+      background-image: url("./img/logo.png");
+    }
+    .form-container {
+      width: 370px;
+      height: 470px;
+      background: #fff;
+      position: absolute;
+      left: 418px;
+      top: 30px;
+      border-radius: 10px;
+    }
+  }
+
   .login-form {
     position: absolute;
     left: 0;
     right: 0;
-    width: 520px;
-    padding: 35px 35px 15px 35px;
-    margin: 120px auto;
+    width: 370px;
+    padding: 35px 15px 15px 15px;
+    margin: 80px auto;
   }
   .tips {
     font-size: 14px;
@@ -202,36 +239,6 @@ $light_gray:#eee;
     &_login {
       font-size: 20px;
     }
-  }
-  .title-container {
-    position: relative;
-    .title {
-      font-size: 26px;
-      color: $light_gray;
-      margin: 0px auto 40px auto;
-      text-align: center;
-      font-weight: bold;
-    }
-    .set-language {
-      color: #fff;
-      position: absolute;
-      top: 5px;
-      right: 0px;
-    }
-  }
-  .show-pwd {
-    position: absolute;
-    right: 10px;
-    top: 7px;
-    font-size: 16px;
-    color: $dark_gray;
-    cursor: pointer;
-    user-select: none;
-  }
-  .thirdparty-button {
-    position: absolute;
-    right: 35px;
-    bottom: 28px;
   }
 }
 </style>

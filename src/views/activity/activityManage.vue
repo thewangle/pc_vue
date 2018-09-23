@@ -1755,11 +1755,8 @@ export default {
     // 获取题库题目列表
     async _fetchSubTaskList() {
       const param = Object.assign({}, this.taskListQuery)
-      console.log(this.activityInfo.type)
       if (this.activityInfo.type === '2') {
-        console.log(1)
-        param.type = '1'
-        console.log(param)
+        param.activity_type = '1'
       }
       const res = await fetchTaskLibList(param)
       const { data } = res
