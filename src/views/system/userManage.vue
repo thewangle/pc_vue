@@ -168,7 +168,6 @@ export default {
       } else if (this.dialogType === 'update') {
         try {
           await this._editStaff(this.admin_id)
-          this._resetAgentInfo()
         } catch (e) {
         }
       }
@@ -195,6 +194,7 @@ export default {
       try {
         const res = await editStaff(param)
         this.dialogFormVisible = false
+        this._resetAgentInfo()
       } catch (e) {
       }
     },
