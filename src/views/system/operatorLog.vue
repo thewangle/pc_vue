@@ -72,8 +72,8 @@ export default {
     typeFilter(val) {
       const typeMap = {
         1: '增加',
-        2: '删除',
-        3: '修改',
+        2: '修改',
+        3: '删除',
         4: '审核'
       }
       return typeMap[val]
