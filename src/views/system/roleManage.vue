@@ -11,7 +11,7 @@
             <div v-for="item in roleList" :key="item.id">
               <el-radio v-model="role" :label="item.id" :disabled="checkDisable(item)" border width="80px">{{ item.role_name }}</el-radio>
               <div style="float: right;">
-                <el-button type="primary" round @click="handleOpenRole(item.id)">编辑角色</el-button>
+                <el-button type="primary" round @click="handleOpenRole(item)">编辑角色</el-button>
                 <el-button type="danger" round style="margin-left: 10px;" @click="handleDeleteRole(item.id)">删除角色</el-button>
               </div>
             </div>
@@ -120,6 +120,7 @@ export default {
         })
         return
       }
+      console.log(this.id)
       if (this.id) {
         try {
           await editRole({ role_name: this.roleName, role_id: this.id })
@@ -152,7 +153,6 @@ export default {
         .then(async _ => {
           await deleteRole({ role_id: id })
           await this._initRoleList()
-          await this._initMenuList()
         })
         .catch(_ => {})
     },
@@ -164,14 +164,14 @@ export default {
     handleAddRole() {
       this._addRole()
     },
-    handleOpenRole(id) {
+    handleOpenRole(item) {
       this.addRoleVisible = true
       this.title = '更新角色'
-      this.id = id
+      this.id = item.id
+      this.roleName = item.role_name
     },
     handleDeleteRole(id) {
       this._deleteRole(id)
-      this.id = id
     },
     handleClose() {
       this.roleName = ''
