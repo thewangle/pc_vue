@@ -1397,8 +1397,9 @@ export default {
       const config = {
         headers: { 'Content-Type': 'multipart/form-data' }
       }
+      const fileType = req.file.type.split('/')[1]
       // 重命名要上传的文件
-      const keyname = 'top-team' + Date.now() + Math.floor(Math.random() * 100)
+      const keyname = 'top-team' + Date.now() + Math.floor(Math.random() * 100) + '.' + fileType
       const token = await this._fetchQiNiuToken()
       const formData = new FormData()
       formData.append('file', req.file)
@@ -1591,8 +1592,8 @@ export default {
         this.$message({ message: '创建成功', type: 'success' })
       } catch (e) {
         // 添加活动失败隐藏添加弹窗
-        this.handleCloseDialog()
-        await this._fetchActivityList()
+        // this.handleCloseDialog()
+        // await this._fetchActivityList()
       }
     },
     // 添加任务

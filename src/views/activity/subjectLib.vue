@@ -448,7 +448,7 @@ export default {
       })
     },
     // 导入图片
-    handleImgChange(file) {
+    handleImgChange(e) {
       const ImgObj = {}
       const ImgInput = document.querySelector('#ImgInput')
       const length = ImgInput.files.length
