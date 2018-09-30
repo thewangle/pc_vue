@@ -277,7 +277,7 @@ export function updateClassfiy(data) {
  */
 export function getactteamloginfo(data) {
   return request({
-    url: '/i/topteam/admin/getactteamloginfo',
+    url: '/i/topteam/admin/getactploginfo',
     method: 'post',
     data
   })

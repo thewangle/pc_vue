@@ -84,7 +84,7 @@
         </el-table-column>
         <el-table-column label="任务用时" width="170px">
           <template slot-scope="scope">
-            <span>{{ scope.row.use_time | timeFilter }}</span>
+            <span>{{ scope.row.use_time | filterTime }}</span>
           </template>
         </el-table-column>
         <el-table-column label="完成任务数" width="170px">
@@ -140,6 +140,15 @@ export default {
       var m = (+date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
       var s = (+date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
       return Y + M + D + h + m + s
+    },
+    filterTime(time) {
+      let h = parseInt(time / 3600)
+      if (h < 10) h = '0' + h
+      let m = parseInt((time / 60) % 60)
+      if (m < 10) m = '0' + m
+      let s = parseInt(time % 60)
+      if (s < 10) s = '0' + s
+      return h + ':' + m + ':' + s
     }
   },
   data() {
@@ -196,7 +205,7 @@ export default {
       const res = await getactteamloginfo(this.dilogQuery)
       const { data } = res
       this.gridData = data.list
-      this.dialogTotal = data.total
+      this.dialogTotal = +data.total
     },
     async _fetchList() {
       this.listLoading = true
