@@ -303,6 +303,11 @@
         <el-form-item label="题目描述" label-width="100px">
           <el-input v-model="taskInfo.desc" type="textarea" />
         </el-form-item>
+        <el-form-item label="题目分类" label-width="100px" v-if="taskClassfiyList.length">
+          <el-select v-model="taskInfo.classification">
+            <el-option v-for="item in taskClassfiyList" :label="item.name" :value="item.id" :key="item.id" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="题目分值" label-width="100px">
           <el-input v-model="taskInfo.score" type="number" />
         </el-form-item>
@@ -701,7 +706,8 @@ import { fetchCoachList,
   delTask,
   editTask,
   fetchTaskLibList,
-  chooseTasklib } from './../../service/activity'
+  chooseTasklib,
+  getTacskClassifyList } from './../../service/activity'
 import { fetchQiNiuToken } from './../../service/common'
 import { getAgentName, getAgentId, getPrice, getLevel } from '@/utils/auth'
 import { qiniuAddress } from './../../config'
@@ -843,7 +849,8 @@ export default {
         answer_url: '',
         score: null,
         answer_limit: 1,
-        limit_time: ''
+        limit_time: '',
+        classification: ''
       },
       dialogImageUrl: '',
       dialogVisible: false,
@@ -867,7 +874,8 @@ export default {
       payType: '1',
       gifFileList: [],
       activity: {}, // 活动信息
-      level: getLevel()
+      level: getLevel(),
+      taskClassfiyList: [] // 题目分类
     }
   },
   computed: {
@@ -1166,6 +1174,8 @@ export default {
       this.taskInfo.answer_limit = row.answer_limit
       this.taskInfo.answer_type = row.answer_type
       this.taskInfo.limit_time = row.limit_time
+      this.$set(this.taskInfo, 'classification', row.classification)
+      // this.taskInfo.classification = row.classification
       if (row.question_img) {
         this.taskInfo.question_img = row.question_img
         this.taskQFileList = [{ name: row.name, url: row.question_img }]
@@ -1764,9 +1774,15 @@ export default {
       this.tasklistData = data.list
       this.taskTotal = data.total
     },
+    // 获取题目分类列表
+    async _fetchTaskClassify() {
+      const res = await getTacskClassifyList()
+      this.taskClassfiyList = res.data.list
+    },
     init() {
       this._fetchCoachList()
       this._fetchActivityList()
+      this._fetchTaskClassify()
     }
   }
 }

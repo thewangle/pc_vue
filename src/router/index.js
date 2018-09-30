@@ -99,6 +99,14 @@ export const asyncRouterMap = [
     hidden: true,
     children: [
       {
+        id: 58,
+        path: 'personCounte',
+        component: () => import('@/views/count/personCounte'),
+        name: 'PersonCounte',
+        meta: { title: '个人版财务统计', icon: 'money' },
+        hidden: false
+      },
+      {
         id: 14,
         path: 'show',
         component: () => import('@/views/count/index'),
@@ -151,6 +159,14 @@ export const asyncRouterMap = [
         name: 'OperatorLog',
         meta: { title: '操作日志', icon: 'edit', noCache: true },
         hidden: true
+      },
+      {
+        id: 57,
+        path: 'taskClassify',
+        component: () => import('@/views/system/taskClassify'),
+        name: 'TaskClassfiy',
+        meta: { title: '题目分类', icon: 'edit', noCache: true },
+        hidden: false
       }
     ]
   },

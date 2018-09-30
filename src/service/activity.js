@@ -225,3 +225,60 @@ export function chooseTasklib(data) {
     data
   })
 }
+
+/**
+ * 获取分类
+ */
+export function getTacskClassifyList(data = { page_no: 1, page_size: 1000 }) {
+  return request({
+    url: '/i/topteam/admin/getclassifylist',
+    method: 'get',
+    data
+  })
+}
+
+/**
+ * 添加分类
+ */
+export function addClassfiy(data) {
+  return request({
+    url: '/i/topteam/admin/addclassify',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 删除分类
+ * @param {*} data
+ */
+export function delClassify(data) {
+  return request({
+    url: '/i/topteam/admin/delclassify',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 修改分类
+ * @param {*} data
+ */
+export function updateClassfiy(data) {
+  return request({
+    url: '/i/topteam/admin/Modifyclassify',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 个人版本查看记录详情
+ */
+export function getactteamloginfo(data) {
+  return request({
+    url: '/i/topteam/admin/getactteamloginfo',
+    method: 'post',
+    data
+  })
+}

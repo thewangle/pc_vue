@@ -35,3 +35,21 @@ export function fetchChargeList(data) {
     data
   })
 }
+
+// 个人版本财务统计列表
+export function getPcounteList(data) {
+  return request({
+    url: '/i/topteam/admin/getpaccountlist',
+    method: 'post',
+    data
+  })
+}
+
+// 个人版财务统计详情
+export function getJoinList(data) {
+  return request({
+    url: '/i/topteam/admin/getpjoinlist',
+    method: 'post',
+    data
+  })
+}
