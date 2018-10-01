@@ -435,7 +435,7 @@ export default {
         headers: { 'Content-Type': 'multipart/form-data' }
       }
       formData.append('file', fileInput.files[0])
-      console.log(formData)
+      let loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
       axios.post('/i/topteam/admin/importTaskLib', formData, config).then(res => {
         const data = res.data
         if (data.error_code !== 0) {
@@ -445,6 +445,9 @@ export default {
           e.target.value = ''
           this._fetchList()
         }
+        this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+          loadingInstance.close();
+        })
       })
     },
     // 导入图片
@@ -455,6 +458,7 @@ export default {
       const config = {
         headers: { 'Content-Type': 'multipart/form-data' }
       }
+      let loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
       Object.keys(ImgInput.files).forEach(async temp => {
         const item = ImgInput.files[temp]
         const fileType = item.type.split('/')[1]
@@ -478,6 +482,9 @@ export default {
             this.$message({ message: '上传成功', type: 'success' })
             e.target.value = ''
           }
+          this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+            loadingInstance.close();
+          })
         }
       })
     },
@@ -493,6 +500,7 @@ export default {
       formData.append('file', req.file)
       formData.append('token', token)
       formData.append('key', keyname)
+      let loadingInstance = Loading.service({ fullscreen: true, text: '上传' })
       axios.post(this.domain, formData, config).then(res => {
         const url = this.qiniuAddress + '/' + res.data.key
         if (type === 'task') {
@@ -507,6 +515,9 @@ export default {
             url: url
           })
         }
+        this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+          loadingInstance.close();
+        })
       })
     },
     // 重置任务表单
