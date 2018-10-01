@@ -305,6 +305,7 @@
         </el-form-item>
         <el-form-item label="题目分类" label-width="100px" v-if="taskClassfiyList.length">
           <el-select v-model="taskInfo.classification">
+            <el-option label="默认" value="0" />
             <el-option v-for="item in taskClassfiyList" :label="item.name" :value="item.id" :key="item.id" />
           </el-select>
         </el-form-item>
@@ -850,7 +851,7 @@ export default {
         score: null,
         answer_limit: 1,
         limit_time: '',
-        classification: ''
+        classification: '0'
       },
       dialogImageUrl: '',
       dialogVisible: false,
@@ -963,9 +964,11 @@ export default {
       const config = {
         headers: { 'Content-Type': 'multipart/form-data' }
       }
+      
       Object.keys(ImgInput.files).forEach(async temp => {
         const item = ImgInput.files[temp]
-        const keyname = 'top-team' + Date.now() + Math.floor(Math.random() * 100) + item.name
+        const fileType = item.type.split('/')[1]
+        const keyname = 'top-team' + Date.now() + Math.floor(Math.random() * 100) + '.' + fileType
         const token = await this._fetchQiNiuToken()
         const formData = new FormData()
         formData.append('file', item)
@@ -1747,7 +1750,8 @@ export default {
         answer_url: '',
         score: null,
         answer_limit: 1,
-        limit_time: ''
+        limit_time: '',
+        classification: '0'
       }
       this.taskQFileList = []
       this.taskAFileList = []

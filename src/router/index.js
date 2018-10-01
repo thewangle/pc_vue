@@ -99,19 +99,19 @@ export const asyncRouterMap = [
     hidden: true,
     children: [
       {
-        id: 58,
-        path: 'personCounte',
-        component: () => import('@/views/count/personCounte'),
-        name: 'PersonCounte',
-        meta: { title: '个人版财务统计', icon: 'money' },
-        hidden: false
-      },
-      {
         id: 14,
         path: 'show',
         component: () => import('@/views/count/index'),
         name: 'Show',
         meta: { title: '财务统计', icon: 'money' },
+        hidden: true
+      },
+      {
+        id: 54,
+        path: 'personCounte',
+        component: () => import('@/views/count/personCounte'),
+        name: 'PersonCounte',
+        meta: { title: '个人版财务统计', icon: 'money' },
         hidden: true
       },
       {
@@ -161,12 +161,12 @@ export const asyncRouterMap = [
         hidden: true
       },
       {
-        id: 57,
+        id: 55,
         path: 'taskClassify',
         component: () => import('@/views/system/taskClassify'),
         name: 'TaskClassfiy',
         meta: { title: '题目分类', icon: 'edit', noCache: true },
-        hidden: false
+        hidden: true
       }
     ]
   },

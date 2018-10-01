@@ -31,12 +31,12 @@ const tableRouter = {
       hidden: true
     },
     {
-      id: 59,
+      id: 53,
       path: 'activityprecord',
       component: () => import('@/views/activity/activityPRecord'),
       name: 'AtivityPRecord',
       meta: { title: '个人版活动记录', icon: 'documentation' },
-      hidden: false
+      hidden: true
     },
     {
       id: 8,

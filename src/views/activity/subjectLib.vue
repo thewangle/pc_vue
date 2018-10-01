@@ -457,7 +457,8 @@ export default {
       }
       Object.keys(ImgInput.files).forEach(async temp => {
         const item = ImgInput.files[temp]
-        const keyname = 'top-team' + Date.now() + Math.floor(Math.random() * 100) + item.name
+        const fileType = item.type.split('/')[1]
+        const keyname = 'top-team' + Date.now() + Math.floor(Math.random() * 100) + '.' + fileType
         const token = await this._fetchQiNiuToken()
         const formData = new FormData()
         formData.append('file', item)
