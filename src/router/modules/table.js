@@ -27,7 +27,7 @@ const tableRouter = {
       path: 'activity-record',
       component: () => import('@/views/activity/activityRecord'),
       name: 'AtivityRecord',
-      meta: { title: '活动记录', icon: 'documentation' },
+      meta: { title: '团队版活动记录', icon: 'documentation' },
       hidden: true
     },
     {
