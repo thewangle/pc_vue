@@ -472,8 +472,15 @@ export default {
         formData.append('file', item)
         formData.append('token', token)
         formData.append('key', keyname)
-
-        const res = await axios.post(this.domain, formData, config)
+        let res = null
+        try {
+          res = await axios.post(this.domain, formData, config)
+        } catch(e) {
+          this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+            loadingInstance.close();
+          })
+        }
+        // const res = await axios.post(this.domain, formData, config)
         const url = this.qiniuAddress + '/' + res.data.key
         const name = item.name.split('.')[0]
         ImgObj[name] = url
