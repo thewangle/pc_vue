@@ -282,6 +282,7 @@ import { fetchTaskLibList, delTaskLib, addTaskLib, updateTaskLib } from './../..
 import { fetchQiNiuToken } from './../../service/common'
 import { qiniuAddress } from './../../config'
 import axios from 'axios'
+import { Loading } from 'element-ui'
 // import { parseTime } from '@/utils'
 export default {
   name: 'SubkectLib',
@@ -428,7 +429,6 @@ export default {
     },
     // 导入题库
     handleFileChange(e) {
-      console.log(e)
       const fileInput = document.querySelector('#fileInput')
       const formData = new FormData()
       const config = {
