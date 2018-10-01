@@ -3,7 +3,7 @@
     <div class="filter-container">
       <el-input v-model="listQuery.agent_name" placeholder="请输入运营商名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-input v-model="listQuery.name" placeholder="请输入活动名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-select v-model="listQuery.type" placeholder="请选择活动类型" clearable style="width: 200px" class="filter-item" @change="handleFilter">
+      <el-select v-model="listQuery.type" placeholder="请选择活动类型" style="width: 200px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in activities" :key="item.key" :label="item.label" :value="item.key"/>
       </el-select>
       <el-button v-waves style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
