@@ -714,6 +714,7 @@ import { getAgentName, getAgentId, getPrice, getLevel } from '@/utils/auth'
 import { qiniuAddress } from './../../config'
 import axios from 'axios'
 import waves from '@/directive/waves' // 水波纹指令
+import { Loading } from 'element-ui'
 
 export default {
   name: 'ActivityManage',
@@ -964,7 +965,7 @@ export default {
       const config = {
         headers: { 'Content-Type': 'multipart/form-data' }
       }
-      
+      let loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
       Object.keys(ImgInput.files).forEach(async temp => {
         const item = ImgInput.files[temp]
         const fileType = item.type.split('/')[1]
@@ -989,6 +990,9 @@ export default {
             e.target.value = ''
             this._fetchTaskList(this.activityId)
           }
+          this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+            loadingInstance.close();
+          })
         }
       })
     },
@@ -1015,6 +1019,7 @@ export default {
       }
       formData.append('file', fileInput.files[0])
       formData.append('activity_id', activityId)
+      let loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
       axios.post('/i/topteam/admin/importTask', formData, config).then(res => {
         const data = res.data
         if (data.error_code !== 0) {
@@ -1024,6 +1029,9 @@ export default {
           e.target.value = ''
           this._fetchTaskList(activityId)
         }
+        this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+          loadingInstance.close();
+        })
       })
     },
     handleFilter() {
@@ -1407,6 +1415,7 @@ export default {
     },
     // 上传七牛云
     async _uploadQiNiu(req, type) {
+      let loadingInstance = Loading.service({ fullscreen: true, text: '上传中' })
       const config = {
         headers: { 'Content-Type': 'multipart/form-data' }
       }
@@ -1441,6 +1450,9 @@ export default {
             url: url
           })
         }
+        this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+          loadingInstance.close();
+        })
       })
     },
     // 获取教练列表
