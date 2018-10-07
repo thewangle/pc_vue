@@ -115,9 +115,9 @@
         <el-form-item label="答题类型" label-width="100px">
           <el-select v-model="taskInfo.answer_type" :disabled="dialogTaskType === 'edit'">
             <el-option label="普通题" value="1" />
-            <el-option v-if="taskInfo.type === '1' || taskInfo.type === '3'" label="关卡题" value="2" />
-            <el-option v-if="(taskInfo.type === '1' || taskInfo.type === '3')" label="团队限时题" value="3" />
-            <el-option v-if="(taskInfo.type === '1' || taskInfo.type === '3')" label="活动抢答题" value="4"/>
+            <el-option v-if="taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3'" label="关卡题" value="2" />
+            <el-option v-if="(taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3')" label="团队限时题" value="3" />
+            <el-option v-if="(taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3')" label="活动抢答题" value="4"/>
           </el-select>
         </el-form-item>
         <el-form-item label="题目顺序" label-width="100px">
