@@ -1240,7 +1240,7 @@ export default {
         try {
           const response = await getPayInfo({ order_sn: data.order_sn, pay_type: this.payType })
           this.$message({ message: '支付成功', type: 'success' })
-          this.handleClosePayDialog()
+          this.handleGobackActivityList()
         } catch (e) {}
       }
     },
