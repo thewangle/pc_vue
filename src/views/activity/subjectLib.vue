@@ -97,7 +97,7 @@
           <el-input v-model="taskInfo.name" />
         </el-form-item>
         <el-form-item label="题目类型" label-width="100px">
-          <el-select v-model="taskInfo.type" :disabled="dialogTaskType === 'edit'" @change="taskInfo.answer_type = '1'">
+          <el-select v-model="taskInfo.type" :disabled="dialogTaskType === 'edit'" @change="taskTypeChange">
             <el-option label="选择题" value="1" />
             <el-option label="文字题" value="2" />
             <el-option label="图片题" value="3" />
@@ -113,18 +113,18 @@
           <el-input v-model="taskInfo.score" type="number" />
         </el-form-item>
         <el-form-item label="答题类型" label-width="100px">
-          <el-select v-model="taskInfo.answer_type" :disabled="dialogTaskType === 'edit'">
+          <el-select v-model="taskInfo.answer_type" :disabled="dialogTaskType === 'edit'" @change="answerTypeChange">
             <el-option label="普通题" value="1" />
-            <el-option v-if="taskInfo.type === '1' || taskInfo.type === '3'" label="关卡题" value="2" />
-            <el-option v-if="(taskInfo.type === '1' || taskInfo.type === '3')" label="团队限时题" value="3" />
-            <el-option v-if="(taskInfo.type === '1' || taskInfo.type === '3')" label="活动抢答题" value="4"/>
+            <el-option v-if="taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3'" label="关卡题" value="2" />
+            <el-option v-if="(taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3')" label="团队限时题" value="3" />
+            <el-option v-if="(taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3')" label="活动抢答题" value="4"/>
           </el-select>
         </el-form-item>
         <el-form-item label="题目顺序" label-width="100px">
           <el-input v-model="taskInfo.seq" type="number" />
         </el-form-item>
         <el-form-item label="答题人数" label-width="100px">
-          <el-input v-model="taskInfo.answer_limit" type="number" />
+          <el-input v-model="taskInfo.answer_limit" :disabled="taskInfo.answer_type === '4' || (taskInfo.type !== '1' && taskInfo.type !== '2' && taskInfo.type !== '3')" type="number" />
         </el-form-item>
         <el-form-item v-if="taskInfo.answer_type === '3'" label="答题时间" label-width="100px">
           <el-input v-model="taskInfo.limit_time" type="number">
@@ -362,6 +362,15 @@ export default {
     handleCurrentChange(val) {
       this.listQuery.page_no = val
       this._fetchList()
+    },
+    taskTypeChange(val) {
+      this.taskInfo.answer_type = '1'
+      this.taskInfo.answer_limit = 1
+    },
+    answerTypeChange(value) {
+      if (value === '4') {
+        this.taskInfo.answer_limit = 1
+      }
     },
     handleSizeChange(size) {
       this.listQuery.page_size = size
