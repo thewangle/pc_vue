@@ -104,11 +104,11 @@
         </el-table-column>
       </el-table>
       <el-pagination
-          :current-page="dilogQuery.page_no"
-          :total="dialogTotal"
-          background
-          layout="total, prev, pager, next, jumper"
-          @current-change="handledialogCurrentChange"/>
+        :current-page="dilogQuery.page_no"
+        :total="dialogTotal"
+        background
+        layout="total, prev, pager, next, jumper"
+        @current-change="handledialogCurrentChange"/>
     </el-dialog>
   </div>
 </template>
@@ -173,7 +173,7 @@ export default {
         page_no: 1,
         page_size: 10,
         act_id: ''
-      },
+      }
     }
   },
   created() {

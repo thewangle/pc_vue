@@ -2,7 +2,7 @@
   <div class="login-container">
     <section class="login_Img">
       <h3 class="title">伴行服务商管理系统</h3>
-      <div class="logo"></div>
+      <div class="logo"/>
       <div class="form-container">
         <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
           <el-form-item prop="username">

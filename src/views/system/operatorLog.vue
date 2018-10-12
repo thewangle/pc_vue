@@ -88,7 +88,7 @@ export default {
         page_no: 1,
         page_size: 20,
         content: ''
-      },
+      }
     }
   },
   created() {
@@ -115,7 +115,7 @@ export default {
         this.listLoading = false
         this.list = res.data.list
         this.total = res.data.total
-      } catch(e) {}
+      } catch (e) {}
     }
   }
 }

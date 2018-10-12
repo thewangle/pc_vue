@@ -73,7 +73,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <div class="pagination-container">
       <el-pagination :current-page="listQuery.page_no" :page-sizes="[10,20,30, 50]" :page-size="listQuery.page_size" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div>
@@ -202,7 +202,7 @@
       <div class="job-list">
         <div class="job-title">
           <h3 style="display: inline-block">任务列表</h3>
-          
+
           <div :disabled="!activityId" class="filePicker" style="float: right">
             <label>导入任务</label>
             <input
@@ -303,7 +303,7 @@
         <el-form-item label="题目描述" label-width="100px">
           <el-input v-model="taskInfo.desc" type="textarea" />
         </el-form-item>
-        <el-form-item label="题目分类" label-width="100px" v-if="taskClassfiyList.length">
+        <el-form-item v-if="taskClassfiyList.length" label="题目分类" label-width="100px">
           <el-select v-model="taskInfo.classification">
             <el-option label="默认" value="0" />
             <el-option v-for="item in taskClassfiyList" :label="item.name" :value="item.id" :key="item.id" />
@@ -316,8 +316,8 @@
           <el-select v-model="taskInfo.answer_type" :disabled="dialogTaskType === 'edit'" @change="answerTypeChange">
             <el-option label="普通题" value="1" />
             <el-option v-if="taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3'" label="关卡题" value="2" />
-            <el-option v-if="(activityInfo.type === '1' || checkInfo.type === '1') && (taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3')" label="团队限时题" value="3" />
-            <el-option v-if="(activityInfo.type === '1' || checkInfo.type === '1') && (taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3')" label="活动抢答题" value="4"/>
+            <el-option v-if="(activityInfo.type === '1' || checkInfo.type === '1') && (taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3')" label="限时题" value="3" />
+            <el-option v-if="(activityInfo.type === '1' || checkInfo.type === '1') && (taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3')" label="抢答题" value="4"/>
           </el-select>
         </el-form-item>
         <el-form-item v-if="taskInfo.answer_type === '3'" label="答题时间" label-width="100px">
@@ -463,6 +463,12 @@
             <img :src="dialogAnswerImageUrl" width="100%" alt="">
           </el-dialog>
         </template>
+
+        <!-- 选择定位 -->
+        <el-form-item label="定位" label-width="100px">
+          <span>{{ locationName || locationName1 }}</span>
+          <el-button type="primary" @click="handleOpenTenceMap">选择定位</el-button>
+        </el-form-item>
 
         <el-form-item>
           <div style="text-align: center">
@@ -640,15 +646,14 @@
       class="taskListDialog"
       title="题库导入"
       @close="handleCloseTaskList">
-       <el-table
+      <el-table
         :data="tasklistData"
         style="width: 100%"
         border
         fit
         highlight-current-row
         @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55" align="center">
-        </el-table-column>
+        <el-table-column type="selection" width="55" align="center"/>
         <el-table-column label="序号" width="70" align="center">
           <template slot-scope="scope">
             {{ scope.$index + 1 }}
@@ -689,6 +694,19 @@
       </span>
     </el-dialog>
     <!-- 题库列表弹窗 -->
+
+    <!-- 选择定位弹窗 -->
+    <el-dialog
+      :close-on-click-modal="false"
+      :visible.sync="dialogMap"
+      title="选择定位"
+      class="activityDialog">
+      <div id="map-container" style="width: 100%; height: 500px;"/>
+      <div style="text-align: center; margin-top: 20px">
+        <el-button type="primary" @click="handleSaveLocation">保存定位</el-button>
+      </div>
+    </el-dialog>
+    <!-- 选择定位弹窗 -->
   </div>
 </template>
 
@@ -710,7 +728,7 @@ import { fetchCoachList,
   chooseTasklib,
   getTacskClassifyList } from './../../service/activity'
 import { fetchQiNiuToken } from './../../service/common'
-import { getAgentName, getAgentId, getPrice, getLevel } from '@/utils/auth'
+import { getAgentName, getAgentId, getPrice, getLevel, getCityName } from '@/utils/auth'
 import { qiniuAddress } from './../../config'
 import axios from 'axios'
 import waves from '@/directive/waves' // 水波纹指令
@@ -755,8 +773,8 @@ export default {
       const typeMap = {
         1: '普通题',
         2: '关卡题',
-        3: '团队限时题',
-        4: '活动抢答题'
+        3: '限时题',
+        4: '抢答题'
       }
       return typeMap[type]
     },
@@ -792,7 +810,7 @@ export default {
       total: 0,
       listQuery: {
         page_no: 1,
-        page_size: 10, 
+        page_size: 10,
         type: null,
         agent_name: null,
         name: null,
@@ -833,6 +851,9 @@ export default {
         check: '' // 是够长期
       },
       activityId: null,
+      dialogMap: false, // 地图定位弹窗
+      chooseLocation: [], // 选择的经纬度
+      locationName1: '',
       taskInfo: {
         name: null,
         type: '1',
@@ -852,7 +873,8 @@ export default {
         score: null,
         answer_limit: 1,
         limit_time: '',
-        classification: '0'
+        classification: '0',
+        location_point: ''
       },
       dialogImageUrl: '',
       dialogVisible: false,
@@ -890,12 +912,108 @@ export default {
       } else {
         return false
       }
+    },
+    locationName() {
+      // 地址和经纬度之间进行转换服务
+      const geocoder = new qq.maps.Geocoder()
+      const coord = this.taskInfo.location_point ? this.taskInfo.location_point.split(',') : ''
+      if (!coord || !coord.length) {
+        return '暂无定位'
+      }
+      const lat = coord[0]
+      const lng = coord[1]
+
+      const location = new qq.maps.LatLng(lat, lng)
+      geocoder.getAddress(location)
+
+      // const result = await geocoder.setComplete()
+      // console.log(result)
+      const vm = this
+      geocoder.setComplete(function(result) {
+        console.log('=====>', result)
+        let detailAddress = ''
+        Object.keys(result.detail.addressComponents).forEach(key => {
+          detailAddress += result.detail.addressComponents[key]
+        })
+        vm.locationName1 = detailAddress
+      })
+      return vm.locationName1
     }
   },
   created() {
     this.init()
   },
   methods: {
+    handleSaveLocation() {
+      this.$set(this.taskInfo, 'location_point', this.chooseLocation.join())
+      // this.taskInfo.location_point = this.chooseLocation.join()
+      this.dialogMap = false
+    },
+    // 打开地图定位
+    async handleOpenTenceMap() {
+      // 首次打开弹窗清空选择定位
+      this.chooseLocation = []
+
+      this.dialogMap = true
+      let cityName = getCityName()
+      const vm = this
+      this.$nextTick(() => {
+        const map = new qq.maps.Map(document.getElementById('map-container'))
+        // 地址和经纬度之间进行转换服务
+        const geocoder = new qq.maps.Geocoder()
+        // 初始地图显示位置
+        if (cityName && !this.taskInfo.location_point) {
+          geocoder.getLocation(cityName)
+        } else if(this.taskInfo.location_point) {
+          const lat = this.taskInfo.location_point.split(',')[0]
+          const lng = this.taskInfo.location_point.split(',')[1]
+          const location = new qq.maps.LatLng(lat, lng)
+          geocoder.getAddress(location)
+        } else {
+          this.$message({
+            message: '该运营商没有设置城市',
+            type: 'error'
+          })
+          return
+        }
+        // 设置标志物
+        const marker = new qq.maps.Marker({
+          map: map,
+          content: '定位地点'
+        })
+        //设置Marker的可见性，为true时可见,false时不可见，默认属性为true
+        marker.setVisible(true)
+        //设置Marker的动画属性为从落下
+        marker.setAnimation(qq.maps.MarkerAnimation.DOWN)
+        // 设置服务请求成功的回调函数
+        geocoder.setComplete(function(result) {
+          map.setCenter(result.detail.location)
+          map.setZoom(18)
+          console.log(result)
+          //设置标注的名称，当鼠标划过Marker时显示
+          let detailAddress = ''
+          Object.keys(result.detail.addressComponents).forEach(key => {
+            detailAddress += result.detail.addressComponents[key]
+          })
+          marker.setTitle(detailAddress || result.detail.address)
+          marker.setPosition(result.detail.location)
+          vm.chooseLocation = []
+          vm.chooseLocation.push(result.detail.location.lat)
+          vm.chooseLocation.push(result.detail.location.lng)
+        })
+        // 点击地图弹出选择地址
+        qq.maps.event.addListener(map, 'click', function(e) {
+          const lng = e.latLng.getLng()
+          const lat = e.latLng.getLat()
+          const coord = new qq.maps.LatLng(lat, lng)
+          geocoder.getAddress(coord)
+        })
+        // 点击marker展示选中的地址
+        qq.maps.event.addListener(marker, 'click', function(e) {
+          vm.$alert(`${e.target.title}`, '定位地点')
+        })
+      })
+    },
     async handleSubmitLibTask() {
       if (!this.taskCheckedList.length) {
         this.$message({ message: '请选择要导入的题目', type: 'error' })
@@ -965,7 +1083,7 @@ export default {
       const config = {
         headers: { 'Content-Type': 'multipart/form-data' }
       }
-      let loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
+      const loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
       Object.keys(ImgInput.files).forEach(async temp => {
         const item = ImgInput.files[temp]
         const fileType = item.type.split('/')[1]
@@ -991,7 +1109,7 @@ export default {
             this._fetchTaskList(this.activityId)
           }
           this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-            loadingInstance.close();
+            loadingInstance.close()
           })
         }
       })
@@ -1019,7 +1137,7 @@ export default {
       }
       formData.append('file', fileInput.files[0])
       formData.append('activity_id', activityId)
-      let loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
+      const loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
       axios.post('/i/topteam/admin/importTask', formData, config).then(res => {
         const data = res.data
         if (data.error_code !== 0) {
@@ -1030,11 +1148,11 @@ export default {
           this._fetchTaskList(activityId)
         }
         this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-          loadingInstance.close();
+          loadingInstance.close()
         })
       }).catch(e => {
         this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-          loadingInstance.close();
+          loadingInstance.close()
         })
       })
     },
@@ -1171,7 +1289,6 @@ export default {
         this._fetchTaskList(this.activityId)
       } catch (e) {
       }
-      
     },
     // 修改任务
     handleUpdateTask(row) {
@@ -1190,6 +1307,7 @@ export default {
       this.taskInfo.answer_type = row.answer_type
       this.taskInfo.limit_time = row.limit_time
       this.$set(this.taskInfo, 'classification', row.classification)
+      this.$set(this.taskInfo, 'location_point', row.location_point)
       // this.taskInfo.classification = row.classification
       if (row.question_img) {
         this.taskInfo.question_img = row.question_img
@@ -1208,7 +1326,7 @@ export default {
       if (row.type === '3') {
         console.log(1111111111)
         console.log(row.answer)
-        this.taskInfo.answer = JSON.parse(row.answer || "[]")
+        this.taskInfo.answer = JSON.parse(row.answer || '[]')
         this.taskInfo.options = JSON.parse(row.options)
         this.taskInfo.options.forEach((item, index) => {
           this.taskAFileList.push({ name: '图片' + (index + 1), url: item })
@@ -1217,6 +1335,9 @@ export default {
       if (row.type === '4' || row.type === '5' || row.type === '6') {
         this.taskInfo.answer_url = row.answer
         this.taskAFileList = [{ name: row.name, url: row.answer }]
+      }
+      if (row.location_point) {
+        
       }
     },
     // 支付完成返回列表
@@ -1368,6 +1489,7 @@ export default {
     handleCloseTaskDialog() {
       this._resetTaskInfo()
       this.dialogTaskVisible = false
+      this.locationName1 = ''
     },
     // 关闭活动审批对话框
     handleCloseCheckDialog() {
@@ -1419,7 +1541,7 @@ export default {
     },
     // 上传七牛云
     async _uploadQiNiu(req, type) {
-      let loadingInstance = Loading.service({ fullscreen: true, text: '上传中' })
+      const loadingInstance = Loading.service({ fullscreen: true, text: '上传中' })
       const config = {
         headers: { 'Content-Type': 'multipart/form-data' }
       }
@@ -1455,11 +1577,11 @@ export default {
           })
         }
         this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-          loadingInstance.close();
+          loadingInstance.close()
         })
       }).catch(e => {
         this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-          loadingInstance.close();
+          loadingInstance.close()
         })
       })
     },
@@ -1705,7 +1827,6 @@ export default {
         this._fetchTaskList(activityId)
       } catch (e) {
       }
-      
     },
     // 获取活动列表
     async _fetchActivityList() {
@@ -1771,8 +1892,10 @@ export default {
         score: null,
         answer_limit: 1,
         limit_time: '',
-        classification: '0'
+        classification: '0',
+        location_point: ''
       }
+      this.chooseLocation = []
       this.taskQFileList = []
       this.taskAFileList = []
     },

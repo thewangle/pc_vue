@@ -116,8 +116,8 @@
           <el-select v-model="taskInfo.answer_type" :disabled="dialogTaskType === 'edit'" @change="answerTypeChange">
             <el-option label="普通题" value="1" />
             <el-option v-if="taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3'" label="关卡题" value="2" />
-            <el-option v-if="(taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3')" label="团队限时题" value="3" />
-            <el-option v-if="(taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3')" label="活动抢答题" value="4"/>
+            <el-option v-if="(taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3')" label="限时题" value="3" />
+            <el-option v-if="(taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3')" label="抢答题" value="4"/>
           </el-select>
         </el-form-item>
         <el-form-item label="题目顺序" label-width="100px">
@@ -263,7 +263,9 @@
             <img :src="dialogAnswerImageUrl" width="100%" alt="">
           </el-dialog>
         </template>
-
+        <!-- <el-form-item label="定位" label-width="100px">
+          <el-button type="primary" @click="handleOpenTenceMap">选择定位</el-button>
+        </el-form-item> -->
         <el-form-item>
           <div style="text-align: center">
             <el-button @click="handleCloseTaskDialog">取消</el-button>
@@ -274,6 +276,14 @@
       </el-form>
     </el-dialog>
     <!-- 新增题目对话框 end -->
+    <el-dialog
+      :close-on-click-modal="false"
+      :visible.sync="dialogMap"
+      title="选择定位"
+      class="activityDialog">
+      <div id="map-container" style="width: 100%; height: 500px;"/>
+
+    </el-dialog>
   </div>
 </template>
 
@@ -283,7 +293,7 @@ import { fetchQiNiuToken } from './../../service/common'
 import { qiniuAddress } from './../../config'
 import axios from 'axios'
 import { Loading } from 'element-ui'
-// import { parseTime } from '@/utils'
+import { getCityName } from '@/utils/auth'
 export default {
   name: 'SubkectLib',
   filters: {
@@ -302,8 +312,8 @@ export default {
       const typeMap = {
         1: '普通题',
         2: '关卡题',
-        3: '团队限时题',
-        4: '活动抢答题'
+        3: '限时题',
+        4: '抢答题'
       }
       return typeMap[type]
     }
@@ -325,6 +335,7 @@ export default {
       dialogTaskVisible: false, // 题目弹框
       dialogTaskTitle: '', // 题目弹窗title
       dialogTaskType: '', // 题目弹窗类型
+      dialogMap: false, // 地图定位弹窗
       taskInfo: {
         name: null,
         type: '1',
@@ -359,6 +370,65 @@ export default {
     this._fetchList()
   },
   methods: {
+    // 打开地图定位
+    async handleOpenTenceMap() {
+      // const
+      this.dialogMap = true
+      const cityName = getCityName()
+      const vm = this
+      this.$nextTick(() => {
+        const map = new qq.maps.Map(document.getElementById('map-container'))
+        // 通过默认ip获取地址
+        const cs = new qq.maps.CityService()
+        // 地址和经纬度之间进行转换服务
+        const geocoder = new qq.maps.Geocoder()
+        // 初始地图显示位置
+        if (cityName) {
+          geocoder.getLocation(cityName)
+        } else {
+          cs.setComplete(function(result) {
+            console.log(result)
+            map.setCenter(result.detail.latLng)
+            map.setZoom(13)
+          })
+          cs.searchLocalCity()
+        }
+        // 设置标志物
+        const marker = new qq.maps.Marker({
+          map: map,
+          content: '定位地点'
+        })
+        //设置Marker的可见性，为true时可见,false时不可见，默认属性为true
+        marker.setVisible(true)
+        //设置Marker的动画属性为从落下
+        marker.setAnimation(qq.maps.MarkerAnimation.DOWN)
+        // 设置服务请求成功的回调函数
+        geocoder.setComplete(function(result) {
+          map.setCenter(result.detail.location)
+          map.setZoom(13)
+          console.log(result)
+          //设置标注的名称，当鼠标划过Marker时显示
+          let detailAddress = ''
+          Object.keys(result.detail.addressComponents).forEach(key => {
+            detailAddress += result.detail.addressComponents[key]
+          })
+          marker.setTitle(detailAddress || result.detail.address)
+          marker.setPosition(result.detail.location)
+        })
+        // 点击地图弹出选择地址
+        qq.maps.event.addListener(map, 'click', function(e) {
+          const lng = e.latLng.getLng()
+          const lat = e.latLng.getLat()
+          const coord = new qq.maps.LatLng(lat, lng)
+          geocoder.getAddress(coord)
+        })
+        // 点击marker展示选中的地址
+        qq.maps.event.addListener(marker, 'click', function(e) {
+          console.log(e)
+          vm.$alert(`${e.target.title}`, '定位地点')
+        })
+      })
+    },
     handleCurrentChange(val) {
       this.listQuery.page_no = val
       this._fetchList()
@@ -444,7 +514,7 @@ export default {
         headers: { 'Content-Type': 'multipart/form-data' }
       }
       formData.append('file', fileInput.files[0])
-      let loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
+      const loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
       axios.post('/i/topteam/admin/importTaskLib', formData, config).then(res => {
         const data = res.data
         if (data.error_code !== 0) {
@@ -455,11 +525,11 @@ export default {
           this._fetchList()
         }
         this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-          loadingInstance.close();
+          loadingInstance.close()
         })
       }).catch(e => {
         this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-          loadingInstance.close();
+          loadingInstance.close()
         })
       })
     },
@@ -471,7 +541,7 @@ export default {
       const config = {
         headers: { 'Content-Type': 'multipart/form-data' }
       }
-      let loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
+      const loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
       Object.keys(ImgInput.files).forEach(async temp => {
         const item = ImgInput.files[temp]
         const fileType = item.type.split('/')[1]
@@ -484,9 +554,9 @@ export default {
         let res = null
         try {
           res = await axios.post(this.domain, formData, config)
-        } catch(e) {
+        } catch (e) {
           this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-            loadingInstance.close();
+            loadingInstance.close()
           })
         }
         // const res = await axios.post(this.domain, formData, config)
@@ -503,7 +573,7 @@ export default {
             e.target.value = ''
           }
           this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-            loadingInstance.close();
+            loadingInstance.close()
           })
         }
       })
@@ -520,7 +590,7 @@ export default {
       formData.append('file', req.file)
       formData.append('token', token)
       formData.append('key', keyname)
-      let loadingInstance = Loading.service({ fullscreen: true, text: '上传' })
+      const loadingInstance = Loading.service({ fullscreen: true, text: '上传' })
       axios.post(this.domain, formData, config).then(res => {
         const url = this.qiniuAddress + '/' + res.data.key
         if (type === 'task') {
@@ -536,11 +606,11 @@ export default {
           })
         }
         this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-          loadingInstance.close();
+          loadingInstance.close()
         })
       }).catch(e => {
         this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-          loadingInstance.close();
+          loadingInstance.close()
         })
       })
     },
@@ -685,7 +755,7 @@ export default {
       // 图片题目
       if (row.type === '3') {
         this.taskAFileList = []
-        this.taskInfo.answer = JSON.parse(row.answer || "[]")
+        this.taskInfo.answer = JSON.parse(row.answer || '[]')
         this.taskInfo.options = JSON.parse(row.options)
         this.taskInfo.options.forEach((item, index) => {
           this.taskAFileList.push({ name: '图片' + (index + 1), url: item })

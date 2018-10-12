@@ -59,7 +59,7 @@
       <el-table-column label="操作" align="center" width="300" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="small" @click="handleShowDetial(scope.row)">查看</el-button>
-          <el-button type="success" size="small" v-if="scope.row.img_pakage_url">
+          <el-button v-if="scope.row.img_pakage_url" type="success" size="small">
             <a :href="scope.row.img_pakage_url">下载图片</a>
           </el-button>
           <el-button size="small">

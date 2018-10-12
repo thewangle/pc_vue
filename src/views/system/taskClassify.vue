@@ -34,7 +34,7 @@
       <el-pagination :current-page="listQuery.page_no" :page-sizes="[10,20,30, 50]" :page-size="listQuery.page_size" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div>
 
-    <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible" @close="handleClose" :close-on-click-modal="false">
+    <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible" :close-on-click-modal="false" @close="handleClose">
       <el-form label-position="right" label-width="120px">
         <el-form-item label="题目分类名称">
           <el-input v-model="taskClassfiyName" />
@@ -61,8 +61,8 @@ export default {
       dialogType: '',
       total: 0,
       listQuery: {
-          page_no:1,
-          page_size: 10
+        page_no: 1,
+        page_size: 10
       },
       taskClassfiyName: '',
       taskClassfiyId: ''
@@ -79,34 +79,34 @@ export default {
       this.list = res.data.list
       this.listLoading = false
     },
-    handleSizeChange (size) {
+    handleSizeChange(size) {
       this.listQuery.page_size = size
       this._getTacskClassifyList()
     },
-    handleCurrentChange (val) {
+    handleCurrentChange(val) {
       this.listQuery.page_no = val
       this._getTacskClassifyList()
     },
-    handleCreate () {
+    handleCreate() {
       this.dialogType = 'add'
       this.dialogTitle = '新增题目分类'
       this.dialogFormVisible = true
     },
-    handleClose () {
+    handleClose() {
       this.dialogFormVisible = false
       this.dialogTitle = ''
       this.dialogType = ''
       this.taskClassfiyName = ''
       this.taskClassfiyId = ''
     },
-    handleUpdate (row) {
+    handleUpdate(row) {
       this.dialogType = 'edit'
       this.dialogTitle = '修改题目分类'
       this.taskClassfiyName = row.name
       this.taskClassfiyId = row.id
       this.dialogFormVisible = true
     },
-    handleDelete (row) {
+    handleDelete(row) {
       this.$confirm('确认删除改题目分类吗？')
         .then(async _ => {
           await delClassify({ id: row.id })
@@ -117,27 +117,27 @@ export default {
           await this._getTacskClassifyList()
         })
     },
-    async handleSubmit () {
+    async handleSubmit() {
       if (!this.taskClassfiyName) {
-        this.$message({message: '请输入题目分类', type: 'success'})
+        this.$message({ message: '请输入题目分类', type: 'success' })
       }
       if (this.dialogType === 'add') {
         try {
           const res = await addClassfiy({ name: this.taskClassfiyName })
-          this.$message({message: '添加题目分类成功', type: 'success'})
+          this.$message({ message: '添加题目分类成功', type: 'success' })
           this.handleClose()
           this._getTacskClassifyList()
-        } catch(e) {
+        } catch (e) {
 
         }
       }
       if (this.dialogType === 'edit') {
         try {
           const res = await updateClassfiy({ id: this.taskClassfiyId, name: this.taskClassfiyName })
-          this.$message({message: '修改题目分类成功', type: 'success'})
+          this.$message({ message: '修改题目分类成功', type: 'success' })
           this.handleClose()
           this._getTacskClassifyList()
-        } catch(e) {}
+        } catch (e) {}
       }
     }
   }
