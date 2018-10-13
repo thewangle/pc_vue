@@ -676,7 +676,7 @@
         </el-table-column>
         <el-table-column label="分值" width="95" align="center">
           <template slot-scope="scope">
-            <span>{{ scope.row.type | typeFilter }}</span>
+            <span>{{ scope.row.score }}</span>
           </template>
         </el-table-column>
         <el-table-column label="答题类型" align="center" width="95">
@@ -969,6 +969,7 @@ export default {
       this.dialogMap = true
       let cityName = getCityName()
       const vm = this
+      let first = true
       this.$nextTick(() => {
         const map = new qq.maps.Map(document.getElementById('map-container'))
 
@@ -1008,11 +1009,15 @@ export default {
         if (cityName && !this.taskInfo.location_point) {
           geocoder.getLocation(cityName)
         } else if(this.taskInfo.location_point) {
+          first = false
           const lat = this.taskInfo.location_point.split(',')[0]
           const lng = this.taskInfo.location_point.split(',')[1]
+          this.chooseLocation.push(lat)
+          this.chooseLocation.push(lng)
           const location = new qq.maps.LatLng(lat, lng)
           geocoder.getAddress(location)
         } else {
+          first = false
           this.$message({
             message: '该运营商没有设置城市',
             type: 'error'
@@ -1037,11 +1042,10 @@ export default {
           Object.keys(result.detail.addressComponents).forEach(key => {
             detailAddress += result.detail.addressComponents[key]
           })
-          marker.setTitle(detailAddress || result.detail.address)
-          marker.setPosition(result.detail.location)
-          // vm.chooseLocation = []
-          // vm.chooseLocation.push(result.detail.location.lat)
-          // vm.chooseLocation.push(result.detail.location.lng)
+          if (!first) {
+            marker.setTitle(detailAddress || result.detail.address)
+            marker.setPosition(result.detail.location)
+          }
         })
         // 点击地图弹出选择地址
         qq.maps.event.addListener(map, 'click', function(e) {
@@ -1052,6 +1056,7 @@ export default {
           vm.chooseLocation = []
           vm.chooseLocation.push(lat)
           vm.chooseLocation.push(lng)
+          first = false
           geocoder.getAddress(coord)
         })
         // 点击marker展示选中的地址
