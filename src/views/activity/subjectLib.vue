@@ -281,6 +281,12 @@
       :visible.sync="dialogMap"
       title="选择定位"
       class="activityDialog">
+      <el-form>
+        <el-form-item label="查询地址" label-width="100">
+          <el-input :value="searchLocation" />
+        </el-form-item>
+      </el-form>
+      
       <div id="map-container" style="width: 100%; height: 500px;"/>
 
     </el-dialog>
@@ -363,7 +369,8 @@ export default {
       dialogAnswerImageUrl: '',
       dialogAnswerImgVisible: false,
       nineImageUrl: '',
-      dialogNineVisible: false
+      dialogNineVisible: false,
+      searchLocation: ''
     }
   },
   created() {

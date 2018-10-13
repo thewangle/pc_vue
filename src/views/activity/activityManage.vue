@@ -701,6 +701,11 @@
       :visible.sync="dialogMap"
       title="选择定位"
       class="activityDialog">
+      <div class="search-area">
+        <el-input placeholder="请输入地址（如需搜索城市请加上城市所在上级地址）" v-model="searchLocation" style="width: 400px; margin-bottom: 10px;"/>
+        <el-button type="primary" @click="handleSearchLocation">搜索</el-button>
+      </div>
+      
       <div id="map-container" style="width: 100%; height: 500px;"/>
       <div style="text-align: center; margin-top: 20px">
         <el-button type="primary" @click="handleSaveLocation">保存定位</el-button>
@@ -899,7 +904,9 @@ export default {
       gifFileList: [],
       activity: {}, // 活动信息
       level: getLevel(),
-      taskClassfiyList: [] // 题目分类
+      taskClassfiyList: [], // 题目分类
+      searchLocation: '', // 搜索地址
+      searchService: null         // 地图实例
     }
   },
   computed: {
@@ -926,11 +933,8 @@ export default {
       const location = new qq.maps.LatLng(lat, lng)
       geocoder.getAddress(location)
 
-      // const result = await geocoder.setComplete()
-      // console.log(result)
       const vm = this
       geocoder.setComplete(function(result) {
-        console.log('=====>', result)
         let detailAddress = ''
         Object.keys(result.detail.addressComponents).forEach(key => {
           detailAddress += result.detail.addressComponents[key]
@@ -944,6 +948,13 @@ export default {
     this.init()
   },
   methods: {
+    handleSearchLocation() {
+      if (!this.searchLocation.trim()) {
+        this.searchLocation = ''
+        this.$message({ message: '地址不能为空', type: 'error' })
+      }
+      this.searchService.search(this.searchLocation)
+    },
     handleSaveLocation() {
       this.$set(this.taskInfo, 'location_point', this.chooseLocation.join())
       // this.taskInfo.location_point = this.chooseLocation.join()
@@ -953,12 +964,44 @@ export default {
     async handleOpenTenceMap() {
       // 首次打开弹窗清空选择定位
       this.chooseLocation = []
+      this.searchLocation = ''
 
       this.dialogMap = true
       let cityName = getCityName()
       const vm = this
       this.$nextTick(() => {
         const map = new qq.maps.Map(document.getElementById('map-container'))
+
+        // 设置搜索服务
+        const searchService = new qq.maps.SearchService({
+          complete: function(results) {
+            if (results.type === 'CITY_LIST' && results.detail.cities.length > 0) {
+              vm.$message({message: '请输入详细地址', type: 'error'})
+              return
+            }
+            //设置回调函数参数
+            const pois = results.detail.pois;
+
+            const latlngBounds = new qq.maps.LatLngBounds();
+
+            for (var i = 0, l = pois.length; i < l; i++) {
+              var poi = pois[i]
+              //扩展边界范围，用来包含搜索到的Poi点
+              latlngBounds.extend(poi.latLng)
+            }
+            //调整地图视野
+            map.fitBounds(latlngBounds)
+            map.setZoom(16)
+          },
+          //若服务请求失败，则运行以下函数
+          error: function() {
+            vm.$message({ message: '没有搜索到该位置', type: 'error' })
+            vm.searchLocation = ''
+          }
+        })
+        // 保存搜索服务实例
+        this.searchService = searchService
+
         // 地址和经纬度之间进行转换服务
         const geocoder = new qq.maps.Geocoder()
         // 初始地图显示位置
@@ -988,8 +1031,7 @@ export default {
         // 设置服务请求成功的回调函数
         geocoder.setComplete(function(result) {
           map.setCenter(result.detail.location)
-          map.setZoom(18)
-          console.log(result)
+          map.setZoom(16)
           //设置标注的名称，当鼠标划过Marker时显示
           let detailAddress = ''
           Object.keys(result.detail.addressComponents).forEach(key => {
@@ -1292,7 +1334,6 @@ export default {
     },
     // 修改任务
     handleUpdateTask(row) {
-      console.log(row)
       this.dialogTaskType = 'edit'
       this.dialogTaskTitle = '修改任务'
       this.dialogTaskVisible = true
@@ -1324,8 +1365,6 @@ export default {
       }
       // 图片题目
       if (row.type === '3') {
-        console.log(1111111111)
-        console.log(row.answer)
         this.taskInfo.answer = JSON.parse(row.answer || '[]')
         this.taskInfo.options = JSON.parse(row.options)
         this.taskInfo.options.forEach((item, index) => {
