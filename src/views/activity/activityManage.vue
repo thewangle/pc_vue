@@ -1145,14 +1145,22 @@ export default {
       Object.keys(ImgInput.files).forEach(async temp => {
         const item = ImgInput.files[temp]
         const fileType = item.type.split('/')[1]
-        const keyname = 'top-team' + Date.now() + Math.floor(Math.random() * 100) + '.' + fileType
+        const keyname = 'top-team' + Date.now() + '' + (Math.random() * 100) + '.' + fileType
         const token = await this._fetchQiNiuToken()
         const formData = new FormData()
         formData.append('file', item)
         formData.append('token', token)
         formData.append('key', keyname)
 
-        const res = await axios.post(this.domain, formData, config)
+        let res = null
+        try {
+          res = await axios.post(this.domain, formData, config)
+        } catch (e) {
+          this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+            loadingInstance.close()
+          })
+          this.$message({message: '有图片上传失败，请重新上传全部图片', type: 'error'})
+        }
         const url = this.qiniuAddress + '/' + res.data.key
         const name = item.name.split('.')[0]
         ImgObj[name] = url
