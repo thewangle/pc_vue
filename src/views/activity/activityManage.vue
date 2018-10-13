@@ -1039,15 +1039,19 @@ export default {
           })
           marker.setTitle(detailAddress || result.detail.address)
           marker.setPosition(result.detail.location)
-          vm.chooseLocation = []
-          vm.chooseLocation.push(result.detail.location.lat)
-          vm.chooseLocation.push(result.detail.location.lng)
+          // vm.chooseLocation = []
+          // vm.chooseLocation.push(result.detail.location.lat)
+          // vm.chooseLocation.push(result.detail.location.lng)
         })
         // 点击地图弹出选择地址
         qq.maps.event.addListener(map, 'click', function(e) {
           const lng = e.latLng.getLng()
           const lat = e.latLng.getLat()
           const coord = new qq.maps.LatLng(lat, lng)
+          console.log(lat, lng)
+          vm.chooseLocation = []
+          vm.chooseLocation.push(lat)
+          vm.chooseLocation.push(lng)
           geocoder.getAddress(coord)
         })
         // 点击marker展示选中的地址
