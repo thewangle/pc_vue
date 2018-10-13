@@ -191,6 +191,7 @@
               :file-list="taskAFileList"
               multiple
               list-type="picture"
+              accept="image/jpeg,image/gif,image/png"
             >
               <el-button>上传图片</el-button>
             </el-upload>
@@ -221,6 +222,7 @@
               :limit="1"
               :action="domain"
               :file-list="taskAFileList"
+              accept="video/mp4,video/ogg,video/flv,video/avi,video/wmv,video/rmvb"
             >
               <el-button>上传视频</el-button>
             </el-upload>
@@ -238,6 +240,7 @@
               :limit="1"
               :action="domain"
               :file-list="taskAFileList"
+              accept="audio/*"
             >
               <el-button>上传音频</el-button>
             </el-upload>
@@ -256,6 +259,7 @@
               :action="domain"
               :file-list="taskAFileList"
               list-type="picture-card"
+              accept="image/jpeg,image/gif,image/png"
             >
               <el-button>上传图片</el-button>
             </el-upload>
@@ -771,7 +775,9 @@ export default {
       }
       if (row.type === '4' || row.type === '5' || row.type === '6') {
         this.taskInfo.answer_url = row.answer
-        this.taskAFileList = [{ name: row.name, url: row.answer }]
+        if (this.taskInfo.answer_url) {
+          this.taskAFileList = [{ name: row.name, url: row.answer }]
+        }
       }
     },
     // 修改提交任务

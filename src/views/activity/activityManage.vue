@@ -460,6 +460,7 @@
               :action="domain"
               :file-list="taskAFileList"
               list-type="picture-card"
+              accept="image/jpeg,image/gif,image/png"
             >
               <el-button>上传图片</el-button>
             </el-upload>
@@ -1388,10 +1389,9 @@ export default {
       }
       if (row.type === '4' || row.type === '5' || row.type === '6') {
         this.taskInfo.answer_url = row.answer
-        this.taskAFileList = [{ name: row.name, url: row.answer }]
-      }
-      if (row.location_point) {
-        
+        if(this.taskInfo.answer_url) {
+          this.taskAFileList = [{ name: row.name, url: row.answer }]
+        }
       }
     },
     // 支付完成返回列表
