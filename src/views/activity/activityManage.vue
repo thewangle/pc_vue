@@ -423,6 +423,7 @@
               :limit="1"
               :action="domain"
               :file-list="taskAFileList"
+              accept="video/mp4,video/ogg,video/flv,video/avi,video/wmv,video/rmvb"
             >
               <el-button>上传视频</el-button>
             </el-upload>
@@ -440,6 +441,7 @@
               :limit="1"
               :action="domain"
               :file-list="taskAFileList"
+              accept="audio/*"
             >
               <el-button>上传音频</el-button>
             </el-upload>
@@ -471,7 +473,7 @@
         <el-form-item label="定位" label-width="100px">
           <span>{{ locationName || locationName1 }}</span>
           <el-button type="primary" @click="handleOpenTenceMap">选择定位</el-button>
-          <p style="color: #f573c1">注：选择定位后，只有到达指定位置才能回答此题</p>  
+          <p style="color: #f573c1; margin-top: 0;">注：选择定位后，只有到达指定位置才能回答此题</p>  
         </el-form-item>
 
         <el-form-item>
