@@ -221,6 +221,7 @@
               type="file"
               name="file"
               multiple
+              accept="image/jpeg,image/gif,image/png"
               @change="handleImgChange">
           </div>
           <el-button :disabled="!activityId" type="primary" style="float: right; margin-right: 20px;" @click="handleOpenTaskDialog">添加任务</el-button>
@@ -339,6 +340,7 @@
             :action="domain"
             :file-list="taskQFileList"
             list-type="picture-card"
+            accept="image/jpeg,image/gif,image/png"
           >
             <el-button>上传图片</el-button>
           </el-upload>
@@ -389,6 +391,7 @@
               :action="domain"
               :file-list="taskAFileList"
               multiple
+              accept="image/jpeg,image/gif,image/png"
               list-type="picture"
             >
               <el-button>上传图片</el-button>
@@ -468,6 +471,7 @@
         <el-form-item label="定位" label-width="100px">
           <span>{{ locationName || locationName1 }}</span>
           <el-button type="primary" @click="handleOpenTenceMap">选择定位</el-button>
+          <p style="color: #f573c1">注：选择定位后，只有到达指定位置才能回答此题</p>  
         </el-form-item>
 
         <el-form-item>
