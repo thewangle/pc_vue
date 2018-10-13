@@ -140,6 +140,7 @@
             :action="domain"
             :file-list="taskQFileList"
             list-type="picture-card"
+            accept="image/jpeg,image/gif,image/png"
           >
             <el-button>上传图片</el-button>
           </el-upload>
