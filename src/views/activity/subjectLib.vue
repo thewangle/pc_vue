@@ -753,6 +753,7 @@ export default {
       this.taskInfo.seq = row.seq
       this.taskInfo.answer_limit = row.answer_limit || 1
       this.taskInfo.answer_type = row.answer_type
+      this.taskInfo.limit_time = row.limit_time || 0
       if (row.question_img) {
         this.taskInfo.question_img = row.question_img
         this.taskQFileList = [{ name: row.name, url: row.question_img }]
