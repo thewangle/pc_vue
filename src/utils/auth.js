@@ -102,9 +102,20 @@ export function setPrice(price) {
 export function removePrice() {
   return Cookies.remove(Price)
 }
+
+const CityName = 'city_name'
+export function getCityName() {
+  return Cookies.get(CityName)
+}
+export function setCityName(cityName) {
+  return Cookies.set(CityName, cityName)
+}
+export function removeCityName(cityName) {
+  return Cookies.remove(CityName)
+}
 // 保存用户信息
 export function setUserInfo(user) {
-  const { role_id, agent_id, user_name, agent_name, province_id, level, price } = user
+  const { role_id, agent_id, user_name, agent_name, province_id, level, price, city_name } = user
   setRoleId(role_id)
   setAgentId(agent_id)
   setUserName(user_name)
@@ -112,6 +123,7 @@ export function setUserInfo(user) {
   setProvinceId(province_id)
   setLevel(level)
   setPrice(price / 100)
+  setCityName(city_name)
 }
 
 // 清楚用户信息
@@ -122,5 +134,6 @@ export function removeUserInfo() {
   removeAgentName()
   removeProvinceId()
   removeLevel()
-  removePrice
+  removePrice()
+  removeCityName()
 }

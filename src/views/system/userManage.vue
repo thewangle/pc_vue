@@ -45,7 +45,7 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible" @close="handleClose" :close-on-click-modal="false">
+    <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible" :close-on-click-modal="false" @close="handleClose">
       <el-form :model="agentInfo" label-position="right" label-width="120px">
         <el-form-item label="员工姓名">
           <el-input v-model="agentInfo.name" />
@@ -53,7 +53,7 @@
         <el-form-item label="电话">
           <el-input v-model="agentInfo.phone" />
         </el-form-item>
-        <el-form-item label="角色名称" v-if="!this.disable_role">
+        <el-form-item v-if="!this.disable_role" label="角色名称">
           <el-select v-model="agentInfo.role_id" :placeholder="place" clearable>
             <el-option
               v-for="item in roleList"
@@ -150,7 +150,7 @@ export default {
       this.disable_role = disable_role
       this.roleList.forEach((item) => {
         if (item.id === role_id) {
-          flag  = true
+          flag = true
         }
       })
       if (!flag) {

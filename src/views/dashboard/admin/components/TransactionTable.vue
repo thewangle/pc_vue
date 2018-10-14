@@ -13,8 +13,8 @@
         @change="handleDateChange"/>
     </div>
     <div class="card-content">
-      <h4>一个月内活动{{type === 'team' ? '场' : '人'}}次</h4>
-      <p>{{ num }}{{type === 'team' ? '场' : '次'}}</p>
+      <h4>一个月内活动{{ type === 'team' ? '场' : '人' }}次</h4>
+      <p>{{ num }}{{ type === 'team' ? '场' : '次' }}</p>
       <span>点击上方日期可查询场次</span>
     </div>
   </el-card>
