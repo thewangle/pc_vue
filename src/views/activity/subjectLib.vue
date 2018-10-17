@@ -34,7 +34,7 @@
           type="file"
           name="file"
           multiple
-          accept="image/jpeg,image/gif,image/png"
+          accept="image/*,vedio/*,audio/*"
           @change="handleImgChange">
       </div>
     </div>

@@ -221,7 +221,7 @@
               type="file"
               name="file"
               multiple
-              accept="image/jpeg,image/gif,image/png"
+              accept="image/*,vedio/*,audio/*"
               @change="handleImgChange">
           </div>
           <el-button :disabled="!activityId" type="primary" style="float: right; margin-right: 20px;" @click="handleOpenTaskDialog">添加任务</el-button>
