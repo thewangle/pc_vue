@@ -330,7 +330,7 @@
           <el-input v-model="taskInfo.seq" type="number" />
         </el-form-item>
         <el-form-item label="答题人数" label-width="100px">
-          <el-input v-model="taskInfo.answer_limit" :disabled="activityInfo.type === '2' || taskInfo.answer_type === '4' || (taskInfo.type !== '1' && taskInfo.type !== '2' && taskInfo.type !== '3')" type="number" />
+          <el-input v-model="taskInfo.answer_limit" :disabled="activityInfo.type === '2' || taskInfo.answer_type === '4'" type="number" />
         </el-form-item>
         <el-form-item label="题目图片" label-width="100px">
           <el-upload
