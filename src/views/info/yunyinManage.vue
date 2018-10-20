@@ -44,9 +44,9 @@
           <span>{{ scope.row.agent_name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="活动价" align="center" width="95">
+      <el-table-column label="活动价(元)" align="center" width="95">
         <template slot-scope="scope">
-          <span>{{ scope.row.price }}</span>
+          <span>{{ scope.row.price / 100 }}</span>
         </template>
       </el-table-column>
       <el-table-column label="所在地区" class-name="status-col" width="180">

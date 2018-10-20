@@ -90,7 +90,7 @@
           <el-input v-model="activityInfo.agentName" disabled />
         </el-form-item>
         <el-form-item label="活动类型">
-          <el-select v-model="activityInfo.type" @change="handleActivityChange">
+          <el-select v-model="activityInfo.type" @change="handleActivityChange" :disabled="dialogActivitytype === 'edit'">
             <el-option label="团队-基础版" value="1" />
             <el-option label="个人-基础版" value="2" />
           </el-select>

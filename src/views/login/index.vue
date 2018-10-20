@@ -96,19 +96,10 @@ export default {
       }
     },
     handleLogin() {
-      if(window.navigator.onLine==false){
-          this.$message('网络断了，请检查网络！');
-          this.logins='登录中...'
-          this.is_dis=true
-          let that=this
-          setTimeout(function(){ 
-            that.logins='登录' 
-            that.is_dis=false
-          }, 3000);
-      }
       this.$refs.loginForm.validate(async valid => {
         if (valid) {
           this.loading = true
+          
           const { username, password } = this.loginForm
           try {
             const res = await login({ user_name: username, passwd: password })
