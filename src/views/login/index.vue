@@ -34,7 +34,7 @@
             </span>
           </el-form-item>
 
-          <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
+          <el-button :loading="loading" type="primary" :disabled="is_dis" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">{{ logins }}</el-button>
 
         </el-form>
       </div>
@@ -66,6 +66,8 @@ export default {
       }
     }
     return {
+      logins:'登陆',
+      is_dis:false,
       loginForm: {
         username: '',
         password: ''
@@ -94,6 +96,16 @@ export default {
       }
     },
     handleLogin() {
+      if(window.navigator.onLine==false){
+          this.$message('网络断了，请检查网络！');
+          this.logins='登录中...'
+          this.is_dis=true
+          let that=this
+          setTimeout(function(){ 
+            that.logins='登录' 
+            that.is_dis=false
+          }, 3000);
+      }
       this.$refs.loginForm.validate(async valid => {
         if (valid) {
           this.loading = true
