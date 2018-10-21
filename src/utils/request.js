@@ -58,14 +58,13 @@ service.interceptors.response.use(
     }
   },
   error => {
-    console.log('err' + error) // for debug
-    if (error.message=='Request failed with status code 504') {
+    if (error.message === 'Request failed with status code 504' || error.message === 'Network Error') {
       Message({
         message: '网络断了，请检查网络！',
         type: 'error',
         duration: 5 * 1000
       })
-    }else{
+    } else {
       Message({
         message: error.message,
         type: 'error',

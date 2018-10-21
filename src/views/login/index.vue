@@ -107,12 +107,8 @@ export default {
             this.logins='登录'
             this.$router.push({ path: '/' })
           } catch (e) {
-            let that=this
-            setTimeout(function(){ 
-              that.loading = false
-              that.logins='登录' 
-            }, 3000);
-            
+            this.loading = false
+            this.logins='登录'  
           }
         } else {
           console.log('error submit!!')
