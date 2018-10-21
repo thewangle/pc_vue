@@ -34,7 +34,7 @@
             </span>
           </el-form-item>
 
-          <el-button :loading="loading" type="primary" :disabled="is_dis" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">{{ logins }}</el-button>
+          <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">{{ logins }}</el-button>
 
         </el-form>
       </div>
@@ -67,7 +67,6 @@ export default {
     }
     return {
       logins:'登陆',
-      is_dis:false,
       loginForm: {
         username: '',
         password: ''
@@ -99,15 +98,21 @@ export default {
       this.$refs.loginForm.validate(async valid => {
         if (valid) {
           this.loading = true
-          
+          this.logins='登录中...'
           const { username, password } = this.loginForm
           try {
             const res = await login({ user_name: username, passwd: password })
             setUserInfo(res.data)
             this.loading = false
+            this.logins='登录'
             this.$router.push({ path: '/' })
           } catch (e) {
-            this.loading = false
+            let that=this
+            setTimeout(function(){ 
+              that.loading = false
+              that.logins='登录' 
+            }, 3000);
+            
           }
         } else {
           console.log('error submit!!')
