@@ -290,7 +290,7 @@ export default {
         agent_id: getAgentId(),
         contacts: row.contacts,
         phone: row.phone,
-        price: row.price,
+        price: row.price / 100,
         selectArea: [row.province_id, row.city_id, row.county_id]
       }
     },
