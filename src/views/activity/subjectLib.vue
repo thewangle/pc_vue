@@ -141,7 +141,6 @@
             :file-list="taskQFileList"
             list-type="picture-card"
             accept="image/jpeg,image/gif,image/png"
-            :on-change="file_size"
           >
             <el-button>上传图片</el-button>
           </el-upload>
@@ -594,13 +593,10 @@ export default {
         }
       })
     },
-    file_size(file){
-      this.files_size=file.size
-    },
     // 上传七牛云
     async _uploadQiNiu(req, type) {
-      if (this.files_size>512000) {
-        this.$message('图片文件超过500K了，请调整后在进行导入');
+      if (req.file.size>512000) {
+        this.$message.error('图片文件超过500K了，请调整后在进行导入!');
       } else {
         const config = {
           headers: { 'Content-Type': 'multipart/form-data' }
