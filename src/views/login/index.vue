@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <section class="login_Img">
-      <h3 class="title">伴行服务商管理系统</h3>
+      <h3 class="title">Mind Tower 印塔管理系统</h3>
       <div class="logo"/>
       <div class="form-container">
         <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
@@ -33,6 +33,8 @@
               <svg-icon icon-class="eye" />
             </span>
           </el-form-item>
+
+          <el-radio v-model="radio" label="1" style="margin-bottom:20px;">记住密码</el-radio>
 
           <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">{{ logins }}</el-button>
 
@@ -66,6 +68,7 @@ export default {
       }
     }
     return {
+      radio: '',
       logins:'登陆',
       loginForm: {
         username: '',
@@ -80,6 +83,9 @@ export default {
       showDialog: false
     }
   },
+  mounted(){
+    this.getCookie();
+  },
   created() {
     // window.addEventListener('hashchange', this.afterQRScan)
   },
@@ -87,6 +93,33 @@ export default {
     // window.removeEventListener('hashchange', this.afterQRScan)
   },
   methods: {
+    //设置cookie
+    setCookie(c_name, c_pwd, exdays) {
+        var exdate = new Date();
+        exdate.setTime(exdate.getTime() + 24 * 60 * 60 * 1000 * exdays); //保存的天数
+        document.cookie = "userName=" + c_name + ";path=/;expires=" + exdate.toLocaleString()
+        document.cookie = "userPwd=" + c_pwd + ";path=/;expires=" + exdate.toLocaleString()
+    },
+    //获取cookie
+    getCookie: function() {
+        if (document.cookie.length > 0) {
+            var arr = document.cookie.split('; '); //这里显示的格式需要切割一下自己可输出看下
+            // console.log(arr)
+            for (var i = 0; i < arr.length; i++) {
+                var arr2 = arr[i].split('='); //再次切割
+                //判断查找相对应的值
+                if (arr2[0] == 'userName') {
+                    this.loginForm.username = arr2[1]; //保存到保存数据的地方
+                } else if (arr2[0] == 'userPwd') {
+                    this.loginForm.password = arr2[1];
+                }
+            }
+        }
+    },
+    //删除cookie
+    clearCookie: function() {
+        this.setCookie("", "", -1); //修改2值都为空，天数为负1天就好了
+    },
     showPwd() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
@@ -95,6 +128,11 @@ export default {
       }
     },
     handleLogin() {
+      if (this.radio==1) {
+        this.setCookie(this.loginForm.username, this.loginForm.password, 7);
+      }else{
+        this.clearCookie();
+      }
       this.$refs.loginForm.validate(async valid => {
         if (valid) {
           this.loading = true

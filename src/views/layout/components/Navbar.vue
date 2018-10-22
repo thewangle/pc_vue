@@ -2,7 +2,7 @@
   <el-menu class="navbar" mode="horizontal">
     <hamburger :toggle-click="toggleSideBar" :is-active="sidebar.opened" class="hamburger-container"/>
 
-    <div class="system-name">伴行测试管理系统V1.0</div>
+    <div class="system-name">Mind Tower 印塔管理系统</div>
 
     <div class="user-name">{{ name }}</div>
 
@@ -11,15 +11,15 @@
     <div class="right-menu">
       <!-- <error-log class="errLog-container right-menu-item"/> -->
 
-      <el-tooltip :content="$t('navbar.screenfull')" effect="dark" placement="bottom">
+      <!-- <el-tooltip :content="$t('navbar.screenfull')" effect="dark" placement="bottom">
         <screenfull class="screenfull right-menu-item"/>
-      </el-tooltip>
+      </el-tooltip> -->
 
       <!-- <lang-select class="international right-menu-item"/> -->
 
-      <el-tooltip :content="$t('navbar.theme')" effect="dark" placement="bottom">
+      <!-- <el-tooltip :content="$t('navbar.theme')" effect="dark" placement="bottom">
         <theme-picker class="theme-switch right-menu-item"/>
-      </el-tooltip>
+      </el-tooltip> -->
 
       <div class="tips">
         <router-link to="/documentation">消息</router-link>
