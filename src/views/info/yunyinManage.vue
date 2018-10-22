@@ -101,7 +101,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button>取消</el-button>
+        <el-button @click="handleClose">取消</el-button>
         <el-button v-if="dialotType === 'add'" type="primary" @click="handleCreateAgent">保存</el-button>
         <el-button v-if="dialotType === 'edit'" type="primary" @click="handleEditAgent">保存</el-button>
       </div>
@@ -295,6 +295,7 @@ export default {
       }
     },
     handleClose() {
+      this.dialogFormVisible = false
       this._restForm()
     },
     handleDeleteOperator(id) {
