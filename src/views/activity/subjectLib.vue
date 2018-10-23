@@ -332,6 +332,7 @@ export default {
   },
   data() {
     return {
+      files_size:'',
       total: 0,
       listQuery: {
         page_no: 1,
@@ -594,39 +595,45 @@ export default {
     },
     // 上传七牛云
     async _uploadQiNiu(req, type) {
-      const config = {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      }
-      // 重命名要上传的文件
-      const keyname = 'top-team' + Date.now() + Math.floor(Math.random() * 100) + req.file.name
-      const token = await this._fetchQiNiuToken()
-      const formData = new FormData()
-      formData.append('file', req.file)
-      formData.append('token', token)
-      formData.append('key', keyname)
-      const loadingInstance = Loading.service({ fullscreen: true, text: '上传' })
-      axios.post(this.domain, formData, config).then(res => {
-        const url = this.qiniuAddress + '/' + res.data.key
-        if (type === 'task') {
-          this.taskInfo.question_img = url
+      if(/image\/\w+/.test(req.file.type)){ 
+          if (req.file.size>512000) {
+            this.$message.error('图片文件超过500K了，请调整后在进行导入!');
+          }  
+      } else {
+        const config = {
+          headers: { 'Content-Type': 'multipart/form-data' }
         }
-        if (type === 'answer') {
-          this.taskInfo.answer_url = url
-        }
-        if (type === 'nine') {
-          this.taskAFileList.push({
-            name: res.data.key.slice(0, 23),
-            url: url
+        // 重命名要上传的文件
+        const keyname = 'top-team' + Date.now() + Math.floor(Math.random() * 100) + req.file.name
+        const token = await this._fetchQiNiuToken()
+        const formData = new FormData()
+        formData.append('file', req.file)
+        formData.append('token', token)
+        formData.append('key', keyname)
+        const loadingInstance = Loading.service({ fullscreen: true, text: '上传' })
+        axios.post(this.domain, formData, config).then(res => {
+          const url = this.qiniuAddress + '/' + res.data.key
+          if (type === 'task') {
+            this.taskInfo.question_img = url
+          }
+          if (type === 'answer') {
+            this.taskInfo.answer_url = url
+          }
+          if (type === 'nine') {
+            this.taskAFileList.push({
+              name: res.data.key.slice(0, 23),
+              url: url
+            })
+          }
+          this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+            loadingInstance.close()
           })
-        }
-        this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-          loadingInstance.close()
+        }).catch(e => {
+          this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+            loadingInstance.close()
+          })
         })
-      }).catch(e => {
-        this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-          loadingInstance.close()
-        })
-      })
+      }
     },
     // 重置任务表单
     _resetTaksForm() {
