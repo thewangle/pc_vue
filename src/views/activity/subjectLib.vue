@@ -533,6 +533,7 @@ export default {
         const data = res.data
         if (data.error_code !== 0) {
           this.$message({ message: data.error_msg, type: 'error' })
+          e.target.value = ''
         } else {
           this.$message({ message: '导入成功', type: 'success' })
           e.target.value = ''

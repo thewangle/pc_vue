@@ -62,9 +62,10 @@
       </el-table-column>
       <el-table-column label="操作" align="center" min-width="130" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button v-if="(scope.row.activity_status === '2' || scope.row.activity_status === '6') && showable" type="primary" size="mini" @click="handleEditActivity(scope.row)">修改</el-button>
+          <el-button v-if="(scope.row.activity_status === '2' || scope.row.activity_status === '6' || scope.row.activity_status === '-1') && showable" type="primary" size="mini" @click="handleEditActivity(scope.row)">修改</el-button>
           <el-button v-if="scope.row.activity_status !== '1'" size="mini" type="success" @click="handleShowActivityInfo(scope.row)">查看</el-button>
           <el-button v-if="scope.row.activity_status === '1' && level === '2'" size="mini" @click="handleCheckActivity(scope.row)">去审批</el-button>
+          <el-button v-if="scope.row.activity_status === '1' && (level === '5' || level === '6')" size="mini" @click="handleDismissActivity(scope.row)">撤销</el-button>
           <el-button
             v-if="scope.row.activity_status === 5 || scope.row.activity_status === '6'"
             size="mini"
@@ -83,6 +84,7 @@
       :visible.sync="dialogFormVisible"
       :title="dialogActivityTitle"
       class="aDialog"
+      top="8vh"
       @close="handleCloseDialog">
       <hr >
       <el-form :inline="true" :model="activityInfo" :disabled="dialogFormDisable" class="demo-form-inline">
@@ -96,7 +98,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="选择教练">
-          <el-select v-model="activityInfo.coachId" :disabled="!activityInfo.type" :clearable="!(dialogActivitytype === 'edit' && activityInfo.coachId)">
+          <el-select v-model="activityInfo.coachId" :disabled="(dialogActivitytype === 'edit' && !activityInfo.coachId)" :clearable="!(dialogActivitytype === 'edit' && activityInfo.coachId)">
             <el-option v-for="item in coachList" :label="item.name" :value="item.id" :key="item.id" />
           </el-select>
         </el-form-item>
@@ -193,12 +195,22 @@
             </el-upload>
           </el-form-item>
         </div>
-        <el-form-item>
-          <el-button v-if="dialogActivitytype === 'add'" type="primary" @click="handleCreateActivitySubmit">创建活动</el-button>
-          <el-button v-if="dialogActivitytype === 'edit'" type="primary" @click="handleUpdateActivitySubmit">修改活动</el-button>
-        </el-form-item>
+        <div style="textAlign: center">
+          <el-button v-if="dialogActivitytype === 'add'" type="primary" @click="handleCreateActivitySubmit">创建活动并下一步</el-button>
+          <el-button v-if="dialogActivitytype === 'edit'" type="primary" @click="handleUpdateActivitySubmit">修改活动并下一步</el-button>
+        </div>
       </el-form>
-      <hr >
+    </el-dialog>
+    <!-- 新增活动对话框 end -->
+
+    <!-- 题目列表添加弹窗 start -->
+    <el-dialog
+      :close-on-click-modal="false"
+      :visible.sync="dialogAddTaskVisible"
+      :title="dialogActivityTitle"
+      class="aDialog"
+      top="8vh"
+      @close="handleCloseAddTaskDialog">
       <div class="job-list">
         <div class="job-title">
           <h3 style="display: inline-block">任务列表</h3>
@@ -233,6 +245,7 @@
             border
             fit
             highlight-current-row
+            height="500"
             style="width: 100%;">
             <el-table-column label="序号" align="center" width="65">
               <template slot-scope="scope">
@@ -276,9 +289,12 @@
             </el-table-column>
           </el-table>
         </div>
+        <div style="marginTop: 20px; textAlign: center">
+          <el-button type="primary" @click="handleSaveTaskList">保存</el-button>
+        </div>
       </div>
     </el-dialog>
-    <!-- 新增活动对话框 end -->
+    <!-- 题目列表添加弹窗 end -->
 
     <!-- 新增题目对话框 start -->
     <el-dialog
@@ -286,6 +302,7 @@
       :visible.sync="dialogTaskVisible"
       :title="dialogTaskTitle"
       class="activityDialog"
+      top="8vh"
       @close="handleCloseTaskDialog">
       <el-form :model="taskInfo" class="demo-form-inline">
         <el-form-item label="题目标题" label-width="100px">
@@ -493,6 +510,7 @@
       :visible.sync="dialogCheckVisible"
       class="activityDialog"
       fullscreen
+      top="8vh"
       @close="handleCloseCheckDialog">
       <hr >
       <div slot="title">
@@ -738,7 +756,8 @@ import { fetchCoachList,
   editTask,
   fetchTaskLibList,
   chooseTasklib,
-  getTacskClassifyList } from './../../service/activity'
+  getTacskClassifyList,
+  cancelact } from './../../service/activity'
 import { fetchQiNiuToken } from './../../service/common'
 import { getAgentName, getAgentId, getPrice, getLevel, getCityName } from '@/utils/auth'
 import { qiniuAddress } from './../../config'
@@ -754,6 +773,7 @@ export default {
   filters: {
     statusFilter(status) {
       const statusMap = {
+        '-1': '已撤销',
         1: '待审核',
         2: '准备中审核通过',
         3: '已开始进行中',
@@ -829,9 +849,10 @@ export default {
         status: null
       },
       activities: [{ label: '团队-基础版', key: 1 }, { label: '个人-基础版', key: 2 }],
-      status: [{ label: '待审批', key: '1' }, { label: '准备中', key: '2' }, { label: '进行中', key: '3' }, { label: '暂停中', key: '4' }, { label: '已完成', key: '5' }, { label: '未通过', key: '6' }],
+      status: [{ label: '已撤销', key: '-1' }, { label: '待审批', key: '1' }, { label: '准备中', key: '2' }, { label: '进行中', key: '3' }, { label: '暂停中', key: '4' }, { label: '已完成', key: '5' }, { label: '未通过', key: '6' }],
       dialogFormVisible: false, // 添加活动对话框展示
       dialogFormDisable: false, // 添加活动对话框表单禁用
+      dialogAddTaskVisible: false,
       taskList: [],
       dialogTaskVisible: false, // 添加任务对话框展示
       dialogTaskTitle: '',
@@ -1097,6 +1118,28 @@ export default {
         this.taskCheckedList.push(item.id)
       })
     },
+    handleSaveTaskList () {
+      this.handleCloseDialog()
+      this.handleCloseAddTaskDialog()
+    },
+    // 撤销活动
+    handleDismissActivity(row) {
+      console.log(row)
+      this.$confirm('确认撤销该活动？')
+        .then(async _ => {
+          await cancelact(row.id)
+          await this._fetchActivityList()
+          this.$message({
+            message: '撤销成功',
+            type: 'success'
+          })
+        })
+        .catch(_ => {})
+    },
+    // 关闭添加题目对话框
+    handleCloseAddTaskDialog () {
+      this.dialogAddTaskVisible = false
+    },
     // 关闭
     handleCloseTaskList() {
       this.dialogTaskList = false
@@ -1208,6 +1251,7 @@ export default {
         const data = res.data
         if (data.error_code !== 0) {
           this.$message({ message: data.error_msg, type: 'error' })
+          e.target.value = ''
         } else {
           this.$message({ message: '导入成功', type: 'success' })
           e.target.value = ''
@@ -1479,7 +1523,9 @@ export default {
       if (this.activityInfo.type === '2') {
         this.activityInfo.scoreShowType = null
       }
-
+      if (this.activityInfo.coachId === '0') {
+        this.activityInfo.coachId = null
+      }
       this.activityInfo = Object.assign({}, this.activityInfo)
     },
     // 打开修改弹窗
@@ -1694,7 +1740,7 @@ export default {
       // 起始分值
       data.score = score
       // 教练ID
-      data.coach_id = coachId
+      data.coach_id = coachId || 0
       // 活动描述
       data.act_desc = actDesc
       // 分值形式
@@ -1716,7 +1762,6 @@ export default {
       // 个人版本
       if (data.type === '2') {
         data.score = 0
-        data.coach_id = 0
         data.score_show_type = 0
       }
       // 团队版本
@@ -1728,6 +1773,8 @@ export default {
         await updateActivity(data)
         // 创建活动成功form禁用
         this.dialogFormDisable = true
+        this.dialogAddTaskVisible = true
+        this.dialogFormVisible = false
         this.$message({ message: '修改成功', type: 'success' })
         const res = await fetchActivityInfo({ act_id: data.act_id })
         const { name, type, set_start_time, set_stop_time, money, qcode_url } = res.data
@@ -1771,7 +1818,7 @@ export default {
       // 起始分值
       data.score = score
       // 教练ID
-      data.coach_id = coachId
+      data.coach_id = coachId || 0
       // 活动描述
       data.act_desc = actDesc
       // 分值形式
@@ -1808,6 +1855,8 @@ export default {
         this.activityId = res.data
         await this._fetchTaskList(res.data)
         this.$message({ message: '创建成功', type: 'success' })
+        this.dialogFormVisible = false
+        this.dialogAddTaskVisible = true
       } catch (e) {
         // 添加活动失败隐藏添加弹窗
         // this.handleCloseDialog()

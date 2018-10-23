@@ -282,3 +282,13 @@ export function getactteamloginfo(data) {
     data
   })
 }
+
+/**
+ * 撤销活动
+ */
+export function cancelact(id) {
+  return request({
+    url: `/i/topteam/admin/cancelact?act_id=${id}`,
+    method: 'get'
+  })
+}
