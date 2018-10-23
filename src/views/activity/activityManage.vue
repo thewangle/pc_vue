@@ -96,7 +96,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="选择教练">
-          <el-select v-model="activityInfo.coachId" :disabled="!activityInfo.type || activityInfo.type === '2'">
+          <el-select v-model="activityInfo.coachId" :disabled="!activityInfo.type" :clearable="!(dialogActivitytype === 'edit' && activityInfo.coachId)">
             <el-option v-for="item in coachList" :label="item.name" :value="item.id" :key="item.id" />
           </el-select>
         </el-form-item>
@@ -296,9 +296,9 @@
             <el-option label="选择题" value="1" />
             <el-option label="文字题" value="2" />
             <el-option label="图片题" value="3" />
-            <el-option v-if="activityInfo.type === '1' || checkInfo.type === '1'" label="视频题" value="4"/>
-            <el-option v-if="activityInfo.type === '1' || checkInfo.type === '1'" label="语音题" value="5"/>
-            <el-option v-if="activityInfo.type === '1' || checkInfo.type === '1'" label="拍照题" value="6"/>
+            <el-option v-if="activityInfo.coachId" label="视频题" value="4"/>
+            <el-option v-if="activityInfo.coachId" label="语音题" value="5"/>
+            <el-option v-if="activityInfo.coachId" label="拍照题" value="6"/>
           </el-select>
         </el-form-item>
         <el-form-item label="题目描述" label-width="100px">
@@ -317,8 +317,8 @@
           <el-select v-model="taskInfo.answer_type" :disabled="dialogTaskType === 'edit'" @change="answerTypeChange">
             <el-option label="普通题" value="1" />
             <el-option v-if="taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3'" label="关卡题" value="2" />
-            <el-option v-if="(activityInfo.type === '1' || checkInfo.type === '1') && (taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3')" label="限时题" value="3" />
-            <el-option v-if="(activityInfo.type === '1' || checkInfo.type === '1') && (taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3')" label="抢答题" value="4"/>
+            <el-option v-if="(activityInfo.coachId) && (taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3')" label="限时题" value="3" />
+            <el-option v-if="(activityInfo.coachId) && (taskInfo.type === '1' || taskInfo.type === '2' || taskInfo.type === '3')" label="抢答题" value="4"/>
           </el-select>
         </el-form-item>
         <el-form-item v-if="taskInfo.answer_type === '3'" label="答题时间" label-width="100px">
@@ -1462,7 +1462,10 @@ export default {
       this.activityInfo.scoreType = score_type
       this.activityInfo.scoreShowType = score_show_type
       this.activityInfo.keepTime = keep_time
-      if (keep_time === '0') { this.activityInfo.check = true }
+      if (keep_time === '0') { 
+        this.activityInfo.check = true
+        this.activityInfo.keepTime = ''
+      }
       this.activityInfo.price = money / 100
       this.activityInfo.time = [set_start_time * 1000, set_stop_time * 1000]
       this.activityInfo.actDesc = act_desc
@@ -1474,7 +1477,6 @@ export default {
       gif_url && (this.gifFileList = [{ name: 'gif', url: gif_url }])
 
       if (this.activityInfo.type === '2') {
-        this.activityInfo.coachId = null
         this.activityInfo.scoreShowType = null
       }
 
@@ -1791,7 +1793,6 @@ export default {
       // 个人版本
       if (data.type === '2') {
         data.score = 0
-        data.coach_id = 0
         data.score_show_type = 0
       }
       // 团队版本

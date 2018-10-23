@@ -252,6 +252,7 @@ export default {
       this._fetchAgentList()
     },
     handleFilter() {
+      this.listQuery.page_no = 1
       this._fetchAgentList()
     },
     handleClose() {

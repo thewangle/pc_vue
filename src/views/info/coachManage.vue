@@ -64,7 +64,7 @@
           <el-input v-model="agentInfo.contacts" />
         </el-form-item>
         <el-form-item label="用户名">
-          <el-input v-model="agentInfo.username" :disabled="dialogType === 'update'" />
+          <el-input v-model="agentInfo.username" />
         </el-form-item>
         <el-form-item label="联系电话">
           <el-input v-model="agentInfo.phone" />
@@ -140,6 +140,7 @@ export default {
       this._fetchCoachList()
     },
     handleFilter() {
+      this.listQuery.page_no = 1
       this._fetchCoachList()
     },
     handleCreate() {
@@ -185,7 +186,12 @@ export default {
           })
         }
         if (this.dialogType === 'update') {
-          const res = await updateCoach({ id: this.coachId, contacts: this.agentInfo.contacts, phone: this.agentInfo.phone })
+          const res = await updateCoach({ 
+            id: this.coachId,
+            contacts: this.agentInfo.contacts,
+            phone: this.agentInfo.phone,
+            username: this.agentInfo.username
+          })
         }
         this.handleClose()
         this._fetchCoachList()
