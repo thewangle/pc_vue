@@ -34,7 +34,7 @@
             </span>
           </el-form-item>
 
-          <el-radio v-model="radio" label="1" style="margin-bottom:20px;">记住密码</el-radio>
+          <el-checkbox v-model="user_record" style="margin-bottom:20px;">记住密码</el-checkbox>
 
           <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">{{ logins }}</el-button>
 
@@ -68,7 +68,7 @@ export default {
       }
     }
     return {
-      radio: '',
+      user_record: false,
       logins:'登陆',
       loginForm: {
         username: '',
@@ -128,7 +128,7 @@ export default {
       }
     },
     handleLogin() {
-      if (this.radio==1) {
+      if (this.user_record) {
         this.setCookie(this.loginForm.username, this.loginForm.password, 7);
       }else{
         this.clearCookie();

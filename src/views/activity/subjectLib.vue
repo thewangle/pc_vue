@@ -595,8 +595,10 @@ export default {
     },
     // 上传七牛云
     async _uploadQiNiu(req, type) {
-      if (req.file.size>512000) {
-        this.$message.error('图片文件超过500K了，请调整后在进行导入!');
+      if(/image\/\w+/.test(req.file.type)){ 
+          if (req.file.size>512000) {
+            this.$message.error('图片文件超过500K了，请调整后在进行导入!');
+          }  
       } else {
         const config = {
           headers: { 'Content-Type': 'multipart/form-data' }
