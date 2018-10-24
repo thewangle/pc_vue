@@ -215,29 +215,27 @@
         <div class="job-title">
           <h3 style="display: inline-block">任务列表</h3>
 
-          <div :disabled="!activityId" class="filePicker" style="float: right">
+          <div class="filePicker" style="float: right">
             <label>导入任务</label>
             <input
               id="fileInput"
-              :disabled="!activityId"
               type="file"
               name="file"
               accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
               @change="handleFileChange">
           </div>
-          <div :disabled="!activityId" class="filePicker" style="float: right; margin-right: 20px">
+          <div class="filePicker" style="float: right; margin-right: 20px">
             <label>导入图片</label>
             <input
               id="ImgInput"
-              :disabled="!activityId"
               type="file"
               name="file"
               multiple
               accept="image/*,vedio/*,audio/*"
               @change="handleImgChange">
           </div>
-          <el-button :disabled="!activityId" type="primary" style="float: right; margin-right: 20px;" @click="handleOpenTaskDialog">添加任务</el-button>
-          <el-button :disabled="!activityId" type="success" style="float: right; margin-right: 20px;" @click="handleOpenSubjectList">题库导入</el-button>
+          <el-button type="primary" style="float: right; margin-right: 20px;" @click="handleOpenTaskDialog">添加任务</el-button>
+          <el-button type="success" style="float: right; margin-right: 20px;" @click="handleOpenSubjectList">题库导入</el-button>
         </div>
         <div class="job-table">
           <el-table
@@ -1138,6 +1136,7 @@ export default {
     },
     // 关闭添加题目对话框
     handleCloseAddTaskDialog () {
+      this.dialogFormVisible = false
       this.dialogAddTaskVisible = false
     },
     // 关闭
@@ -1577,8 +1576,11 @@ export default {
       this.reason = ''
     },
     // 关闭添加活动对话框
-    handleCloseDialog() {
+    handleCloseDialog(shouldReturn) {
       this.dialogFormDisable = false
+      if (shouldReturn) {
+        return
+      }
       if (this.dialogActivitytype === 'add') {
         this.activityId = null
         this.taskList = []
@@ -1774,7 +1776,7 @@ export default {
         // 创建活动成功form禁用
         this.dialogFormDisable = true
         this.dialogAddTaskVisible = true
-        this.dialogFormVisible = false
+        this.handleCloseDialog(true)
         this.$message({ message: '修改成功', type: 'success' })
         const res = await fetchActivityInfo({ act_id: data.act_id })
         const { name, type, set_start_time, set_stop_time, money, qcode_url } = res.data
@@ -1855,7 +1857,7 @@ export default {
         this.activityId = res.data
         await this._fetchTaskList(res.data)
         this.$message({ message: '创建成功', type: 'success' })
-        this.dialogFormVisible = false
+        this.handleCloseDialog(true)
         this.dialogAddTaskVisible = true
       } catch (e) {
         // 添加活动失败隐藏添加弹窗
@@ -2028,6 +2030,10 @@ export default {
       if (this.activityInfo.type === '2') {
         param.activity_type = '1'
       }
+      if (this.activityInfo.type === '2' && this.activityInfo.coachId) {
+        param.activity_type = '2'
+      }
+      console.log(param)
       const res = await fetchTaskLibList(param)
       const { data } = res
       this.tasklistData = data.list
