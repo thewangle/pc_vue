@@ -193,6 +193,7 @@ export default {
       this._fetchList()
     },
     handleFilter() {
+      this.listQuery.page_no = 1
       this._fetchList()
     },
     handleShowDetial(row) {
