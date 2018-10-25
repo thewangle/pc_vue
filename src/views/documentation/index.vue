@@ -29,6 +29,11 @@
                 <a href="http://cdnimg.bxunion.com/图片批量处理工具v7.0.zip">图片处理工具下载</a>
               </el-button>
             </div>
+            <div class="content-item">
+              <el-button type="primary" size="mini">
+                <a href="http://cdnimg.bxunion.com/用户使用说明.pdf">用户使用说明文档下载</a>
+              </el-button>
+            </div>
           </div>
         </el-card>
       </el-col>

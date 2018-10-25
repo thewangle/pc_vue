@@ -58,7 +58,8 @@ service.interceptors.response.use(
     }
   },
   error => {
-    if (error.message === 'Request failed with status code 504' || error.message === 'Network Error') {
+    const reg = new RegExp(/504|503|500|400/)
+    if (reg.test(error.message) || error.message === 'Network Error') {
       Message({
         message: '网络断了，请检查网络！',
         type: 'error',

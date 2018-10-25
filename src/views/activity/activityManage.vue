@@ -1654,6 +1654,10 @@ export default {
     },
     // 上传七牛云
     async _uploadQiNiu(req, type) {
+      if (/image\/\w+/.test(req.file.type) && req.file.size > 1024000) {
+        this.$message.error(`${req.file.name} - 图片文件超过1M了，请调整后在进行导入!`);
+        return
+      }
       const loadingInstance = Loading.service({ fullscreen: true, text: '上传中' })
       const config = {
         headers: { 'Content-Type': 'multipart/form-data' }
