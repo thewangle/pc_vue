@@ -9,6 +9,10 @@
       <el-select v-model="listQuery.status" placeholder="请选择活动状态" clearable style="width: 200px" class="filter-item" @change="handleFilter" >
         <el-option v-for="item in status" :key="item.key" :label="item.label" :value="item.key"/>
       </el-select>
+      <el-select v-model="listQuery.person_coach" placeholder="是否指定教练" clearable style="width: 200px" class="filter-item" @change="handleFilter" >
+        <el-option key="1" label="是" value="1"/>
+        <el-option key="2" label="否" value="2"/>
+      </el-select>
       <el-button v-waves style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
       <el-button v-if="showable" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreateActivity">新增活动</el-button>
     </div>
@@ -844,7 +848,8 @@ export default {
         type: null,
         agent_name: null,
         name: null,
-        status: null
+        status: null,
+        person_coach: null
       },
       activities: [{ label: '团队-基础版', key: 1 }, { label: '个人-基础版', key: 2 }],
       status: [{ label: '已撤销', key: '-1' }, { label: '待审批', key: '1' }, { label: '准备中', key: '2' }, { label: '进行中', key: '3' }, { label: '暂停中', key: '4' }, { label: '已完成', key: '5' }, { label: '未通过', key: '6' }],
@@ -2000,7 +2005,9 @@ export default {
     async _fetchActivityList() {
       this.listLoading = true
       try {
-        const res = await fetchActivityList(this.listQuery)
+        let param = Object.assign({}, this.listQuery)
+        !param.person_coach && (param.person_coach = 0) 
+        const res = await fetchActivityList(param)
         const { data } = res
         this.listLoading = false
         this.list = data.list

@@ -6,6 +6,10 @@
       <el-select v-model="listQuery.type" placeholder="请选择活动类型" style="width: 200px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in activities" :key="item.key" :label="item.label" :value="item.key"/>
       </el-select>
+      <el-select v-model="listQuery.person_coach" placeholder="是否指定教练" clearable style="width: 200px" class="filter-item" @change="handleFilter" >
+        <el-option key="1" label="是" value="1"/>
+        <el-option key="2" label="否" value="2"/>
+      </el-select>
       <el-button v-waves style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
     </div>
 
@@ -163,7 +167,8 @@ export default {
         agent_name: undefined,
         name: undefined,
         status: 5,
-        act_log: 1
+        act_log: 1,
+        person_coach: null
       },
       activities: [{ label: '个人-基础版', key: 2 }],
       dialogInfoVisible: false,
