@@ -1221,11 +1221,12 @@ export default {
         ImgObj[name] = url
         if (Object.keys(ImgObj).length === length) {
           const res = await axios.post(
-            '/i/topteam/admin/MatchTaskLibPic',
-            { match_list: JSON.stringify(ImgObj) }
+            '/i/topteam/admin/MatchTaskPic',
+            { activity_id: this.activityId, match_list: JSON.stringify(ImgObj) }
           )
           if (!res.data.error_code) {
             this.$message({ message: '上传成功', type: 'success' })
+            this._fetchTaskList(this.activityId)
           } else {
             this.$message({ message: res.data.message, type: 'error' })
           }
