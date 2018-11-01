@@ -18,6 +18,7 @@
       :data="list"
       border
       fit
+      max-height="400"
       highlight-current-row
       style="width: 100%;">
       <el-table-column label="序号" align="center" width="65">
