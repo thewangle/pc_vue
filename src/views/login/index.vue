@@ -69,7 +69,7 @@ export default {
     }
     return {
       user_record: false,
-      logins:'登陆',
+      logins:'登录',
       loginForm: {
         username: '',
         password: ''
