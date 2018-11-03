@@ -1228,7 +1228,7 @@ export default {
             this.$message({ message: '上传成功', type: 'success' })
             this._fetchTaskList(this.activityId)
           } else {
-            this.$message({ message: res.data.message, type: 'error' })
+            this.$message({ message: res.data.error_msg, type: 'error' })
           }
           e.target.value = ''
           this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
