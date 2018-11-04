@@ -152,13 +152,13 @@
         <!-- 选择题 -->
         <template v-if="taskInfo.type === '1'">
           <el-form-item label="题目选项" label-width="100px">
-            <el-input v-for="(item, index) in taskInfo.options" :key="item" v-model="taskInfo.options[index]" placeholder="请输入选项内容">
+            <el-input v-for="(item, index) in taskInfo.options" :key="index" v-model="taskInfo.options[index]" placeholder="请输入选项内容">
               <template slot="prepend" style="width: 51px">{{index}}</template>
               <template slot="suffix">
                 <el-button size="mini" type="primary" style="margin-top: 4px" v-if="index === lastKey" @click="handleClickOption(index)">删除</el-button>
               </template>
               <template slot="append">
-                <el-checkbox :checked="handleConsole(index)" @change="(value) => {handleCheckBoxChange(value, index)}">是否为正确答案</el-checkbox>
+                <el-checkbox @change="(value) => {handleCheckBoxChange(value, index)}">是否为正确答案</el-checkbox>
               </template>
             </el-input>
             <el-button @click="handleAddNewLine" style="margin-top:10px">添加一行</el-button>

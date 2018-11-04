@@ -406,7 +406,7 @@
                 <el-button size="mini" type="primary" style="margin-top: 4px" v-if="index === lastKey" @click="handleClickOption(index)">删除</el-button>
               </template>
               <template slot="append">
-                <el-checkbox :checked="taskInfo.answer.indexOf(index) !== -1" @change="(value) => {handleCheckBoxChange(value, index)}">是否为正确答案</el-checkbox>
+                <el-checkbox @change="(value) => {handleCheckBoxChange(value, index)}">是否为正确答案</el-checkbox>
               </template>
             </el-input>
             <!-- <el-input v-model="taskInfo.options.A" placeholder="请输入选项内容">
