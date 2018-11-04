@@ -43,10 +43,10 @@
     <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible" :close-on-click-modal="false" @close="handleClose">
       <el-form label-position="right" label-width="140px">
         <el-form-item label="采集信息模板名称">
-          <el-input v-model="name"/>
+          <el-input v-model="name" maxlength="10"/>
         </el-form-item>
         <el-form-item label="应用场景">
-          <el-input v-model="scence_name" />
+          <el-input v-model="scence_name" maxlength="15" />
         </el-form-item>
         <el-form-item v-for="item in tagList" :key="item.id" :label="item.tag_name">
           <div v-if="item.show_type === '1'">
@@ -57,7 +57,7 @@
             <el-select placeholder="全部" v-model="item.value" @change="(value) => {handleSelectChange(value, item)}">
               <el-option v-for="option in item.editList" :key="option.id" :label="option.value" :value="option.id" ></el-option>
             </el-select>
-            <el-button type="primary" @click="handleOpenEditDialog(item)">编辑</el-button>
+            <el-button type="primary" v-if="item.tag_name !== '人员所属'" @click="handleOpenEditDialog(item)">编辑</el-button>
             <el-checkbox :checked="item.is_show === '1'" @change="(value) => {handleCheckBoxChange(value, item)}">是否展示</el-checkbox>
           </div>
         </el-form-item>
