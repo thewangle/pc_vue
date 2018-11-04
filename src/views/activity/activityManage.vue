@@ -1035,6 +1035,10 @@ export default {
       return this.taskInfo.answer.indexOf(item) !== -1
     },
     handleAddNewLine() {
+      if(this.lastKey === 'Z') {
+        this.$message({ message: '不能再增加选项啦~', type: 'error' })
+        return
+      }
       console.log(typeof this.lastKey)
       let charNum = this.lastKey.charCodeAt()
       ++charNum
