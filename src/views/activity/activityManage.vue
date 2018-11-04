@@ -151,13 +151,13 @@
         </el-form-item>
         <br />
 
-        <el-form-item label="采集信息">
+        <el-form-item label="采集信息" v-if="activityInfo.coachId && activityInfo.type === '2'">
           <el-select v-model="needTpl" :disabled="activityInfo.type !== '2'" @change="activityInfo.tplId = null">
             <el-option label="是" value="1"/>
             <el-option label="否" value="2"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="信息模板">
+        <el-form-item label="信息模板" v-if="activityInfo.coachId && activityInfo.type === '2'">
           <el-select v-model="activityInfo.tplId" :disabled="needTpl === '2'">
             <el-option v-for="item in tplList" :label="item.name" :value="item.id" :key="item.id" />
           </el-select>
