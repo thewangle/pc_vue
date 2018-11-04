@@ -152,26 +152,16 @@
         <!-- 选择题 -->
         <template v-if="taskInfo.type === '1'">
           <el-form-item label="题目选项" label-width="100px">
-            <el-input v-model="taskInfo.options.A" placeholder="请输入选项内容">
-              <template slot="prepend">A</template>
+            <el-input v-for="(item, index) in taskInfo.options" :key="index" v-model="taskInfo.options[index]" placeholder="请输入选项内容">
+              <template slot="prepend" style="width: 51px">{{index}}</template>
+              <template slot="suffix">
+                <el-button size="mini" type="primary" style="margin-top: 4px" v-if="index === lastKey" @click="handleClickOption(index)">删除</el-button>
+              </template>
+              <template slot="append">
+                <el-checkbox :checked="handleConsole(index)" @change="(value) => {handleCheckBoxChange(value, index)}">是否为正确答案</el-checkbox>
+              </template>
             </el-input>
-            <el-input v-model="taskInfo.options.B" placeholder="请输入选项内容">
-              <template slot="prepend">B</template>
-            </el-input>
-            <el-input v-model="taskInfo.options.C" placeholder="请输入选项内容">
-              <template slot="prepend">C</template>
-            </el-input>
-            <el-input v-model="taskInfo.options.D" placeholder="请输入选项内容">
-              <template slot="prepend">D</template>
-            </el-input>
-          </el-form-item>
-          <el-form-item label="答案" label-width="100px">
-            <el-checkbox-group v-model="taskInfo.answer">
-              <el-checkbox label="A"/>
-              <el-checkbox label="B"/>
-              <el-checkbox label="C"/>
-              <el-checkbox label="D"/>
-            </el-checkbox-group>
+            <el-button @click="handleAddNewLine" style="margin-top:10px">添加一行</el-button>
           </el-form-item>
         </template>
         <!-- 文字题目 -->
@@ -383,7 +373,50 @@ export default {
   created() {
     this._fetchList()
   },
+  computed: {
+    optionsLength() {
+      return Object.keys(this.taskInfo.options).length
+    },
+    lastKey() {
+      return Object.keys(this.taskInfo.options)[this.optionsLength - 1]
+    }
+  },
   methods: {
+    handleConsole(item) {
+      return this.taskInfo.answer.indexOf(item) !== -1
+    },
+    handleAddNewLine() {
+      console.log(typeof this.lastKey)
+      let charNum = this.lastKey.charCodeAt()
+      ++charNum
+      const newKey = String.fromCharCode(charNum)
+      this.$set(this.taskInfo.options, newKey, null)
+    },
+    // 删除最后一行
+    handleClickOption(index) {
+      if (this.optionsLength === 1) {
+        this.$message({message: '不能再删啦~'})
+        return
+      }
+      this.$delete(this.taskInfo.options, index)
+    },
+    // 选中答案
+    handleCheckBoxChange(value, index) {
+      // 选中并且答案不存在
+      if (value && !(this.taskInfo.answer.indexOf(index) >= 0)) {
+        this.taskInfo.answer.push(index)
+      }
+      // 未选中，并且答案已存在
+      if (!value && this.taskInfo.answer.indexOf(index) >= 0 ) {
+        const answer = []
+        this.taskInfo.answer.forEach(item => {
+          if (item !== index) {
+            answer.push(item)
+          }
+        })
+        this.taskInfo.answer = answer
+      }
+    },
     // 打开地图定位
     async handleOpenTenceMap() {
       // const

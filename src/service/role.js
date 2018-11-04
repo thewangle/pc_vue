@@ -134,3 +134,53 @@ export function getOperatorLog(data) {
     data
   })
 }
+
+/**
+ * 获取采集信息列表
+ */
+export function getTemplateList(data) {
+  return request({
+    url: '/i/topteam/admin/gettemplatelist',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 获取标签列表
+ */
+export function getTagList(id = 0) {
+  return request({
+    url: `/i/topteam/admin/gettaglist?page_no=1&page_size=1000&template_id=${id}`,
+    method: 'get'
+  })
+}
+
+/**
+ * 新增模板
+ */
+export function addTplTag(data) {
+  return request({
+    url: '/i/topteam/admin/addtptag',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 删除模板
+ */
+export function delTpl(id) {
+  return request({
+    url: `/i/topteam/admin/deltemplate&id=${id}`,
+    method: 'get'
+  })
+}
+
+export function updateTpl(data) {
+  return request({
+    url: '/i/topteam/admin/updatetemplate',
+    method: 'post',
+    data
+  })
+}
