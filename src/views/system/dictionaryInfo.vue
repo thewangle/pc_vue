@@ -320,7 +320,7 @@ export default {
       this._getDictionaryList()
     },
     handleDelete(row) {
-      this.$confirm('确认删除该题目模板吗？')
+      this.$confirm('是否要删除此采集信息模板？')
         .then(async _ => {
           await delTpl(row.id)
           this.$message({ message: '删除成功', type: 'success' })
