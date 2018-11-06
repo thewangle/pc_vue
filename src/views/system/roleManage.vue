@@ -89,12 +89,24 @@ export default {
     },
     // 获得选中菜单项
     _getcheckedMenuIds(menuList) {
-      menuList.forEach((item) => {
-        item.checked && this.checkedMenuList.push(item.id)
-        if (item.childs.length > 0) {
-          this._getcheckedMenuIds(item.childs)
-        }
-      })
+      for(let i=0;i<menuList.length;i++){
+          for(let j=0;j<menuList[i].childs.length;j++){
+              for(let b=0;b<menuList[i].childs[j].childs.length;b++){
+                  console.log(menuList[i].childs[j].childs[b].checked)
+                  let menuList_3=menuList[i].childs[j].childs[b]
+                  if (menuList_3.checked==1) {
+                    this.checkedMenuList.push(menuList_3.id)
+                  }
+              }
+          }
+      }
+      // menuList.forEach((item) => {
+      //   console.log(menuList)
+      //   item.checked && this.checkedMenuList.push(item.id)
+      //   if (item.childs.length > 0) {
+      //     this._getcheckedMenuIds(item.childs)
+      //   }
+      // })
     },
     // 获取角色列表
     async _initRoleList() {
@@ -179,7 +191,13 @@ export default {
     },
     // 更改权限
     handleChangeRoleMenuList() {
-      const menu_ids = this.$refs.menuTree.getCheckedKeys().join()
+      let menu_num=this.$refs.menuTree.getCheckedNodes(false,true)
+      let menu_id=[]
+      for (let i=0; i < menu_num.length;  i++) {
+        menu_id.push(menu_num[i].id)
+      }
+      const menu_ids = menu_id.join()
+      // const menu_ids = this.$refs.menuTree.getCheckedKeys().join()
       this.$confirm('确认修改该角色权限吗')
         .then(async _ => {
           await setRoleMenulist({ role_id: this.role, menu_ids: menu_ids })
