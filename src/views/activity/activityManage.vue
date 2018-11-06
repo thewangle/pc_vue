@@ -406,7 +406,7 @@
                 <el-button size="mini" type="primary" style="margin-top: 4px" v-if="index === lastKey" @click="handleClickOption(index)">删除</el-button>
               </template>
               <template slot="append">
-                <el-checkbox @change="(value) => {handleCheckBoxChange(value, index)}">是否为正确答案</el-checkbox>
+                <el-checkbox :checked="taskInfo.answer.indexOf(index) !== -1" @change="(value) => {handleCheckBoxChange(value, index)}">是否为正确答案</el-checkbox>
               </template>
             </el-input>
             <!-- <el-input v-model="taskInfo.options.A" placeholder="请输入选项内容">
@@ -1449,7 +1449,13 @@ export default {
         data.answer = JSON.stringify(data.answer.sort())
       }
       if (data.type === '1') {
-        if (!data.options.A || !data.options.B || !data.options.C || !data.options.D) {
+        let flag = false
+        Object.keys(data.options).forEach(item => {
+          if (!data.options[item]) {
+            flag = true
+          }
+        })
+        if (flag) {
           this.$message({ message: '选项不能为空', type: 'error' })
           return
         }
@@ -1718,6 +1724,12 @@ export default {
       this.dialogTaskType = 'add'
       this.dialogTaskTitle = '添加任务'
       this.dialogTaskVisible = true
+      this.taskInfo.options = {
+        A: null,
+        B: null,
+        C: null,
+        D: null
+      }
     },
     // 关闭添加任务对话框
     handleCloseTaskDialog() {
@@ -2012,7 +2024,13 @@ export default {
       const data = Object.assign({}, this.taskInfo, { activity_id: activityId })
       data.answer = JSON.stringify(data.answer)
       if (data.type === '1') {
-        if (!data.options.A || !data.options.B || !data.options.C || !data.options.D) {
+        let flag = false
+        Object.keys(data.options).forEach(item => {
+          if (!data.options[item]) {
+            flag = true
+          }
+        })
+        if (flag) {
           this.$message({ message: '选项不能为空', type: 'error' })
           return
         }
@@ -2130,10 +2148,6 @@ export default {
         seq: null,
         question_img: null,
         options: {
-          A: null,
-          B: null,
-          C: null,
-          D: null
         },
         answer: [],
         answer2: '',

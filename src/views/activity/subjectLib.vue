@@ -158,7 +158,7 @@
                 <el-button size="mini" type="primary" style="margin-top: 4px" v-if="index === lastKey" @click="handleClickOption(index)">删除</el-button>
               </template>
               <template slot="append">
-                <el-checkbox @change="(value) => {handleCheckBoxChange(value, index)}">是否为正确答案</el-checkbox>
+                <el-checkbox :checked="taskInfo.answer.indexOf(index) !== -1" @change="(value) => {handleCheckBoxChange(value, index)}">是否为正确答案</el-checkbox>
               </template>
             </el-input>
             <el-button @click="handleAddNewLine" style="margin-top:10px">添加一行</el-button>
@@ -505,6 +505,12 @@ export default {
       this.dialogTaskTitle = '创建题目'
       this.dialogTaskType = 'add'
       this.dialogTaskVisible = true
+      this.taskInfo.options = {
+        A: null,
+        B: null,
+        C: null,
+        D: null
+      }
     },
     handleRemove(file, fileList) {
       this.taskAFileList = fileList
@@ -724,10 +730,6 @@ export default {
         seq: null,
         question_img: null,
         options: {
-          A: null,
-          B: null,
-          C: null,
-          D: null
         },
         answer: [],
         answer2: '', // 文字题答案
@@ -766,7 +768,13 @@ export default {
       const data = Object.assign({}, this.taskInfo)
       data.answer = JSON.stringify(data.answer)
       if (data.type === '1') {
-        if (!data.options.A || !data.options.B || !data.options.C || !data.options.D) {
+        let flag = false
+        Object.keys(data.options).forEach(item => {
+          if (!data.options[item]) {
+            flag = true
+          }
+        })
+        if (flag) {
           this.$message({ message: '选项不能为空', type: 'error' })
           return
         }
@@ -881,7 +889,13 @@ export default {
         data.answer = JSON.stringify(data.answer.sort())
       }
       if (data.type === '1') {
-        if (!data.options.A || !data.options.B || !data.options.C || !data.options.D) {
+        let flag = false
+        Object.keys(data.options).forEach(item => {
+          if (!data.options[item]) {
+            flag = true
+          }
+        })
+        if (flag) {
           this.$message({ message: '选项不能为空', type: 'error' })
           return
         }
