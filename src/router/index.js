@@ -165,7 +165,15 @@ export const asyncRouterMap = [
         path: 'taskClassify',
         component: () => import('@/views/system/taskClassify'),
         name: 'TaskClassfiy',
-        meta: { title: '题目分类', icon: 'edit', noCache: true },
+        meta: { title: '题目分类字典', icon: 'edit', noCache: true },
+        hidden: true
+      },
+      {
+        id: 62,
+        path: 'dictionaryInfo',
+        component: () => import('@/views/system/dictionaryInfo'),
+        name: 'DictionaryInfo',
+        meta: { title: '采集信息字典', icon: 'edit', noCache: true },
         hidden: true
       }
     ]

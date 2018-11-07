@@ -93,7 +93,10 @@
       <hr >
       <el-form :inline="true" :model="activityInfo" :disabled="dialogFormDisable" class="demo-form-inline">
         <el-form-item label="运营商名">
-          <el-input v-model="activityInfo.agentName" disabled />
+          <el-input v-model="activityInfo.agentName" disabled style="width: 195px"/>
+        </el-form-item>
+        <el-form-item label="活动名称">
+          <el-input v-model="activityInfo.name" style="width: 195px" />
         </el-form-item>
         <el-form-item label="活动类型">
           <el-select v-model="activityInfo.type" @change="handleActivityChange" :disabled="dialogActivitytype === 'edit'">
@@ -101,13 +104,15 @@
             <el-option label="个人-基础版" value="2" />
           </el-select>
         </el-form-item>
-        <el-form-item label="选择教练">
-          <el-select v-model="activityInfo.coachId" :disabled="(dialogActivitytype === 'edit' && !activityInfo.coachId)" :clearable="!(dialogActivitytype === 'edit' && activityInfo.coachId)">
-            <el-option v-for="item in coachList" :label="item.name" :value="item.id" :key="item.id" />
-          </el-select>
+        <br />
+        <el-form-item label="起始分值">
+          <el-input v-model="activityInfo.score" :disabled="!activityInfo.type || activityInfo.type === '2'" onkeypress="return event.keyCode ? event.keyCode>=48 && event.keyCode<=57 : event.which >= 48 && event.which <= 57" style="width: 195px"/>
         </el-form-item>
-        <el-form-item label="活动名称">
-          <el-input v-model="activityInfo.name" />
+        <el-form-item label="可见分数">
+          <el-select v-model="activityInfo.scoreShowType" :disabled="!activityInfo.type || activityInfo.type === '2'">
+            <el-option label="否" value="1" />
+            <el-option label="是" value="2" />
+          </el-select>
         </el-form-item>
         <el-form-item label="分值形式">
           <el-select v-model="activityInfo.scoreType">
@@ -117,23 +122,47 @@
             <el-option v-if="activityInfo.type === '1'" label="游戏币" value="4" />
           </el-select>
         </el-form-item>
-        <el-form-item label="可见分数">
-          <el-select v-model="activityInfo.scoreShowType" :disabled="!activityInfo.type || activityInfo.type === '2'">
-            <el-option label="否" value="1" />
-            <el-option label="是" value="2" />
+        <br />
+        <el-form-item label="需要教练">
+          <el-select v-model="needCoach" :disabled="activityInfo.type !== '2'" @change="activityInfo.coachId = null">
+            <el-option label="是" value="1"/>
+            <el-option label="否" value="2"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="起始分值">
-          <el-input v-model="activityInfo.score" :disabled="!activityInfo.type || activityInfo.type === '2'" onkeypress="return event.keyCode ? event.keyCode>=48 && event.keyCode<=57 : event.which >= 48 && event.which <= 57"/>
+        <el-form-item label="选择教练">
+          <el-select v-model="activityInfo.coachId" :disabled="(dialogActivitytype === 'edit' && !activityInfo.coachId) || needCoach === '2'" :clearable="!(dialogActivitytype === 'edit' && activityInfo.coachId)">
+            <el-option v-for="item in coachList" :label="item.name" :value="item.id" :key="item.id" />
+          </el-select>
+        </el-form-item>
+        <br />
+        
+        <el-form-item label="长期活动">
+          <el-select v-model="longTime" :disabled="activityInfo.type !== '2'" @change="activityInfo.keepTime = ''">
+            <el-option label="是" value="1"/>
+            <el-option label="否" value="2"/>
+          </el-select>
         </el-form-item>
         <el-form-item label="活动时长">
           <el-input v-model="activityInfo.keepTime" :disabled="checkdisabled" onkeypress="return event.keyCode ? event.keyCode>=48 && event.keyCode<=57 : event.which >= 48 && event.which <= 57">
             <div slot="suffix">
-              <el-checkbox v-if="activityInfo.type === '2'" v-model="activityInfo.check" @change="handleCheckedChange">长期</el-checkbox>
               (分钟)
             </div>
           </el-input>
         </el-form-item>
+        <br />
+
+        <el-form-item label="采集信息" v-if="activityInfo.coachId && activityInfo.type === '2'">
+          <el-select v-model="needTpl" :disabled="activityInfo.type !== '2'" @change="activityInfo.tplId = null">
+            <el-option label="是" value="1"/>
+            <el-option label="否" value="2"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="信息模板" v-if="activityInfo.coachId && activityInfo.type === '2'">
+          <el-select v-model="activityInfo.tplId" :disabled="needTpl === '2'">
+            <el-option v-for="item in tplList" :label="item.name" :value="item.id" :key="item.id" />
+          </el-select>
+        </el-form-item>
+
         <el-form-item v-if="activityInfo.type === '2'" label="活动价格">
           <el-input v-model="activityInfo.price" onkeypress="return event.keyCode ? event.keyCode>=48 && event.keyCode<=57 : event.which >= 48 && event.which <= 57"/>
         </el-form-item>
@@ -371,7 +400,16 @@
         <!-- 选择题 -->
         <template v-if="taskInfo.type === '1'">
           <el-form-item label="题目选项" label-width="100px">
-            <el-input v-model="taskInfo.options.A" placeholder="请输入选项内容">
+            <el-input v-for="(item, index) in taskInfo.options" :key="index" v-model="taskInfo.options[index]" placeholder="请输入选项内容">
+              <template slot="prepend" style="width: 51px">{{index}}</template>
+              <template slot="suffix">
+                <el-button size="mini" type="primary" style="margin-top: 4px" v-if="index === lastKey" @click="handleClickOption(index)">删除</el-button>
+              </template>
+              <template slot="append">
+                <el-checkbox :checked="taskInfo.answer.indexOf(index) !== -1" @change="(value) => {handleCheckBoxChange(value, index)}">是否为正确答案</el-checkbox>
+              </template>
+            </el-input>
+            <!-- <el-input v-model="taskInfo.options.A" placeholder="请输入选项内容">
               <template slot="prepend">A</template>
             </el-input>
             <el-input v-model="taskInfo.options.B" placeholder="请输入选项内容">
@@ -382,16 +420,17 @@
             </el-input>
             <el-input v-model="taskInfo.options.D" placeholder="请输入选项内容">
               <template slot="prepend">D</template>
-            </el-input>
+            </el-input> -->
+            <el-button @click="handleAddNewLine" style="margin-top:10px">添加一行</el-button>
           </el-form-item>
-          <el-form-item label="答案" label-width="100px">
+          <!-- <el-form-item label="答案" label-width="100px">
             <el-checkbox-group v-model="taskInfo.answer">
               <el-checkbox label="A"/>
               <el-checkbox label="B"/>
               <el-checkbox label="C"/>
               <el-checkbox label="D"/>
             </el-checkbox-group>
-          </el-form-item>
+          </el-form-item> -->
         </template>
         <!-- 文字题目 -->
         <template v-if="taskInfo.type === '2'">
@@ -760,6 +799,7 @@ import { fetchCoachList,
   chooseTasklib,
   getTacskClassifyList,
   cancelact } from './../../service/activity'
+import { getTemplateList } from './../../service/role'
 import { fetchQiNiuToken } from './../../service/common'
 import { getAgentName, getAgentId, getPrice, getLevel, getCityName } from '@/utils/auth'
 import { qiniuAddress } from './../../config'
@@ -825,6 +865,9 @@ export default {
   },
   data() {
     return {
+      needCoach: "1",
+      longTime: "2",
+      needTpl: "2",
       taskCheckedList: [],
       taskTotal: 0,
       taskListQuery: {
@@ -884,6 +927,7 @@ export default {
         iconUrl: '', // 活动封面Url
         gif_url: '', // 个人版本gifUrl
         price: '', // 活动价格
+        tplId: '',
         check: '' // 是够长期
       },
       activityId: null,
@@ -918,7 +962,8 @@ export default {
       dialogAnswerImgVisible: false,
       nineImageUrl: '',
       dialogNineVisible: false,
-      coachList: [], // 教练列表
+      coachList: [], // 教练列表,
+      tplList: [], // 采集信息模板列表
       domain: 'http://upload.qiniup.com/',
       qiniuAddress: qiniuAddress,
       checkInfo: {
@@ -945,7 +990,7 @@ export default {
       return (+getLevel()) > 4
     },
     checkdisabled() {
-      if (this.activityInfo.check) {
+      if (this.longTime === '1') {
         return true
       } else {
         return false
@@ -973,12 +1018,62 @@ export default {
         vm.locationName1 = detailAddress
       })
       return vm.locationName1
+    },
+    optionsLength() {
+      return Object.keys(this.taskInfo.options).length
+    },
+    lastKey() {
+      return Object.keys(this.taskInfo.options)[this.optionsLength - 1]
     }
   },
   created() {
     this.init()
   },
   methods: {
+    handleConsole(item) {
+      console.log(this.taskInfo.answer)
+      return this.taskInfo.answer.indexOf(item) !== -1
+    },
+    handleAddNewLine() {
+      if(this.lastKey === 'Z') {
+        this.$message({ message: '不能再增加选项啦~', type: 'error' })
+        return
+      }
+      console.log(typeof this.lastKey)
+      let charNum = this.lastKey.charCodeAt()
+      ++charNum
+      console.log(charNum)
+      const newKey = String.fromCharCode(charNum)
+      console.log(newKey)
+      this.$set(this.taskInfo.options, newKey, null)
+      console.log(this.taskInfo.options)
+    },
+    // 删除最后一行
+    handleClickOption(index) {
+      if (this.optionsLength === 1) {
+        this.$message({message: '不能再删啦~'})
+        return
+      }
+      this.$delete(this.taskInfo.options, index)
+      console.log(this.taskInfo.options)
+    },
+    // 选中答案
+    handleCheckBoxChange(value, index) {
+      // 选中并且答案不存在
+      if (value && !(this.taskInfo.answer.indexOf(index) >= 0)) {
+        this.taskInfo.answer.push(index)
+      }
+      // 未选中，并且答案已存在
+      if (!value && this.taskInfo.answer.indexOf(index) >= 0 ) {
+        const answer = []
+        this.taskInfo.answer.forEach(item => {
+          if (item !== index) {
+            answer.push(item)
+          }
+        })
+        this.taskInfo.answer = answer
+      }
+    },
     handleSearchLocation() {
       if (!this.searchLocation.trim()) {
         this.searchLocation = ''
@@ -1188,8 +1283,8 @@ export default {
       const config = {
         headers: { 'Content-Type': 'multipart/form-data' }
       }
-      const loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
-
+      let count = 0;
+      let loadingInstance = Loading.service({ fullscreen: true, text: `上传中` })
       for(let item of ImgInput.files) {
         if (/image\/\w+/.test(item.type) && item.size > 1024000) {
           this.$message.error(`${item.name} - 图片文件超过1M了，请调整后在进行导入!`);
@@ -1221,65 +1316,22 @@ export default {
         ImgObj[name] = url
         if (Object.keys(ImgObj).length === length) {
           const res = await axios.post(
-            '/i/topteam/admin/MatchTaskLibPic',
-            { match_list: JSON.stringify(ImgObj) }
+            '/i/topteam/admin/MatchTaskPic',
+            { activity_id: this.activityId, match_list: JSON.stringify(ImgObj) }
           )
           if (!res.data.error_code) {
             this.$message({ message: '上传成功', type: 'success' })
-            e.target.value = ''
+            this._fetchTaskList(this.activityId)
+          } else {
+            this.$message({ message: res.data.error_msg, type: 'error' })
           }
+          e.target.value = ''
           this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
             loadingInstance.close()
           })
         }
       }
     },
-    // handleImgChange(e) {
-    //   const ImgObj = {}
-    //   const ImgInput = document.querySelector('#ImgInput')
-    //   const length = ImgInput.files.length
-    //   const config = {
-    //     headers: { 'Content-Type': 'multipart/form-data' }
-    //   }
-    //   const loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
-    //   Object.keys(ImgInput.files).forEach(async temp => {
-    //     const item = ImgInput.files[temp]
-    //     const fileType = item.type.split('/')[1]
-    //     const keyname = 'top-team' + Date.now() + '' + (Math.random() * 100) + '.' + fileType
-    //     const token = await this._fetchQiNiuToken()
-    //     const formData = new FormData()
-    //     formData.append('file', item)
-    //     formData.append('token', token)
-    //     formData.append('key', keyname)
-
-    //     let res = null
-    //     try {
-    //       res = await axios.post(this.domain, formData, config)
-    //     } catch (e) {
-    //       this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-    //         loadingInstance.close()
-    //       })
-    //       this.$message({message: '有图片上传失败，请重新上传全部图片', type: 'error'})
-    //     }
-    //     const url = this.qiniuAddress + '/' + res.data.key
-    //     const name = item.name.split('.')[0]
-    //     ImgObj[name] = url
-    //     if (Object.keys(ImgObj).length === length) {
-    //       const res = await axios.post(
-    //         '/i/topteam/admin/MatchTaskPic',
-    //         { activity_id: this.activityId, match_list: JSON.stringify(ImgObj) }
-    //       )
-    //       if (!res.data.error_code) {
-    //         this.$message({ message: '上传成功', type: 'success' })
-    //         e.target.value = ''
-    //         this._fetchTaskList(this.activityId)
-    //       }
-    //       this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-    //         loadingInstance.close()
-    //       })
-    //     }
-    //   })
-    // },
     handleRemove(file, fileList) {
       this.taskAFileList = fileList
     },
@@ -1289,9 +1341,14 @@ export default {
         this.activityInfo.price = 10
         this.activityInfo.answer_limit = 1
         this.activityInfo.scoreType = '1'
+      } else {
+        this.needCoach = '1'
+        this.longTime = '2'
+        this.needTpl = '2'
       }
       this.activityInfo.check = false
       this.activityInfo.coachId = null
+      this.activityInfo.tplId = null
     },
     // 导入任务
     handleFileChange(e) {
@@ -1392,7 +1449,13 @@ export default {
         data.answer = JSON.stringify(data.answer.sort())
       }
       if (data.type === '1') {
-        if (!data.options.A || !data.options.B || !data.options.C || !data.options.D) {
+        let flag = false
+        Object.keys(data.options).forEach(item => {
+          if (!data.options[item]) {
+            flag = true
+          }
+        })
+        if (flag) {
           this.$message({ message: '选项不能为空', type: 'error' })
           return
         }
@@ -1552,10 +1615,16 @@ export default {
         agent_name, agent_id, act_desc, set_start_time, score,
         set_stop_time, activity_status, type, coach_id, name,
         score_type, score_show_type, keep_time, money, bg_img,
-        icon, gif_url
+        icon, gif_url, template_id
       } = this.activity
 
       this.activityInfo.score = score
+      this.activityInfo.tplId = template_id
+      if (template_id !== '0') {
+        this.needTpl = '1'
+      } else {
+        this.activityInfo.tplId = null
+      }
       this.activityInfo.agentName = agent_name // 运营商名
       this.activityInfo.type = type
       this.activityInfo.agent_id = agent_id
@@ -1565,7 +1634,7 @@ export default {
       this.activityInfo.scoreShowType = score_show_type
       this.activityInfo.keepTime = keep_time
       if (keep_time === '0') { 
-        this.activityInfo.check = true
+        this.longTime = '1'
         this.activityInfo.keepTime = ''
       }
       this.activityInfo.price = money / 100
@@ -1655,6 +1724,12 @@ export default {
       this.dialogTaskType = 'add'
       this.dialogTaskTitle = '添加任务'
       this.dialogTaskVisible = true
+      this.taskInfo.options = {
+        A: null,
+        B: null,
+        C: null,
+        D: null
+      }
     },
     // 关闭添加任务对话框
     handleCloseTaskDialog() {
@@ -1773,7 +1848,7 @@ export default {
       const data = {}
       const {
         time, name, keepTime, score, coachId,
-        actDesc, scoreType, scoreShowType, type, bgImgUrl, iconUrl, price, check, gif_url, agent_id
+        actDesc, scoreType, scoreShowType, type, bgImgUrl, iconUrl, price, check, gif_url, agent_id, tplId
       } = this.activityInfo
       if (type === '1') {
         if (!time.length || !name || !keepTime || !score || !coachId || !type) {
@@ -1817,8 +1892,13 @@ export default {
       // 金额
       data.money = price
       // 长期时间
-      if (check) {
+      if (this.longTime === '1') {
         data.keep_time = 0
+      }
+      if (tplId) {
+        data.template_id = tplId
+      } else {
+        data.template_id = 0
       }
       // 个人版本
       if (data.type === '2') {
@@ -1852,7 +1932,7 @@ export default {
       const data = {}
       const {
         time, name, keepTime, score, coachId,
-        actDesc, scoreType, scoreShowType, type, bgImgUrl, iconUrl, price, check, gif_url
+        actDesc, scoreType, scoreShowType, type, bgImgUrl, iconUrl, price, check, gif_url, tplId
       } = this.activityInfo
       if (type === '1') {
         if (!time.length || !name || !keepTime || !score || !coachId || !type) {
@@ -1895,9 +1975,15 @@ export default {
       // 金额
       data.money = price
       // 长期时间
-      if (check) {
+      if (this.longTime === '1') {
         data.keep_time = 0
       }
+      if (tplId) {
+        data.template_id = tplId
+      } else {
+        data.tplId = 0
+      }
+      
       // 个人版本
       if (data.type === '2') {
         data.score = 0
@@ -1938,7 +2024,13 @@ export default {
       const data = Object.assign({}, this.taskInfo, { activity_id: activityId })
       data.answer = JSON.stringify(data.answer)
       if (data.type === '1') {
-        if (!data.options.A || !data.options.B || !data.options.C || !data.options.D) {
+        let flag = false
+        Object.keys(data.options).forEach(item => {
+          if (!data.options[item]) {
+            flag = true
+          }
+        })
+        if (flag) {
           this.$message({ message: '选项不能为空', type: 'error' })
           return
         }
@@ -2056,10 +2148,6 @@ export default {
         seq: null,
         question_img: null,
         options: {
-          A: null,
-          B: null,
-          C: null,
-          D: null
         },
         answer: [],
         answer2: '',
@@ -2105,10 +2193,16 @@ export default {
       const res = await getTacskClassifyList()
       this.taskClassfiyList = res.data.list
     },
+    // 获取模板信息列表
+    async _getTemplateList() {
+      const res = await getTemplateList({ page_no: 1, page_size: 1000 })
+      this.tplList = res.data.list
+    },
     init() {
       this._fetchCoachList()
       this._fetchActivityList()
       this._fetchTaskClassify()
+      this._getTemplateList()
     }
   }
 }
@@ -2174,6 +2268,9 @@ export default {
 .container{
   width: 160px;
   margin: 30px auto;
+}
+.el-input-group--prepend .el-input-group__prepend {
+  width: 51px;
 }
 </style>
 
