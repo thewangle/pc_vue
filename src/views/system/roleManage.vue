@@ -31,6 +31,7 @@
               :props="defaultProps"
               :default-checked-keys="checkedMenuList"
               show-checkbox
+              check-strictly
               node-key="id"/>
           </div>
         </el-card>
@@ -89,24 +90,12 @@ export default {
     },
     // 获得选中菜单项
     _getcheckedMenuIds(menuList) {
-      for(let i=0;i<menuList.length;i++){
-          for(let j=0;j<menuList[i].childs.length;j++){
-              for(let b=0;b<menuList[i].childs[j].childs.length;b++){
-                  console.log(menuList[i].childs[j].childs[b].checked)
-                  let menuList_3=menuList[i].childs[j].childs[b]
-                  if (menuList_3.checked==1) {
-                    this.checkedMenuList.push(menuList_3.id)
-                  }
-              }
-          }
-      }
-      // menuList.forEach((item) => {
-      //   console.log(menuList)
-      //   item.checked && this.checkedMenuList.push(item.id)
-      //   if (item.childs.length > 0) {
-      //     this._getcheckedMenuIds(item.childs)
-      //   }
-      // })
+      menuList.forEach((item) => {
+        item.checked && this.checkedMenuList.push(item.id)
+        if (item.childs.length > 0) {
+          this._getcheckedMenuIds(item.childs)
+        }
+      })
     },
     // 获取角色列表
     async _initRoleList() {
