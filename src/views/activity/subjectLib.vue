@@ -286,6 +286,15 @@
       <div id="map-container" style="width: 100%; height: 500px;"/>
 
     </el-dialog>
+    <!-- 进度条 -->
+    <div v-if='is_progress' class="progress_wrap" style="width:100%;height:100%;position: absolute;top: 0;left: 0;z-index:9999;">
+      <div style="width:100%;height:100%;display:flex;justify-content: center;align-items: center;">
+        <div class="progress_bg" style="width:100%;height:100%;background:black;opacity:0.3;position: absolute;top: 0;left: 0;"></div>
+        <div class="progress_content" style="width:20%;height:18px;">
+          <el-progress :text-inside="true" :stroke-width="18" :percentage='jindu'></el-progress>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -322,6 +331,8 @@ export default {
   },
   data() {
     return {
+      jindu:0,
+      is_progress:false,
       files_size:'',
       total: 0,
       listQuery: {
@@ -550,6 +561,7 @@ export default {
       this.dialogTaskVisible = false
       this._resetTaksForm()
       this._fetchList()
+      this.jindu=0
     },
     // 删除题目
     handleDeleteTask(id) {
@@ -566,13 +578,18 @@ export default {
     },
     // 导入题库
     handleFileChange(e) {
+      this.is_progress=true
       const fileInput = document.querySelector('#fileInput')
       const formData = new FormData()
       const config = {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: progressEvent => {
+          this.jindu=progressEvent.loaded / progressEvent.total * 100 | 0
+          console.log(progressEvent.loaded / progressEvent.total * 100 | 0) + '%'
+        }
       }
       formData.append('file', fileInput.files[0])
-      const loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
+      // const loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
       axios.post('/i/topteam/admin/importTaskLib', formData, config).then(res => {
         const data = res.data
         if (data.error_code !== 0) {
@@ -583,48 +600,115 @@ export default {
           e.target.value = ''
           this._fetchList()
         }
-        this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-          loadingInstance.close()
-        })
+        this.is_progress=false
+        this.jindu=0
+        // this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+        //   loadingInstance.close()
+        // })
       }).catch(e => {
-        this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-          loadingInstance.close()
-        })
+        // this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+        //   loadingInstance.close()
+        // })
       })
+    },
+    // 压缩图片函数
+    canvasDataURL(path, obj, callback){
+      let img = new Image();
+      img.src = path;
+      img.onload = function(){
+          let that = this;
+          let w = that.width,
+              h = that.height,
+              scale = w / h;
+          w = obj.width || w;
+          h = obj.height || (w / scale);
+          let quality = 0.7;
+          let canvas = document.createElement('canvas');
+          let ctx = canvas.getContext('2d');
+          let anw = document.createAttribute("width");
+          anw.nodeValue = w;
+          let anh = document.createAttribute("height");
+          anh.nodeValue = h;
+          canvas.setAttributeNode(anw);
+          canvas.setAttributeNode(anh);
+          ctx.drawImage(that, 0, 0, w, h);
+          if(obj.quality && obj.quality <= 1 && obj.quality > 0){
+              quality = obj.quality;
+          }
+          let base64 = canvas.toDataURL('image/jpeg', quality);
+          callback(base64);
+      }
+    },
+    //创建FileReader实例
+    photoCompress(file,w,objDiv){
+        let ready=new FileReader();
+        ready.readAsDataURL(file);
+        let that=this
+        ready.onload=function(){
+            let re=this.result;
+            that.canvasDataURL(re,w,objDiv)
+        }
+    },
+    //将以base64的图片url数据转换为Blob
+    convertBase64UrlToBlob(urlData){
+        let arr = urlData.split(','), mime = arr[0].match(/:(.*?);/)[1],
+            bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+        while(n--){
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new Blob([u8arr], {type:mime});
     },
     // 导入图片
     async handleImgChange(e) {
+      this.is_progress=true
       const ImgObj = {}
       const ImgInput = document.querySelector('#ImgInput')
       const length = ImgInput.files.length
       const config = {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      }
-      const loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
-
-      for(let item of ImgInput.files) {
-        if (/image\/\w+/.test(item.type) && item.size > 1024000) {
-          this.$message.error(`${item.name} - 图片文件超过1M了，请调整后在进行导入!`);
-          this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-            loadingInstance.close()
-          })
-          e.target.value = ''
-          return
+        headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: progressEvent => {
+          this.jindu=progressEvent.loaded / progressEvent.total * 100 | 0
+          console.log(progressEvent.loaded / progressEvent.total * 100 | 0) + '%'
         }
+      }
+      // const loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
+      for(let item of ImgInput.files) {
         const fileType = item.type.split('/')[1]
         const keyname = 'top-team' + Date.now() + '' + (Math.random() * 100) + '.' + fileType
         const token = await this._fetchQiNiuToken()
         const formData = new FormData()
-        formData.append('file', item)
-        formData.append('token', token)
-        formData.append('key', keyname)
+        if (/image\/\w+/.test(item.type) && item.size > 1024000) {
+          // this.$message.error(`${item.name} - 图片文件超过1M了，请调整后在进行导入!`);
+          // this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+          //   loadingInstance.close()
+          // })
+          // e.target.value = ''
+          // return
+          this.photoCompress(item, {
+              quality: 0.2
+          }, function(base64Codes){
+              var bl = that.convertBase64UrlToBlob(base64Codes);
+              formData.append('file', bl); // 文件对象
+              formData.append('token', token)
+              formData.append('key', keyname)
+          });
+        }else{
+          formData.append('file', item)
+          formData.append('token', token)
+          formData.append('key', keyname)
+        }
         let res = null
         try {
-          res = await axios.post(this.domain, formData, config)
-        } catch (error) {
-          this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-            loadingInstance.close()
+          await axios.post(this.domain, formData, config).then(ress=>{
+            res=ress
+            this.is_progress=false
+            this.jindu=0
           })
+        } catch (error) {
+          console.log(error)
+          // this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+          //   loadingInstance.close()
+          // })
           e.target.value = ''
           this.$message({message: '有图片上传失败，请重新上传全部图片', type: 'error'})
         }
@@ -642,9 +726,9 @@ export default {
             this.$message({ message: res.data.error_msg, type: 'error' })
           }
           e.target.value = ''
-          this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-            loadingInstance.close()
-          })
+          // this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+          //   loadingInstance.close()
+          // })
         }
       }
       // Object.keys(ImgInput.files).forEach(async temp => {
@@ -686,17 +770,33 @@ export default {
     },
     // 上传七牛云
     async _uploadQiNiu(req, type) {
+      this.is_progress=true
       const config = {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: progressEvent => {
+          this.jindu=progressEvent.loaded / progressEvent.total * 100 | 0
+        }
       }
       // 重命名要上传的文件
       const keyname = 'top-team' + Date.now() + Math.floor(Math.random() * 100) + req.file.name
       const token = await this._fetchQiNiuToken()
       const formData = new FormData()
-      formData.append('file', req.file)
-      formData.append('token', token)
-      formData.append('key', keyname)
-      const loadingInstance = Loading.service({ fullscreen: true, text: '上传' })
+      let that=this
+      if(req.file.size/1024 > 1025) { //大于1M，进行压缩上传
+          this.photoCompress(req.file, {
+              quality: 0.2
+          }, function(base64Codes){
+              var bl = that.convertBase64UrlToBlob(base64Codes);
+              formData.append('file', bl); // 文件对象
+              formData.append('token', token)
+              formData.append('key', keyname)
+          });
+      }else{
+        formData.append('file', req.file)
+        formData.append('token', token)
+        formData.append('key', keyname)
+      }
+      // const loadingInstance = Loading.service({ fullscreen: true, text: '上传' })
       axios.post(this.domain, formData, config).then(res => {
         const url = this.qiniuAddress + '/' + res.data.key
         if (type === 'task') {
@@ -711,13 +811,15 @@ export default {
             url: url
           })
         }
-        this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-          loadingInstance.close()
-        })
+        this.is_progress=false
+        this.jindu=0
+        // this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+        //   loadingInstance.close()
+        // })
       }).catch(e => {
-        this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-          loadingInstance.close()
-        })
+        // this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+        //   loadingInstance.close()
+        // })
       })
     },
     // 重置任务表单

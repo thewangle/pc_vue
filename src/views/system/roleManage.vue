@@ -89,6 +89,9 @@ export default {
     },
     // 获得选中菜单项
     _getcheckedMenuIds(menuList) {
+      if (menuList[0].checked==1) {
+        this.checkedMenuList.push(menuList[0].id)
+      }
       for(let i=0;i<menuList.length;i++){
           for(let j=0;j<menuList[i].childs.length;j++){
               for(let b=0;b<menuList[i].childs[j].childs.length;b++){
