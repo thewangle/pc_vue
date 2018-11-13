@@ -287,11 +287,11 @@
 
     </el-dialog>
     <!-- 进度条 -->
-    <div v-if='is_progress' class="progress_wrap" style="width:100%;height:100%;position: absolute;top: 0;left: 0;z-index:9999;">
-      <div style="width:100%;height:100%;display:flex;justify-content: center;align-items: center;">
-        <div class="progress_bg" style="width:100%;height:100%;background:black;opacity:0.3;position: absolute;top: 0;left: 0;"></div>
-        <div class="progress_content" style="width:20%;height:18px;">
-          <el-progress :text-inside="true" :stroke-width="18" :percentage='jindu'></el-progress>
+    <div id="progress" v-if='is_progress' class="progress_wrap">
+      <div class="progress_wraps">
+        <div class="progress_bg"></div>
+        <div class="progress_content">
+          <el-progress  :percentage='jindu' type="circle"></el-progress>
         </div>
       </div>
     </div>
@@ -382,8 +382,12 @@ export default {
     }
   },
   created() {
-    this._fetchList()
+    this._fetchList()   
   },
+  // mounted(){
+  //   document.getElementById('progress').style.width=window.screen.width+"px"
+  //   document.getElementById('progress').style.height=(window.screen.height+200)+"px"
+  // },
   computed: {
     optionsLength() {
       return Object.keys(this.taskInfo.options).length
@@ -589,7 +593,6 @@ export default {
         }
       }
       formData.append('file', fileInput.files[0])
-      // const loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
       axios.post('/i/topteam/admin/importTaskLib', formData, config).then(res => {
         const data = res.data
         if (data.error_code !== 0) {
@@ -602,13 +605,6 @@ export default {
         }
         this.is_progress=false
         this.jindu=0
-        // this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-        //   loadingInstance.close()
-        // })
-      }).catch(e => {
-        // this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-        //   loadingInstance.close()
-        // })
       })
     },
     // 压缩图片函数
@@ -677,58 +673,70 @@ export default {
         const keyname = 'top-team' + Date.now() + '' + (Math.random() * 100) + '.' + fileType
         const token = await this._fetchQiNiuToken()
         const formData = new FormData()
+        formData.append('token', token)
+        formData.append('key', keyname)
+        let that=this
         if (/image\/\w+/.test(item.type) && item.size > 1024000) {
-          // this.$message.error(`${item.name} - 图片文件超过1M了，请调整后在进行导入!`);
-          // this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-          //   loadingInstance.close()
-          // })
-          // e.target.value = ''
-          // return
           this.photoCompress(item, {
               quality: 0.2
-          }, function(base64Codes){
-              var bl = that.convertBase64UrlToBlob(base64Codes);
+          }, function(base64){
+              let bl = that.convertBase64UrlToBlob(base64);
+              bl.uid=item.uid
+              bl.name=item.name
+              bl.uid=item.uid
+              bl.lastModified=item.lastModified
+              bl.lastModifiedDate=item.lastModifiedDate
+              bl.webkitRelativePath=item.webkitRelativePath
               formData.append('file', bl); // 文件对象
-              formData.append('token', token)
-              formData.append('key', keyname)
+              axios.post('http://upload.qiniup.com/', formData, config).then(res=>{
+                const url = that.qiniuAddress + '/' + res.data.key
+                const name = item.name.split('.')[0]
+                ImgObj[name] = url
+                if (Object.keys(ImgObj).length === length) {
+                  axios.post(
+                    '/i/topteam/admin/MatchTaskLibPic',
+                    { match_list: JSON.stringify(ImgObj) }
+                  ).then(res=>{
+                    if (!res.data.error_code) {
+                      that.$message({ message: '上传成功', type: 'success' })
+                    } else {
+                      that.$message({ message: res.data.error_msg, type: 'error' })
+                    }
+                    e.target.value = ''
+                  })
+                }
+                that.is_progress=false
+                that.jindu=0
+              })
           });
         }else{
           formData.append('file', item)
-          formData.append('token', token)
-          formData.append('key', keyname)
-        }
-        let res = null
-        try {
-          await axios.post(this.domain, formData, config).then(ress=>{
-            res=ress
-            this.is_progress=false
-            this.jindu=0
-          })
-        } catch (error) {
-          console.log(error)
-          // this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-          //   loadingInstance.close()
-          // })
-          e.target.value = ''
-          this.$message({message: '有图片上传失败，请重新上传全部图片', type: 'error'})
-        }
-        const url = this.qiniuAddress + '/' + res.data.key
-        const name = item.name.split('.')[0]
-        ImgObj[name] = url
-        if (Object.keys(ImgObj).length === length) {
-          const res = await axios.post(
-            '/i/topteam/admin/MatchTaskLibPic',
-            { match_list: JSON.stringify(ImgObj) }
-          )
-          if (!res.data.error_code) {
-            this.$message({ message: '上传成功', type: 'success' })
-          } else {
-            this.$message({ message: res.data.error_msg, type: 'error' })
+          try {
+            await axios.post('http://upload.qiniup.com/', formData, config).then(res=>{
+              const url = this.qiniuAddress + '/' + res.data.key
+              const name = item.name.split('.')[0]
+              ImgObj[name] = url
+              if (Object.keys(ImgObj).length === length) {
+                axios.post(
+                  '/i/topteam/admin/MatchTaskLibPic',
+                  { match_list: JSON.stringify(ImgObj) }
+                ).then(res=>{
+                  if (!res.data.error_code) {
+                    this.$message({ message: '上传成功', type: 'success' })
+                  } else {
+                    this.$message({ message: res.data.error_msg, type: 'error' })
+                  }
+                  e.target.value = ''
+                })
+              }
+              this.is_progress=false
+              this.jindu=0
+            })
+          } catch (error) {
+            console.log(error)
+            e.target.value = ''
+            this.$message({message: '有图片上传失败，请重新上传全部图片', type: 'error'})
           }
-          e.target.value = ''
-          // this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-          //   loadingInstance.close()
-          // })
         }
       }
       // Object.keys(ImgInput.files).forEach(async temp => {
@@ -777,50 +785,65 @@ export default {
           this.jindu=progressEvent.loaded / progressEvent.total * 100 | 0
         }
       }
+      // console.log(req.file)
       // 重命名要上传的文件
       const keyname = 'top-team' + Date.now() + Math.floor(Math.random() * 100) + req.file.name
       const token = await this._fetchQiNiuToken()
       const formData = new FormData()
+      formData.append('token', token)
+      formData.append('key', keyname)
       let that=this
       if(req.file.size/1024 > 1025) { //大于1M，进行压缩上传
-          this.photoCompress(req.file, {
-              quality: 0.2
-          }, function(base64Codes){
-              var bl = that.convertBase64UrlToBlob(base64Codes);
-              formData.append('file', bl); // 文件对象
-              formData.append('token', token)
-              formData.append('key', keyname)
-          });
+        this.photoCompress(req.file, {
+            quality: 0.2
+        }, function(base64){
+            let bl = that.convertBase64UrlToBlob(base64);
+            bl.uid=req.file.uid
+            bl.name=req.file.name
+            bl.uid=req.file.uid
+            bl.lastModified=req.file.lastModified
+            bl.lastModifiedDate=req.file.lastModifiedDate
+            bl.webkitRelativePath=req.file.webkitRelativePath
+            formData.append('file', bl); // 文件对象
+            axios.post('http://upload.qiniup.com/', formData, config).then(res => {
+              const url = that.qiniuAddress + '/' + res.data.key
+              if (type === 'task') {
+                that.taskInfo.question_img = url
+              }
+              if (type === 'answer') {
+                that.taskInfo.answer_url = url
+              }
+              if (type === 'nine') {
+                that.taskAFileList.push({
+                  name: res.data.key.slice(0, 23),
+                  url: url
+                })
+              }
+              that.is_progress=false
+              that.jindu=0
+            })
+        });
       }else{
         formData.append('file', req.file)
-        formData.append('token', token)
-        formData.append('key', keyname)
+        axios.post(this.domain, formData, config).then(res => {
+          const url = this.qiniuAddress + '/' + res.data.key
+          if (type === 'task') {
+            this.taskInfo.question_img = url
+          }
+          if (type === 'answer') {
+            this.taskInfo.answer_url = url
+          }
+          if (type === 'nine') {
+            this.taskAFileList.push({
+              name: res.data.key.slice(0, 23),
+              url: url
+            })
+          }
+          this.is_progress=false
+          this.jindu=0
+        })
       }
-      // const loadingInstance = Loading.service({ fullscreen: true, text: '上传' })
-      axios.post(this.domain, formData, config).then(res => {
-        const url = this.qiniuAddress + '/' + res.data.key
-        if (type === 'task') {
-          this.taskInfo.question_img = url
-        }
-        if (type === 'answer') {
-          this.taskInfo.answer_url = url
-        }
-        if (type === 'nine') {
-          this.taskAFileList.push({
-            name: res.data.key.slice(0, 23),
-            url: url
-          })
-        }
-        this.is_progress=false
-        this.jindu=0
-        // this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-        //   loadingInstance.close()
-        // })
-      }).catch(e => {
-        // this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-        //   loadingInstance.close()
-        // })
-      })
+      
     },
     // 重置任务表单
     _resetTaksForm() {
@@ -1099,6 +1122,23 @@ export default {
 .container{
   width: 160px;
   margin: 30px auto;
+}
+.progress_wrap{
+  width:100%;height:100%;
+  position: absolute;top: 0;left: 0;z-index:9999;
+}
+.progress_wrap{
+  width:100%;height:100%;
+  display:flex;justify-content: center;align-items: center;
+}
+.progress_bg{
+  width:100%;height:100%;
+  background:black;
+  opacity:0;
+  position: absolute;top: 0;left: 0;
+}
+.progress_content{
+  position: absolute;top: 15%;left:45%;z-index:9999;
 }
 </style>
 
