@@ -1308,6 +1308,7 @@ export default {
         const formData = new FormData()
         formData.append('token', token)
         formData.append('key', keyname)
+        let that=this
         if (/image\/\w+/.test(item.type) && item.size > 1024000) {
           this.photoCompress(item, {
               quality: 0.2
@@ -1327,11 +1328,11 @@ export default {
                 if (Object.keys(ImgObj).length === length) {
                   axios.post(
                     '/i/topteam/admin/MatchTaskPic',
-                    { activity_id: this.activityId, match_list: JSON.stringify(ImgObj) }
+                    { activity_id: that.activityId, match_list: JSON.stringify(ImgObj) }
                   ).then(res=>{
                     if (!res.data.error_code) {
                       that.$message({ message: '上传成功', type: 'success' })
-                      this._fetchTaskList(this.activityId)
+                      that._fetchTaskList(that.activityId)
                     } else {
                       that.$message({ message: res.data.error_msg, type: 'error' })
                     }
@@ -1418,6 +1419,8 @@ export default {
           e.target.value = ''
           this._fetchTaskList(activityId)
         }
+        this.is_progress=false
+        this.jindu=0
       })
     },
     handleFilter() {

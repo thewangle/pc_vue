@@ -664,7 +664,6 @@ export default {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: progressEvent => {
           this.jindu=progressEvent.loaded / progressEvent.total * 100 | 0
-          console.log(progressEvent.loaded / progressEvent.total * 100 | 0) + '%'
         }
       }
       // const loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
