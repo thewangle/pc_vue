@@ -31,6 +31,7 @@
               :props="defaultProps"
               :default-checked-keys="checkedMenuList"
               show-checkbox
+              check-strictly
               node-key="id"/>
           </div>
         </el-card>

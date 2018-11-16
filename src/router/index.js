@@ -169,12 +169,12 @@ export const asyncRouterMap = [
         hidden: true
       },
       {
-        id: 60,
+        id: 62,
         path: 'dictionaryInfo',
         component: () => import('@/views/system/dictionaryInfo'),
         name: 'DictionaryInfo',
         meta: { title: '采集信息字典', icon: 'edit', noCache: true },
-        hidden: false
+        hidden: true
       }
     ]
   },
