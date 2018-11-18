@@ -70,7 +70,7 @@
     </div>
 
     <el-dialog :close-on-click-modal="false" :visible.sync="dialogInfoVisible" title="活动详情查看" custom-class="detaildialog" @close="handleClose">
-      <div class="filter-container">
+      <div class="filter-container" v-if="template_id > 0">
         <el-select v-model="item.value"
           clearable style="width: 200px" class="filter-item"
           :placeholder="`请选择${item.tag_name}`"
@@ -124,7 +124,7 @@
               <span>{{ scope.row.score }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="统计" v-if="template_id > 0">
+          <el-table-column label="统计">
             <template slot-scope="scope">
               <el-button size="mini" @click="showPerResult(scope.row)">查看</el-button>
             </template>
@@ -138,13 +138,15 @@
           @current-change="handledialogCurrentChange"/>
       </div>
       <div v-else>
-        <div class="pie-item">
-          <div ref="pieChart" style="width: 400px;height:300px;"></div>
-          <div>123</div>
+        <div class="pie-item" v-for="(item, index) in tiplist" :key="index" >
+          <div :ref="`pieChart${index}`" style="width: 400px;height:300px;"></div>
+          <div>
+            <p v-for="(tip, index) in item" :key="index">{{tip.tip}}</p>
+          </div>
         </div>
       </div>
     </el-dialog>
-    <el-dialog :visible.sync="dialogPerResult" title="个人答题信息" width="70%">
+    <el-dialog :visible.sync="dialogPerResult" title="个人答题信息" width="70%" @close="handleShowClose">
       <el-tabs v-model="activeName2" type="card" @tab-click="tabClick">
         <el-tab-pane label="答题结果" name="first">
           <el-table
@@ -184,9 +186,12 @@
         </el-tab-pane>
         <el-tab-pane label="统计分析" name="second">
           <div>
-            <div class="pie-item">
-              <div ref="pieChart" style="width: 400px;height:300px;"></div>
-              <div>123</div>
+            <div class="pie-item" v-for="(item, index) in tiplist" :key="index" >
+              <div :ref="`pie${index}`" style="width: 400px;height:300px;"></div>
+              <div style="padding-top: 80px">
+                <p>{{`${playerName} ${item.name} 正确得分${item.right_score}，占题目分类的${item.right_percent}`}}</p>
+                <p>{{`${playerName} ${item.name} 失误得分${item.wrong_score}，占题目分类的${item.wrong_percent}`}}</p>
+              </div>
             </div>
           </div>
         </el-tab-pane>
@@ -281,13 +286,19 @@ export default {
       specialCharts: false,
       activeName2: 'first',
       tableResultData: [],
-      perInfoParams: {}
+      perInfoParams: {},
+      tiplist: [],
+      playerName: '', // 玩家昵称
     };
   },
   created() {
     this._fetchList();
   },
   methods: {
+    handleShowClose() {
+      this.activeName2 = 'first'
+      this.playerName = ''
+    },
     async handledialogFilter() {
       this.specialCharts = false
       const taglist = [];
@@ -318,14 +329,16 @@ export default {
       this.tagList = JSON.parse(JSON.stringify(this.tagList));
     },
     handleClose() {
-      this.tagList = [];
-      this.filterList = [];
-      (this.template_id = 0),
-        (this.dilogQuery = {
-          page_no: 1,
-          page_size: 10,
-          act_id: ""
-        });
+      this.tagList = []
+      this.filterList = []
+      this.template_id = 0
+      this.dilogQuery = {
+        page_no: 1,
+        page_size: 10,
+        act_id: ""
+      }
+      this.tiplist = []
+      this.specialCharts = false
     },
     _filterName(id) {
       let name = "";
@@ -395,54 +408,106 @@ export default {
       this.dilogQuery.tagList = taglist;
       const res = await getAnalysis(this.dilogQuery);
       const { data } = res;
-      console.log(res)
+      this.tiplist = res.data.list
       this.specialCharts = true;
       this.$nextTick(() => {
-        this.pieCharts();
+        this.pieCharts('pieChart');
       })
     },
     // 饼图~
-    pieCharts() {
-      console.log(this.$refs)
-      let pieChart = echarts.init(this.$refs.pieChart);
-      let option = {
-        title: {
-          text: "天气情况统计",
-          left: "left"
-        },
-        tooltip: {
-          trigger: "item",
-          formatter: "{a} <br/>{b} : {c} ({d}%)"
-        },
-        series: [
-          {
-            type: "pie",
-            radius: "65%",
-            center: ["50%", "50%"],
-            selectedMode: "single",
-            data: [
+    pieCharts(name) {
+      this.tiplist.forEach((item, index) => {
+        let pieChart = echarts.init(this.$refs[`${name}${index}`][0]);
+        if (name === 'pieChart') {
+          let option = {
+            title: {
+              text: item.name || '全部',
+              left: "left"
+            },
+            tooltip: {
+              trigger: "item",
+              formatter: "{b} : {c} ({d}%)"
+            },
+            series: [
               {
-                value: 1548,
-                name: "幽州"
-              },
-              { value: 535, name: "荆州" },
-              { value: 510, name: "兖州" },
-              { value: 634, name: "益州" },
-              { value: 735, name: "西凉" }
-            ],
-            itemStyle: {
-              emphasis: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: "rgba(0, 0, 0, 0.5)"
+                type: "pie",
+                radius: "65%",
+                center: ["50%", "50%"],
+                selectedMode: "single",
+                data: [
+                  {
+                    value: item.correct.num,
+                    name: item.correct.num + '分',
+                    itemStyle: {
+                      color: 'green'
+                    }
+                  },
+                  { value: item.error.num,
+                    name: item.error.num + '分',
+                    itemStyle: {
+                      color: 'red'
+                    }
+                  }
+                ],
+                itemStyle: {
+                  emphasis: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: "rgba(0, 0, 0, 0.5)"
+                  }
+                }
               }
-            }
+            ]
           }
-        ]
-      }
-      pieChart.setOption(option);
+          pieChart.setOption(option);
+        }
+        if (name === 'pie') {
+          let option = {
+            title: {
+              text: item.name || '全部',
+              left: "left"
+            },
+            tooltip: {
+              trigger: "item",
+              formatter: "{b} : {c} ({d}%)"
+            },
+            series: [
+              {
+                type: "pie",
+                radius: "65%",
+                center: ["50%", "50%"],
+                selectedMode: "single",
+                data: [
+                  {
+                    value: item.right_percent.split('%')[0],
+                    name: item.right_score + '分',
+                    itemStyle: {
+                      color: 'green'
+                    }
+                  },
+                  { value: item.wrong_percent.split('%')[0],
+                    name: item.wrong_score + '分',
+                    itemStyle: {
+                      color: 'red'
+                    }
+                  }
+                ],
+                itemStyle: {
+                  emphasis: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: "rgba(0, 0, 0, 0.5)"
+                  }
+                }
+              }
+            ]
+          }
+          pieChart.setOption(option);
+        }
+      })
     },
     async showPerResult (data) {
+      console.log(data)
       this.perInfoParams = {
         activity_id: this.dilogQuery.act_id,
         openid: data.user_id
@@ -450,12 +515,17 @@ export default {
       const res = await getPerResult(this.perInfoParams);
       this.tableResultData = res.data
       this.dialogPerResult = true
+      this.playerName = data.user_name
     },
     async tabClick (tab, event) {
       console.log(tab, event);
       if (tab.name === 'second') {
         const res = await getPerResultAnalysis(this.perInfoParams);
-        console.log(res)
+        this.tiplist = res.data
+        console.log(this.tiplist)
+        this.$nextTick(() => {
+          this.pieCharts('pie');
+        })
       }
     }
   }
