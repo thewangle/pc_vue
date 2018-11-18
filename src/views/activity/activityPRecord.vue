@@ -70,16 +70,33 @@
       <el-pagination :current-page="listQuery.page_no" :page-sizes="[10,20,30, 50]" :page-size="listQuery.page_size" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div>
 
-    <el-dialog :close-on-click-modal="false" :visible.sync="dialogInfoVisible" title="活动详情查看" custom-class="detaildialog">
+    <el-dialog :close-on-click-modal="false" :visible.sync="dialogInfoVisible" title="活动详情查看" custom-class="detaildialog" @close="handleClose">
+      <div class="filter-container">
+        <el-select v-model="item.value"
+          clearable style="width: 200px" class="filter-item"
+          :placeholder="`请选择${item.tag_name}`"
+          @change="(value) => {handleSelectChange(value, item)}"
+          v-for="item in tagList" :key="item.id" v-if="item.is_show === '1' && item.show_type === '2'"
+        >
+          <el-option v-for="option in item.editList" :key="option.id" :label="option.value" :value="option.value" ></el-option>
+        </el-select>
+        <el-button v-waves style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handledialogFilter">查询</el-button>
+        <el-button v-waves style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">统计分析</el-button>
+      </div>
       <el-table :data="gridData" border fit highlight-current-row>
         <el-table-column label="序号">
           <template slot-scope="scope">
             <span>{{ scope.$index + 1 }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="活动名称">
+        <el-table-column label="活动名称" width="140px">
           <template slot-scope="scope">
             <span>{{ scope.row.act_name }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="_filterName(item.id)" width="140px" v-for="item in filterList" :key="item.id">
+          <template slot-scope="scope">
+            <span>{{ scope.row[item.id] }}</span>
           </template>
         </el-table-column>
         <el-table-column label="玩家昵称">
@@ -107,6 +124,11 @@
             <span>{{ scope.row.score }}</span>
           </template>
         </el-table-column>
+        <el-table-column label="统计" v-if="template_id > 0">
+          <template slot-scope="scope">
+            <el-button size="mini">查看</el-button>
+          </template>
+        </el-table-column>
       </el-table>
       <el-pagination
         :current-page="dilogQuery.page_no"
@@ -119,7 +141,8 @@
 </template>
 
 <script>
-import { fetchList, getactteamloginfo } from './../../service/activity'
+import { fetchList, getactteamloginfo, getPTloginfo } from './../../service/activity'
+import { getTagList } from './../../service/role'
 import waves from '@/directive/waves' // 水波纹指令
 import { parseTime } from '@/utils'
 
@@ -179,13 +202,63 @@ export default {
         page_no: 1,
         page_size: 10,
         act_id: ''
-      }
+      },
+      filterList: [],
+      tagList: [],
+      template_id: 0
     }
   },
   created() {
     this._fetchList()
   },
   methods: {
+    async handledialogFilter() {
+      const taglist = []
+      this.tagList.forEach(item => {
+        if (item.value) {
+          const obj = { [item.id]: item.value }
+          taglist.push(obj)
+        }
+      })
+      this.dilogQuery.tagList = taglist
+      const res = await getPTloginfo(this.dilogQuery)
+      const { data } = res
+      this.gridData = data.list
+    },
+    handleSelectChange(value, item) {
+      let tagTemp = {}
+      this.tagList.forEach(tag => {
+        if (tag.tag_name === item.children_name) {
+          tagTemp = tag
+        }
+      })
+      item.editList.forEach(list => {
+        if (list.id === value) {
+          tagTemp.editList = list.child_value
+          tagTemp.arrValue = value
+        }
+      })
+      this.tagList = JSON.parse(JSON.stringify(this.tagList))
+    },
+    handleClose() {
+      this.tagList = []
+      this.filterList = []
+      this.template_id = 0,
+      this.dilogQuery = {
+        page_no: 1,
+        page_size: 10,
+        act_id: ''
+      }
+    },
+    _filterName(id) {
+      let name = ''
+      this.filterList.forEach(item => {
+        if (item.id === id) {
+          name = item.tag_name
+        }
+      })
+      return name
+    },
     handledialogCurrentChange(val) {
       this.dilogQuery.page_no = val
       this._fetchDetial()
@@ -205,14 +278,23 @@ export default {
     handleShowDetial(row) {
       this.dialogInfoVisible = true
       this.gridData = []
-      this._fetchDetial(row.id)
+      this._fetchDetial(row)
     },
-    async _fetchDetial(id) {
-      id && (this.dilogQuery.act_id = id)
-      const res = await getactteamloginfo(this.dilogQuery)
+    async _fetchDetial(row) {
+      row.id && (this.dilogQuery.act_id = row.id)
+      let res = null
+      if (row.template_id > 0) {
+        this.template_id = row.template_id
+        const list = await getTagList(row.template_id)
+        this.tagList = list.data.list
+        res = await getPTloginfo(this.dilogQuery)
+      } else {
+        res = await getactteamloginfo(this.dilogQuery)
+      }
       const { data } = res
       this.gridData = data.list
       this.dialogTotal = +data.total
+      this.filterList = data.head
     },
     async _fetchList() {
       this.listLoading = true

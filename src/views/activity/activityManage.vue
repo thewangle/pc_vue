@@ -135,7 +135,7 @@
           </el-select>
         </el-form-item>
         <br />
-        
+
         <el-form-item label="长期活动">
           <el-select v-model="longTime" :disabled="activityInfo.type !== '2'" @change="activityInfo.keepTime = ''">
             <el-option label="是" value="1"/>
@@ -313,9 +313,11 @@
                 <span>{{ scope.row.answer_type | answerTypeFilter }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="操作" align="center" min-width="130" class-name="small-padding fixed-width">
+            <el-table-column label="操作" align="center" min-width="230" class-name="small-padding fixed-width">
               <template slot-scope="scope">
-                <el-button type="primary" @click="handleUpdateTask(scope.row)">修改</el-button>
+                <el-button size="mini" @click="handleChangeTaskSort(scope.row, 'up')">上移</el-button>
+                <el-button size="mini" @click="handleChangeTaskSort(scope.row, 'down')">下移</el-button>
+                <el-button size="mini" type="primary" @click="handleUpdateTask(scope.row)">修改</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -532,7 +534,8 @@
         <el-form-item label="定位" label-width="100px">
           <span>{{ locationName || locationName1 }}</span>
           <el-button type="primary" @click="handleOpenTenceMap">选择定位</el-button>
-          <p style="color: #f573c1; margin-top: 0;">注：选择定位后，只有到达指定位置才能回答此题</p>  
+          <el-button @click="handleDeleteLocation" v-if="locationName1">删除定位</el-button>
+          <p style="color: #f573c1; margin-top: 0;">注：选择定位后，只有到达指定位置才能回答此题</p>
         </el-form-item>
 
         <el-form-item>
@@ -771,7 +774,7 @@
         <el-input placeholder="请输入地址（如需搜索城市请加上城市所在上级地址）" v-model="searchLocation" style="width: 400px; margin-bottom: 10px;"/>
         <el-button type="primary" @click="handleSearchLocation">搜索</el-button>
       </div>
-      
+
       <div id="map-container" style="width: 100%; height: 500px;"/>
       <div style="text-align: center; margin-top: 20px">
         <el-button type="primary" @click="handleSaveLocation">保存定位</el-button>
@@ -807,10 +810,12 @@ import { fetchCoachList,
   fetchTaskLibList,
   chooseTasklib,
   getTacskClassifyList,
-  cancelact } from './../../service/activity'
+  cancelact,
+  moveTask } from './../../service/activity'
 import { getTemplateList } from './../../service/role'
 import { fetchQiNiuToken } from './../../service/common'
-import { getAgentName, getAgentId, getPrice, getLevel, getCityName } from '@/utils/auth'
+import { getAgentName, getAgentId,
+  getPrice, getLevel, getCityName, getCityIp } from '@/utils/auth'
 import { qiniuAddress } from './../../config'
 import axios from 'axios'
 import waves from '@/directive/waves' // 水波纹指令
@@ -1041,6 +1046,28 @@ export default {
     this.init()
   },
   methods: {
+    // 删除定位
+    handleDeleteLocation() {
+      this.taskInfo.location_point = ''
+      this.chooseLocation = []
+      this.locationName1 = ''
+    },
+    //任务上移下移
+    async handleChangeTaskSort(item, type) {
+      console.log(item, type)
+      const typeNum = 1
+      if (type === 'up') {
+        type = 1
+      }
+      if (type === 'down') {
+        type = 2
+      }
+      try {
+        await moveTask(item.id, type)
+      } catch(e) {
+      }
+      this._fetchTaskList(this.activityId)
+    },
     handleConsole(item) {
       console.log(this.taskInfo.answer)
       return this.taskInfo.answer.indexOf(item) !== -1
@@ -1105,6 +1132,7 @@ export default {
 
       this.dialogMap = true
       let cityName = getCityName()
+      let cityIp = getCityIp()  //获得ip,以ip定位
       const vm = this
       let first = true
       this.$nextTick(() => {
@@ -1137,14 +1165,29 @@ export default {
             vm.searchLocation = ''
           }
         })
+
+        // 设置城市服务
+        const vm = this
+        const cityService = new qq.maps.CityService({
+          map: map,
+          complete: function (result) {
+            const { lat, lng } = result.detail.latLng
+            vm.chooseLocation.push(lat)
+            vm.chooseLocation.push(lng)
+            map.setZoom(18)
+            map.setCenter(result.detail.latLng);
+            marker.setPosition(result.detail.latLng)
+          }
+        })
         // 保存搜索服务实例
         this.searchService = searchService
 
         // 地址和经纬度之间进行转换服务
         const geocoder = new qq.maps.Geocoder()
         // 初始地图显示位置
-        if (cityName && !this.taskInfo.location_point) {
-          geocoder.getLocation(cityName)
+        if (cityIp && !this.taskInfo.location_point) {
+          cityService.searchCityByIP(cityIp)
+          console.log(cityIp)
         } else if(this.taskInfo.location_point) {
           first = false
           const lat = this.taskInfo.location_point.split(',')[0]
@@ -1676,7 +1719,7 @@ export default {
       this.activityInfo.scoreType = score_type
       this.activityInfo.scoreShowType = score_show_type
       this.activityInfo.keepTime = keep_time
-      if (keep_time === '0') { 
+      if (keep_time === '0') {
         this.longTime = '1'
         this.activityInfo.keepTime = ''
       }
@@ -2114,7 +2157,7 @@ export default {
       } else {
         data.tplId = 0
       }
-      
+
       // 个人版本
       if (data.type === '2') {
         data.score = 0
@@ -2229,7 +2272,7 @@ export default {
       this.listLoading = true
       try {
         let param = Object.assign({}, this.listQuery)
-        !param.person_coach && (param.person_coach = 0) 
+        !param.person_coach && (param.person_coach = 0)
         const res = await fetchActivityList(param)
         const { data } = res
         this.listLoading = false
