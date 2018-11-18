@@ -148,32 +148,32 @@
       <el-tabs v-model="activeName2" type="card" @tab-click="tabClick">
         <el-tab-pane label="答题结果" name="first">
           <el-table
-            :data="tableData"
+            :data="tableResultData"
             style="width: 100%">
             <el-table-column
               type="index"
               width="50">
             </el-table-column>
             <el-table-column
-              prop="date"
+              prop="task_name"
               label="题目标题"
               width="180">
             </el-table-column>
             <el-table-column
-              prop="name"
+              prop="task_desc"
               label="题目描述"
               width="180">
             </el-table-column>
             <el-table-column
-              prop="address"
+              prop="Classify"
               label="题目分类">
             </el-table-column>
             <el-table-column
-              prop="address"
+              prop="task_score"
               label="题目分值">
             </el-table-column>
             <el-table-column
-              prop="address"
+              prop="score"
               label="题目得分">
             </el-table-column>
           </el-table>
@@ -280,23 +280,8 @@ export default {
       dialogPerResult: false, // 特殊活动统计分析
       specialCharts: false,
       activeName2: 'first',
-      tableData: [{
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-04',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄'
-      }, {
-        date: '2016-05-01',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄'
-      }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄'
-      }]
+      tableResultData: [],
+      perInfoParams: {}
     };
   },
   created() {
@@ -457,11 +442,21 @@ export default {
       }
       pieChart.setOption(option);
     },
-    showPerResult (data) {
+    async showPerResult (data) {
+      this.perInfoParams = {
+        activity_id: this.dilogQuery.act_id,
+        openid: data.user_id
+      }
+      const res = await getPerResult(this.perInfoParams);
+      this.tableResultData = res.data
       this.dialogPerResult = true
     },
-    tabClick (tab, event) {
+    async tabClick (tab, event) {
       console.log(tab, event);
+      if (tab.name === 'second') {
+        const res = await getPerResultAnalysis(this.perInfoParams);
+        console.log(res)
+      }
     }
   }
 };
