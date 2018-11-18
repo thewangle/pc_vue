@@ -177,10 +177,10 @@
               label="题目得分">
             </el-table-column>
           </el-table>
-          <el-pagination
+          <!-- <el-pagination
             layout="prev, pager, next"
             :total="1000">
-          </el-pagination>
+          </el-pagination> -->
         </el-tab-pane>
         <el-tab-pane label="统计分析" name="second">
           <div>
