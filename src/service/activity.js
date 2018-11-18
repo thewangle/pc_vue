@@ -314,3 +314,30 @@ export function getPTloginfo(data) {
     data
   })
 }
+
+// 个人特殊活动统计分析
+export function getAnalysis(data) {
+  return request({
+    url: '/i/topteam/admin/getfenxipact',
+    method: 'post',
+    data
+  })
+}
+
+// 个人答题结果列表
+export function getPerResult(data) {
+  return request({
+    url: '/i/topteam/admin/getanswerrecord',
+    method: 'post',
+    data
+  })
+}
+
+// 个人答题统计分析
+export function getPerResultAnalysis(data) {
+  return request({
+    url: '/i/topteam/admin/getanswerstatistics',
+    method: 'post',
+    data
+  })
+}
