@@ -656,86 +656,57 @@ export default {
     },
     // 导入图片
     async handleImgChange(e) {
-      this.is_progress=true
       const ImgObj = {}
       const ImgInput = document.querySelector('#ImgInput')
       const length = ImgInput.files.length
       const config = {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        onUploadProgress: progressEvent => {
-          this.jindu=progressEvent.loaded / progressEvent.total * 100 | 0
-        }
+        headers: { 'Content-Type': 'multipart/form-data' }
       }
-      // const loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
+      const loadingInstance = Loading.service({ fullscreen: true, text: '导入中' })
+
       for(let item of ImgInput.files) {
+        if (/image\/\w+/.test(item.type) && item.size > 1024000) {
+          this.$message.error(`${item.name} - 图片文件超过1M了，请调整后在进行导入!`);
+          this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+            loadingInstance.close()
+          })
+          e.target.value = ''
+          return
+        }
         const fileType = item.type.split('/')[1]
         const keyname = 'top-team' + Date.now() + '' + (Math.random() * 100) + '.' + fileType
         const token = await this._fetchQiNiuToken()
         const formData = new FormData()
+        formData.append('file', item)
         formData.append('token', token)
         formData.append('key', keyname)
-        let that=this
-        if (/image\/\w+/.test(item.type) && item.size > 1024000) {
-          this.photoCompress(item, {
-              quality: 0.2
-          }, function(base64){
-              let bl = that.convertBase64UrlToBlob(base64);
-              bl.uid=item.uid
-              bl.name=item.name
-              bl.uid=item.uid
-              bl.lastModified=item.lastModified
-              bl.lastModifiedDate=item.lastModifiedDate
-              bl.webkitRelativePath=item.webkitRelativePath
-              formData.append('file', bl); // 文件对象
-              axios.post('http://upload.qiniup.com/', formData, config).then(res=>{
-                const url = that.qiniuAddress + '/' + res.data.key
-                const name = item.name.split('.')[0]
-                ImgObj[name] = url
-                if (Object.keys(ImgObj).length === length) {
-                  axios.post(
-                    '/i/topteam/admin/MatchTaskLibPic',
-                    { match_list: JSON.stringify(ImgObj) }
-                  ).then(res=>{
-                    if (!res.data.error_code) {
-                      that.$message({ message: '上传成功', type: 'success' })
-                    } else {
-                      that.$message({ message: res.data.error_msg, type: 'error' })
-                    }
-                    e.target.value = ''
-                  })
-                }
-                that.is_progress=false
-                that.jindu=0
-              })
-          });
-        }else{
-          formData.append('file', item)
-          try {
-            await axios.post('http://upload.qiniup.com/', formData, config).then(res=>{
-              const url = this.qiniuAddress + '/' + res.data.key
-              const name = item.name.split('.')[0]
-              ImgObj[name] = url
-              if (Object.keys(ImgObj).length === length) {
-                axios.post(
-                  '/i/topteam/admin/MatchTaskLibPic',
-                  { match_list: JSON.stringify(ImgObj) }
-                ).then(res=>{
-                  if (!res.data.error_code) {
-                    this.$message({ message: '上传成功', type: 'success' })
-                  } else {
-                    this.$message({ message: res.data.error_msg, type: 'error' })
-                  }
-                  e.target.value = ''
-                })
-              }
-              this.is_progress=false
-              this.jindu=0
-            })
-          } catch (error) {
-            console.log(error)
-            e.target.value = ''
-            this.$message({message: '有图片上传失败，请重新上传全部图片', type: 'error'})
+        let res = null
+        try {
+          res = await axios.post(this.domain, formData, config)
+        } catch (error) {
+          this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+            loadingInstance.close()
+          })
+          e.target.value = ''
+          this.$message({message: '有图片上传失败，请重新上传全部图片', type: 'error'})
+        }
+        const url = this.qiniuAddress + '/' + res.data.key
+        const name = item.name.split('.')[0]
+        ImgObj[name] = url
+        if (Object.keys(ImgObj).length === length) {
+          const res = await axios.post(
+            '/i/topteam/admin/MatchTaskLibPic',
+            { match_list: JSON.stringify(ImgObj) }
+          )
+          if (!res.data.error_code) {
+            this.$message({ message: '上传成功', type: 'success' })
+          } else {
+            this.$message({ message: res.data.error_msg, type: 'error' })
           }
+          e.target.value = ''
+          this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+            loadingInstance.close()
+          })
         }
       }
       // Object.keys(ImgInput.files).forEach(async temp => {
