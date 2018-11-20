@@ -304,7 +304,7 @@ export default {
       const taglist = [];
       this.tagList.forEach(item => {
         if (item.value) {
-          const obj = { [item.id]: item.value };
+          const obj = { id: item.id, value: item.value };
           taglist.push(obj);
         }
       });
@@ -401,7 +401,7 @@ export default {
       const taglist = [];
       this.tagList.forEach(item => {
         if (item.value) {
-          const obj = { [item.id]: item.value };
+          const obj = { id: item.id, value: item.value }
           taglist.push(obj);
         }
       });
