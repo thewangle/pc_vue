@@ -308,7 +308,7 @@ export default {
           taglist.push(obj);
         }
       });
-      this.dilogQuery.tagList = taglist;
+      this.dilogQuery.tag_list = taglist;
       const res = await getPTloginfo(this.dilogQuery);
       const { data } = res;
       this.gridData = data.list;
@@ -405,7 +405,7 @@ export default {
           taglist.push(obj);
         }
       });
-      this.dilogQuery.tagList = taglist;
+      this.dilogQuery.tag_list = taglist;
       const res = await getAnalysis(this.dilogQuery);
       const { data } = res;
       this.tiplist = res.data.list
