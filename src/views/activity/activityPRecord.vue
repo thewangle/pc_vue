@@ -320,12 +320,14 @@ export default {
           tagTemp = tag;
         }
       });
+      tagTemp.value = ''
       item.editList.forEach(list => {
-        if (list.id === value) {
+        if (list.value === value) {
           tagTemp.editList = list.child_value;
           tagTemp.arrValue = value;
         }
       });
+      console.log(this.tagList)
       this.tagList = JSON.parse(JSON.stringify(this.tagList));
     },
     handleClose() {
