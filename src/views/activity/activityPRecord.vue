@@ -312,6 +312,7 @@ export default {
       const res = await getPTloginfo(this.dilogQuery);
       const { data } = res;
       this.gridData = data.list;
+      this.dialogTotal = +data.total;
     },
     handleSelectChange(value, item) {
       let tagTemp = {};
