@@ -203,6 +203,9 @@ export default {
           flag = true
         }
       })
+      if (!flag) {
+        this.$message({ message: '请至少展示一个信息', type: 'error' })
+      }
       if (this.dialogType === 'add' && flag) {
         await addTplTag({ tag_list: this.tagList, template_name: this.name, scence_name: this.scence_name })
       }
