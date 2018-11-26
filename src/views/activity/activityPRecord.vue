@@ -12,7 +12,6 @@
       </el-select>
       <el-button v-waves style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
     </div>
-
     <el-table
       v-loading="listLoading"
       :data="list"
@@ -70,90 +69,190 @@
       <el-pagination :current-page="listQuery.page_no" :page-sizes="[10,20,30, 50]" :page-size="listQuery.page_size" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div>
 
-    <el-dialog :close-on-click-modal="false" :visible.sync="dialogInfoVisible" title="活动详情查看" custom-class="detaildialog">
-      <el-table :data="gridData" border fit highlight-current-row>
-        <el-table-column label="序号">
-          <template slot-scope="scope">
-            <span>{{ scope.$index + 1 }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="活动名称">
-          <template slot-scope="scope">
-            <span>{{ scope.row.act_name }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="玩家昵称">
-          <template slot-scope="scope">
-            <span>{{ scope.row.user_name }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="任务用时" width="170px">
-          <template slot-scope="scope">
-            <span>{{ scope.row.use_time | filterTime }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="完成任务数" width="170px">
-          <template slot-scope="scope">
-            <span>{{ scope.row.task_num }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="完成任务百分比" width="130px">
-          <template slot-scope="scope">
-            <span>{{ scope.row.task_rate }}%</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="得分">
-          <template slot-scope="scope">
-            <span>{{ scope.row.score }}</span>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-pagination
-        :current-page="dilogQuery.page_no"
-        :total="dialogTotal"
-        background
-        layout="total, prev, pager, next, jumper"
-        @current-change="handledialogCurrentChange"/>
+    <el-dialog :close-on-click-modal="false" :visible.sync="dialogInfoVisible" title="活动详情查看" custom-class="detaildialog" @close="handleClose">
+      <div class="filter-container" v-if="template_id > 0">
+        <el-select v-model="item.value"
+          clearable style="width: 200px" class="filter-item"
+          :placeholder="`请选择${item.tag_name}`"
+          @change="(value) => {handleSelectChange(value, item)}"
+          v-for="item in tagList" :key="item.id" v-if="item.is_show === '1' && item.show_type === '2'"
+        >
+          <el-option v-for="option in item.editList" :key="option.id" :label="option.value" :value="option.value" ></el-option>
+        </el-select>
+        <el-button v-waves style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handledialogFilter">查询</el-button>
+        <el-button v-waves style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="analysis">统计分析</el-button>
+      </div>
+      <div v-if="!specialCharts">
+        <el-table :data="gridData" border fit highlight-current-row>
+          <el-table-column label="序号">
+            <template slot-scope="scope">
+              <span>{{ scope.$index + 1 }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="活动名称" width="140px">
+            <template slot-scope="scope">
+              <span>{{ scope.row.act_name }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column :label="_filterName(item.id)" width="140px" v-for="item in filterList" :key="item.id">
+            <template slot-scope="scope">
+              <span>{{ scope.row[item.id] }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="玩家昵称">
+            <template slot-scope="scope">
+              <span>{{ scope.row.user_name }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="任务用时" width="170px">
+            <template slot-scope="scope">
+              <span>{{ scope.row.use_time | filterTime }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="完成任务数" width="170px">
+            <template slot-scope="scope">
+              <span>{{ scope.row.task_num }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="完成任务百分比" width="130px">
+            <template slot-scope="scope">
+              <span>{{ scope.row.task_rate }}%</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="得分">
+            <template slot-scope="scope">
+              <span>{{ scope.row.score }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="统计">
+            <template slot-scope="scope">
+              <el-button size="mini" @click="showPerResult(scope.row)">查看</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination
+          :current-page="dilogQuery.page_no"
+          :total="dialogTotal"
+          background
+          layout="total, prev, pager, next, jumper"
+          @current-change="handledialogCurrentChange"/>
+      </div>
+      <div v-else>
+        <div class="pie-item" v-for="(item, index) in tiplist" :key="index" >
+          <div :ref="`pieChart${index}`" style="width: 400px;height:300px;"></div>
+          <div>
+            <p v-for="(tip, index) in item" :key="index">{{tip.tip}}</p>
+          </div>
+        </div>
+      </div>
+    </el-dialog>
+    <el-dialog :visible.sync="dialogPerResult" title="个人答题信息" width="70%" @close="handleShowClose">
+      <el-tabs v-model="activeName2" type="card" @tab-click="tabClick">
+        <el-tab-pane label="答题结果" name="first">
+          <el-table
+            :data="tableResultData"
+            style="width: 100%">
+            <el-table-column
+              type="index"
+              width="50">
+            </el-table-column>
+            <el-table-column
+              prop="task_name"
+              label="题目标题"
+              width="180">
+            </el-table-column>
+            <el-table-column
+              prop="task_desc"
+              label="题目描述"
+              width="180">
+            </el-table-column>
+            <el-table-column
+              prop="Classify"
+              label="题目分类">
+            </el-table-column>
+            <el-table-column
+              prop="task_score"
+              label="题目分值">
+            </el-table-column>
+            <el-table-column
+              prop="score"
+              label="题目得分">
+            </el-table-column>
+          </el-table>
+          <!-- <el-pagination
+            layout="prev, pager, next"
+            :total="1000">
+          </el-pagination> -->
+        </el-tab-pane>
+        <el-tab-pane label="统计分析" name="second">
+          <div>
+            <div class="pie-item" v-for="(item, index) in tiplist" :key="index" >
+              <div :ref="`pie${index}`" style="width: 400px;height:300px;"></div>
+              <div style="padding-top: 80px">
+                <p>{{`${playerName} ${item.name} 正确得分${item.right_score}，占题目分类的${item.right_percent}`}}</p>
+                <p>{{`${playerName} ${item.name} 失误得分${item.wrong_score}，占题目分类的${item.wrong_percent}`}}</p>
+              </div>
+            </div>
+          </div>
+        </el-tab-pane>
+      </el-tabs>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchList, getactteamloginfo } from './../../service/activity'
-import waves from '@/directive/waves' // 水波纹指令
-import { parseTime } from '@/utils'
-
+import {
+  fetchList,
+  getactteamloginfo,
+  getPTloginfo,
+  getAnalysis,
+  getPerResult,
+  getPerResultAnalysis
+} from "./../../service/activity";
+import { getTagList } from "./../../service/role";
+import waves from "@/directive/waves"; // 水波纹指令
+import { parseTime } from "@/utils";
+import echarts from 'echarts';
 export default {
-  name: 'AtivityPRecord',
+  name: "AtivityPRecord",
   directives: {
     waves
   },
   filters: {
     activityFilter(status) {
       const activityMap = {
-        1: '团队-基础版',
-        2: '个人-基础版'
-      }
-      return activityMap[status]
+        1: "团队-基础版",
+        2: "个人-基础版"
+      };
+      return activityMap[status];
     },
     timeFilter(timestamp) {
-      var date = new Date(timestamp * 1000)// 如果date为10位不需要乘1000
-      var Y = date.getFullYear() + '-'
-      var M = (+date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
-      var D = (+date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' '
-      var h = (+date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
-      var m = (+date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
-      var s = (+date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
-      return Y + M + D + h + m + s
+      var date = new Date(timestamp * 1000); // 如果date为10位不需要乘1000
+      var Y = date.getFullYear() + "-";
+      var M =
+        (+date.getMonth() + 1 < 10
+          ? "0" + (date.getMonth() + 1)
+          : date.getMonth() + 1) + "-";
+      var D =
+        (+date.getDate() < 10 ? "0" + date.getDate() : date.getDate()) + " ";
+      var h =
+        (+date.getHours() < 10 ? "0" + date.getHours() : date.getHours()) + ":";
+      var m =
+        (+date.getMinutes() < 10
+          ? "0" + date.getMinutes()
+          : date.getMinutes()) + ":";
+      var s =
+        +date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
+      return Y + M + D + h + m + s;
     },
     filterTime(time) {
-      let h = parseInt(time / 3600)
-      if (h < 10) h = '0' + h
-      let m = parseInt((time / 60) % 60)
-      if (m < 10) m = '0' + m
-      let s = parseInt(time % 60)
-      if (s < 10) s = '0' + s
-      return h + ':' + m + ':' + s
+      let h = parseInt(time / 3600);
+      if (h < 10) h = "0" + h;
+      let m = parseInt((time / 60) % 60);
+      if (m < 10) m = "0" + m;
+      let s = parseInt(time % 60);
+      if (s < 10) s = "0" + s;
+      return h + ":" + m + ":" + s;
     }
   },
   data() {
@@ -171,66 +270,279 @@ export default {
         act_log: 1,
         person_coach: null
       },
-      activities: [{ label: '个人-基础版', key: 2 }],
+      activities: [{ label: "个人-基础版", key: 2 }],
       dialogInfoVisible: false,
       gridData: [],
       dialogTotal: 0,
       dilogQuery: {
         page_no: 1,
         page_size: 10,
-        act_id: ''
-      }
-    }
+        act_id: ""
+      },
+      filterList: [],
+      tagList: [],
+      template_id: 0,
+      dialogPerResult: false, // 特殊活动统计分析
+      specialCharts: false,
+      activeName2: 'first',
+      tableResultData: [],
+      perInfoParams: {},
+      tiplist: [],
+      playerName: '', // 玩家昵称
+    };
   },
   created() {
-    this._fetchList()
+    this._fetchList();
   },
   methods: {
+    handleShowClose() {
+      this.activeName2 = 'first'
+      this.playerName = ''
+    },
+    async handledialogFilter() {
+      this.specialCharts = false
+      const taglist = [];
+      this.tagList.forEach(item => {
+        if (item.value) {
+          const obj = { id: item.id, value: item.value };
+          taglist.push(obj);
+        }
+      });
+      this.dilogQuery.tag_list = taglist;
+      const res = await getPTloginfo(this.dilogQuery);
+      const { data } = res;
+      this.gridData = data.list;
+      this.dialogTotal = +data.total;
+    },
+    handleSelectChange(value, item) {
+      let tagTemp = {};
+      this.tagList.forEach(tag => {
+        if (tag.tag_name === item.children_name) {
+          tagTemp = tag;
+        }
+      });
+      tagTemp.value = ''
+      item.editList.forEach(list => {
+        if (list.value === value) {
+          tagTemp.editList = list.child_value;
+          tagTemp.arrValue = value;
+        }
+      });
+      console.log(this.tagList)
+      this.tagList = JSON.parse(JSON.stringify(this.tagList));
+    },
+    handleClose() {
+      this.tagList = []
+      this.filterList = []
+      this.template_id = 0
+      this.dilogQuery = {
+        page_no: 1,
+        page_size: 10,
+        act_id: ""
+      }
+      this.tiplist = []
+      this.specialCharts = false
+    },
+    _filterName(id) {
+      let name = "";
+      this.filterList.forEach(item => {
+        if (item.id === id) {
+          name = item.tag_name;
+        }
+      });
+      return name;
+    },
     handledialogCurrentChange(val) {
-      this.dilogQuery.page_no = val
-      this._fetchDetial()
+      this.dilogQuery.page_no = val;
+      this._fetchDetial();
     },
     handleSizeChange(size) {
-      this.listQuery.page_size = size
-      this._fetchList()
+      this.listQuery.page_size = size;
+      this._fetchList();
     },
     handleCurrentChange(val) {
-      this.listQuery.page_no = val
-      this._fetchList()
+      this.listQuery.page_no = val;
+      this._fetchList();
     },
     handleFilter() {
-      this.listQuery.page_no = 1
-      this._fetchList()
+      this.listQuery.page_no = 1;
+      this._fetchList();
     },
     handleShowDetial(row) {
-      this.dialogInfoVisible = true
-      this.gridData = []
-      this._fetchDetial(row.id)
+      this.dialogInfoVisible = true;
+      this.gridData = [];
+      this._fetchDetial(row);
     },
-    async _fetchDetial(id) {
-      id && (this.dilogQuery.act_id = id)
-      const res = await getactteamloginfo(this.dilogQuery)
-      const { data } = res
-      this.gridData = data.list
-      this.dialogTotal = +data.total
+    async _fetchDetial(row) {
+      row.id && (this.dilogQuery.act_id = row.id);
+      let res = null;
+      if (row.template_id > 0) {
+        this.template_id = row.template_id;
+        const list = await getTagList(row.template_id);
+        this.tagList = list.data.list;
+        res = await getPTloginfo(this.dilogQuery);
+      } else {
+        res = await getactteamloginfo(this.dilogQuery);
+      }
+      const { data } = res;
+      this.gridData = data.list;
+      this.dialogTotal = +data.total;
+      this.filterList = data.head;
     },
     async _fetchList() {
-      this.listLoading = true
+      this.listLoading = true;
       try {
-        const res = await fetchList(this.listQuery)
-        const { data } = res
-        this.list = data.list
-        this.total = data.total
+        const res = await fetchList(this.listQuery);
+        const { data } = res;
+        this.list = data.list;
+        this.total = data.total;
       } catch (e) {}
-      this.listLoading = false
+      this.listLoading = false;
+    },
+    async analysis() {
+      // 统计分析
+      const taglist = [];
+      this.tagList.forEach(item => {
+        if (item.value) {
+          const obj = { id: item.id, value: item.value }
+          taglist.push(obj);
+        }
+      });
+      this.dilogQuery.tag_list = taglist;
+      const res = await getAnalysis(this.dilogQuery);
+      const { data } = res;
+      this.tiplist = res.data.list
+      this.specialCharts = true;
+      this.$nextTick(() => {
+        this.pieCharts('pieChart');
+      })
+    },
+    // 饼图~
+    pieCharts(name) {
+      this.tiplist.forEach((item, index) => {
+        let pieChart = echarts.init(this.$refs[`${name}${index}`][0]);
+        if (name === 'pieChart') {
+          let option = {
+            title: {
+              text: item.name || '全部',
+              left: "left"
+            },
+            tooltip: {
+              trigger: "item",
+              formatter: "{b} : {c} ({d}%)"
+            },
+            series: [
+              {
+                type: "pie",
+                radius: "65%",
+                center: ["50%", "50%"],
+                selectedMode: "single",
+                data: [
+                  {
+                    value: item.correct.num,
+                    name: item.correct.num + '分',
+                    itemStyle: {
+                      color: 'green'
+                    }
+                  },
+                  { value: item.error.num,
+                    name: item.error.num + '分',
+                    itemStyle: {
+                      color: 'red'
+                    }
+                  }
+                ],
+                itemStyle: {
+                  emphasis: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: "rgba(0, 0, 0, 0.5)"
+                  }
+                }
+              }
+            ]
+          }
+          pieChart.setOption(option);
+        }
+        if (name === 'pie') {
+          let option = {
+            title: {
+              text: item.name || '全部',
+              left: "left"
+            },
+            tooltip: {
+              trigger: "item",
+              formatter: "{b} : {c} ({d}%)"
+            },
+            series: [
+              {
+                type: "pie",
+                radius: "65%",
+                center: ["50%", "50%"],
+                selectedMode: "single",
+                data: [
+                  {
+                    value: item.right_percent.split('%')[0],
+                    name: item.right_score + '分',
+                    itemStyle: {
+                      color: 'green'
+                    }
+                  },
+                  { value: item.wrong_percent.split('%')[0],
+                    name: item.wrong_score + '分',
+                    itemStyle: {
+                      color: 'red'
+                    }
+                  }
+                ],
+                itemStyle: {
+                  emphasis: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: "rgba(0, 0, 0, 0.5)"
+                  }
+                }
+              }
+            ]
+          }
+          pieChart.setOption(option);
+        }
+      })
+    },
+    async showPerResult (data) {
+      console.log(data)
+      this.perInfoParams = {
+        activity_id: this.dilogQuery.act_id,
+        openid: data.user_id
+      }
+      const res = await getPerResult(this.perInfoParams);
+      this.tableResultData = res.data
+      this.dialogPerResult = true
+      this.playerName = data.user_name
+    },
+    async tabClick (tab, event) {
+      console.log(tab, event);
+      if (tab.name === 'second') {
+        const res = await getPerResultAnalysis(this.perInfoParams);
+        this.tiplist = res.data
+        console.log(this.tiplist)
+        this.$nextTick(() => {
+          this.pieCharts('pie');
+        })
+      }
     }
   }
-}
+};
 </script>
 
 <style lang="scss">
-.detaildialog.el-dialog, .detaildialog .el-dialog__body{
+.detaildialog.el-dialog,
+.detaildialog .el-dialog__body {
   width: 900px;
+}
+.pie-item {
+  display: flex;
+  flex-direction: row;
 }
 </style>
 

@@ -53,3 +53,12 @@ export function getJoinList(data) {
     data
   })
 }
+
+// 个人特殊版财务统计详情
+export function getSpecialJoinList(data) {
+  return request({
+    url: '/i/topteam/admin/getptjoinlist',
+    method: 'post',
+    data
+  })
+}
