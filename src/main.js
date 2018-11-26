@@ -19,9 +19,15 @@ import './permission' // permission control
 
 import * as filters from './filters' // global filters
 
+import  VueQuillEditor from 'vue-quill-editor'  //vue-quill-editor富文本
+import 'quill/dist/quill.core.css'  //quill依赖
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+
 Vue.use(Element, {
   size: 'medium'
 })
+Vue.use(VueQuillEditor)
 
 // register global utility filters.
 Object.keys(filters).forEach(key => {

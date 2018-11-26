@@ -108,7 +108,12 @@
           </el-select>
         </el-form-item>
         <el-form-item label="题目描述" label-width="100px">
-          <el-input v-model="taskInfo.desc" type="textarea" />
+          <!-- <el-input v-model="taskInfo.desc" type="textarea" /> -->
+          <quill-editor 
+            v-model="taskInfo.desc"
+            ref="myQuillEditor" 
+            :options="editorOption">
+          </quill-editor>
         </el-form-item>
         <el-form-item label="题目分值" label-width="100px">
           <el-input v-model="taskInfo.score" type="number" />
@@ -305,6 +310,7 @@ import { qiniuAddress } from './../../config'
 import axios from 'axios'
 import { Loading } from 'element-ui'
 import { getCityName } from '@/utils/auth'
+import { quillEditor } from 'vue-quill-editor'
 export default {
   name: 'SubkectLib',
   filters: {
@@ -329,8 +335,18 @@ export default {
       return typeMap[type]
     }
   },
+  components: {
+      quillEditor
+  },
   data() {
     return {
+      editorOption:{
+        modules:{
+            toolbar:[
+              ['bold','italic',{ 'color': [] },'clean']
+            ]
+        }
+      },
       jindu:0,
       is_progress:false,
       files_size:'',
@@ -384,10 +400,6 @@ export default {
   created() {
     this._fetchList()   
   },
-  // mounted(){
-  //   document.getElementById('progress').style.width=window.screen.width+"px"
-  //   document.getElementById('progress').style.height=(window.screen.height+200)+"px"
-  // },
   computed: {
     optionsLength() {
       return Object.keys(this.taskInfo.options).length
