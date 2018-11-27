@@ -48,7 +48,7 @@
       style="width: 100%;">
       <el-table-column label="序号" align="center" width="65">
         <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
+          <span>{{scope.$index+(listQuery.page_no - 1) * listQuery.page_size + 1}}</span>
         </template>
       </el-table-column>
       <el-table-column label="题目标题" width="150px" align="center">
