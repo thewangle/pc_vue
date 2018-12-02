@@ -45,6 +45,14 @@ const tableRouter = {
       name: 'SubkectLib',
       meta: { title: '题库管理', icon: 'documentation' },
       hidden: true
+    },
+    {
+      id: 9,
+      path: 'game-manage',
+      component: () => import('@/views/activity/gameManage'),
+      name: 'gameManage',
+      meta: { title: '游戏管理', icon: 'documentation' },
+      hidden: false
     }
   ]
 }
