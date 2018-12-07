@@ -292,3 +292,52 @@ export function cancelact(id) {
     method: 'get'
   })
 }
+
+/**
+ * 移动任务
+ * @param {*} id
+ * @param {*} type
+ */
+export function moveTask(id, type) {
+  return request({
+    url: `/i/topteam/admin/MoveTask?id=${id}&move_type=${type}`
+  })
+}
+
+/**
+ * 获取个人特殊版活动记录详情
+ */
+export function getPTloginfo(data) {
+  return request({
+    url: '/i/topteam/admin/getactptloginfo',
+    method: 'post',
+    data
+  })
+}
+
+// 个人特殊活动统计分析
+export function getAnalysis(data) {
+  return request({
+    url: '/i/topteam/admin/getfenxipact',
+    method: 'post',
+    data
+  })
+}
+
+// 个人答题结果列表
+export function getPerResult(data) {
+  return request({
+    url: '/i/topteam/admin/getanswerrecord',
+    method: 'post',
+    data
+  })
+}
+
+// 个人答题统计分析
+export function getPerResultAnalysis(data) {
+  return request({
+    url: '/i/topteam/admin/getanswerstatistics',
+    method: 'post',
+    data
+  })
+}

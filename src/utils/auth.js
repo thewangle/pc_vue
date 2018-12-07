@@ -113,9 +113,23 @@ export function setCityName(cityName) {
 export function removeCityName(cityName) {
   return Cookies.remove(CityName)
 }
+
+const CityIp = 'city_ip'
+export function getCityIp() {
+  return Cookies.get(CityIp)
+}
+export function setCityIp(cityIp) {
+  return Cookies.set(CityIp, cityIp)
+}
+export function removeCityIp() {
+  return Cookies.remove(CityIp)
+}
 // 保存用户信息
 export function setUserInfo(user) {
-  const { role_id, agent_id, user_name, agent_name, province_id, level, price, city_name } = user
+  const { role_id, agent_id, user_name,
+    agent_name, province_id, level, price, city_name,
+    city_ip
+  } = user
   setRoleId(role_id)
   setAgentId(agent_id)
   setUserName(user_name)
@@ -124,6 +138,7 @@ export function setUserInfo(user) {
   setLevel(level)
   setPrice(price / 100)
   setCityName(city_name)
+  setCityIp(city_ip)
 }
 
 // 清楚用户信息
@@ -136,4 +151,5 @@ export function removeUserInfo() {
   removeLevel()
   removePrice()
   removeCityName()
+  removeCityIp()
 }

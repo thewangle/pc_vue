@@ -60,9 +60,14 @@
 
     <el-dialog :visible.sync="dialogInfoVisible" :close-on-click-modal="false" title="财务统计查看" custom-class="count-dialog">
       <el-table :data="gridData" border fit highlight-current-row>
-        <el-table-column label="活动名称">
+        <el-table-column label="活动名称" width="200px">
           <template slot-scope="scope">
             <span>{{ scope.row.act_name }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="_filterName(item.id)" v-for="item in filterList" :key="item.id" width="150px">
+          <template slot-scope="scope">
+            <span>{{ scope.row[item.id] }}</span>
           </template>
         </el-table-column>
         <el-table-column label="玩家昵称">
@@ -80,7 +85,7 @@
             <span>{{ scope.row.pay_type | payTypeFilter }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="支付金额(元)">
+        <el-table-column label="支付金额(元)" width="130px">
           <template slot-scope="scope">
             <span>{{ scope.row.money / 100 }}</span>
           </template>
@@ -100,7 +105,7 @@
 </template>
 
 <script>
-import { getPcounteList, getJoinList } from './../../service/count'
+import { getPcounteList, getJoinList, getSpecialJoinList } from './../../service/count'
 import waves from '@/directive/waves' // 水波纹指令
 
 export default {
@@ -153,7 +158,8 @@ export default {
       },
       status: [{ label: '代理商', key: 1 }, { label: '运营商', key: 2 }],
       dialogInfoVisible: false,
-      gridData: []
+      gridData: [],
+      filterList: []
     }
   },
   created() {
@@ -165,6 +171,15 @@ export default {
     this._fetchCountList()
   },
   methods: {
+    _filterName(id) {
+      let name = ''
+      this.filterList.forEach(item => {
+        if (item.id === id) {
+          name = item.tag_name
+        }
+      })
+      return name
+    },
     handleFilter() {
       this.listQuery.page_no = 1
       this._fetchCountList()
@@ -187,18 +202,26 @@ export default {
       if (type === 'info') {
         this.dialogInfoVisible = true
       }
-      this._fetactlist()
+      this._fetactlist(row.template_id)
     },
-    async _fetactlist() {
+    async _fetactlist(tpId) {
       const stime = this.listQuery.dateValue[0] || (new Date()).getTime() - 30 * 24 * 60 * 60 * 1000
       const etime = this.listQuery.dateValue[1] || (new Date()).getTime()
       const param = Object.assign({}, this.dilogQuery)
       param.start_time = Math.floor(stime / 1000)
       param.end_time = Math.floor(etime / 1000)
       try {
-        const res = await getJoinList(param)
-        this.gridData = res.data.data
-        this.dialogTotal = +res.data.total
+        if (+tpId > 0) {
+          const res = await getSpecialJoinList(param)
+          console.log(res)
+          this.gridData = res.data.list
+          this.dialogTotal = +res.data.total
+          this.filterList = res.data.head
+        } else {
+          const res = await getJoinList(param)
+          this.gridData = res.data.data
+          this.dialogTotal = +res.data.total
+        }
       } catch (e) {}
     },
     async _fetchCountList() {

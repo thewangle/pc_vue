@@ -197,10 +197,20 @@ export default {
         this.$message({ message: '请输入应用场景', type: 'error' })
         return
       }
-      if (this.dialogType === 'add') {
+      let flag = false
+      this.tagList.forEach((item) => {
+        if (Number(item.is_show)) {
+          flag = true
+        }
+      })
+      if (!flag) {
+        this.$message({ message: '请至少展示一个信息', type: 'error' })
+        return
+      }
+      if (this.dialogType === 'add' && flag) {
         await addTplTag({ tag_list: this.tagList, template_name: this.name, scence_name: this.scence_name })
       }
-      if (this.dialogType === 'edit') {
+      if (this.dialogType === 'edit' && flag) {
         await updateTpl({ tag_list: this.tagList, template_name: this.name, scence_name: this.scence_name, template_id: this.id })
       }
       this.dialogFormVisible = false
@@ -263,7 +273,7 @@ export default {
           })
         }
       })
-      
+
       const newTag = []
       this.tagList.forEach(item => {
         if (item.id === this.selectItem.id) {
