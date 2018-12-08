@@ -168,17 +168,16 @@
         </el-form-item>
         <el-form-item label="起止时间">
           <el-date-picker
-            v-if="activityInfo.type !== '2'"
+            v-if="activityInfo.type !== '2' || longTime === '2'"
             v-model="activityInfo.time"
             type="datetimerange"
             range-separator="-"
             start-placeholder="开始时间"
             end-placeholder="结束时间"
             value-format="timestamp"/>
-          <el-date-picker
-            v-if="activityInfo.type === '2'"
+          <el-time-picker
+            v-if="activityInfo.type === '2' && longTime === '1'  "
             v-model="activityInfo.time"
-            type="datetimerange"
             is-range
             range-separator="-"
             start-placeholder="开始时间"
@@ -1008,6 +1007,8 @@ export default {
     },
     checkdisabled() {
       if (this.longTime === '1') {
+        return true
+      } else if (this.longTime === '2') {
         return true
       } else {
         return false
