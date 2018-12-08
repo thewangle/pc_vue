@@ -175,9 +175,10 @@
             start-placeholder="开始时间"
             end-placeholder="结束时间"
             value-format="timestamp"/>
-          <el-time-picker
+          <el-date-picker
             v-if="activityInfo.type === '2'"
             v-model="activityInfo.time"
+            type="datetimerange"
             is-range
             range-separator="-"
             start-placeholder="开始时间"
