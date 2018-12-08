@@ -124,7 +124,7 @@
         </el-form-item>
         <br />
         <el-form-item label="需要教练">
-          <el-select v-model="needCoach" :disabled="activityInfo.type !== '2'" @change="activityInfo.coachId = null">
+          <el-select v-model="needCoach" :disabled="activityInfo.type !== '2'" @change="coachNeed">
             <el-option label="是" value="1"/>
             <el-option label="否" value="2"/>
           </el-select>
@@ -137,7 +137,7 @@
         <br />
 
         <el-form-item label="长期活动">
-          <el-select v-model="longTime" :disabled="activityInfo.type !== '2'" @change="activityInfo.keepTime = ''">
+          <el-select v-model="longTime" :disabled="activityInfo.type !== '2' || needCoach == 1 || needCoach == 2" @change="activityInfo.keepTime = ''">
             <el-option label="是" value="1"/>
             <el-option label="否" value="2"/>
           </el-select>
@@ -1048,6 +1048,10 @@ export default {
     this.init()
   },
   methods: {
+    coachNeed() {
+      this.activityInfo.coachId = null
+      this.needCoach === '1' ? this.longTime = '2' : this.longTime = '1'
+    },
     // 删除定位
     handleDeleteLocation() {
       this.taskInfo.location_point = ''
