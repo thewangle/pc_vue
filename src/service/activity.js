@@ -377,3 +377,13 @@ export function gameList(data) {
     data
   })
 }
+
+// 删除游戏
+export function delGame(data) {
+  return request({
+    url: '/i/topteam/admin/delgame',
+    method: 'post',
+    data
+  })
+}
+

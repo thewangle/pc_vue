@@ -52,19 +52,14 @@
           <template slot-scope="scope">
             <el-button @click="updateGame(scope.row)" type="text" size="small">修改</el-button>
             <el-button v-if="Number(scope.row.status) === 1" @click="pullOff(scope.row, 0)" type="text" size="small">下架</el-button>
-            <el-button v-else @click="onSale(scope.row, 1)" type="text" size="small">上架</el-button>
+            <el-button v-else @click="pullOn(scope.row, 1)" type="text" size="small">上架</el-button>
 
             <!-- 下架 -->
-            <el-button type="text" size="small">删除</el-button>
+            <el-button type="text" size="small" @click="delGame(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
-    <el-pagination
-      background
-      layout="prev, pager, next"
-      :total="1000">
-    </el-pagination>
     <!-- 新增游戏 -->
     <el-dialog :title="updateStatus ? '修改游戏' : '新增游戏' " :visible.sync="dialogAddGame">
       <el-form :model="form">
@@ -94,8 +89,18 @@
         </el-form-item>
         <el-form-item label="游戏文件：" :label-width="formLabelWidth">
           游戏文件
-          <el-button type="primary" size="small">上传游戏文件</el-button>
-          <el-button type="text" size="small">删除</el-button>
+          <el-upload
+            class="upload-demo"
+            action="http://topteam.ueuc.com/i/topteam/admin/uploadfile"
+            :on-preview="handlePreview"
+            :on-remove="handleRemove"
+            :before-remove="beforeRemove"
+            :limit="3"
+            :on-exceed="handleExceed"
+            :file-list="fileList"
+            name="game">
+            <el-button size="small" type="primary">点击上传</el-button>
+          </el-upload>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -153,7 +158,7 @@
       <span>请确认是否要删除此游戏，删除后将无法恢复！</span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="delGame1 = false">取 消</el-button>
-        <el-button type="primary" @click="delGame1 = false">确 认</el-button>
+        <el-button type="primary" @click="getDelGame">确 认</el-button>
       </span>
     </el-dialog>
     <el-dialog
@@ -163,7 +168,7 @@
       <span>下架后的游戏才能够删除，请先下架此游戏！</span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="delGame2 = false">取 消</el-button>
-        <el-button type="primary" @click="delGame2 = false">下 架</el-button>
+        <el-button type="primary" @click="dialogPullOff">下 架</el-button>
       </span>
     </el-dialog>
   </div>
@@ -173,7 +178,8 @@ import {
   addGame,
   changeGame,
   pullOnGame,
-  gameList } from '../../service/activity'
+  gameList,
+  delGame } from '../../service/activity'
 export default {
   data() {
     return {
@@ -195,13 +201,26 @@ export default {
       },
       formLabelWidth: '120px',
       updateStatus: false,
-      chooseId: ''
+      chooseId: '',
+      fileList: []
     }
   },
   mounted() {
     this.gameList()
   },
   methods: {
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+    handlePreview(file) {
+      console.log(file);
+    },
+    handleExceed(files, fileList) {
+      this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+    },
+    beforeRemove(file, fileList) {
+      return this.$confirm(`确定移除 ${ file.name }？`);
+    },
     addGame() {
       this.updateStatus = false
       this.dialogAddGame = true
@@ -227,13 +246,15 @@ export default {
       } else {
         result = await addGame(data)
       }
-      console.log(result, 'asdfasdf')
+      this.gameList()
     },
     pullOn(item) {
       // 点击上架
       this.chooseId = item.id
-      this.onSale()
+      this.onSale(1)
       // TODO: 上架逻辑
+      this.pullOnGame = true
+      this.gameList()
     },
     pullOff(item) {
       // 点击下架
@@ -244,6 +265,7 @@ export default {
     },
     dialogPullOff() {
       this.changeGame = false
+      this.delGame2 = false
       this.onSale(0)
       this.gameList()
     },
@@ -265,6 +287,23 @@ export default {
       } else {
         this.changeGame = true
       }
+    },
+    delGame(item) {
+      this.chooseId = item.id
+      if (Number(item.status) === 0) {
+        // 下架状态
+        this.delGame1 = true
+      } else {
+        this.delGame2 = true
+      }
+    },
+    async getDelGame(item) {
+      this.delGame1 = false
+      let data = {
+        id: this.chooseId
+      }
+      let result = await delGame(data)
+      this.gameList()
     }
   }
 }
