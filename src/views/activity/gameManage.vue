@@ -33,11 +33,11 @@
           prop="address"
           label="使用条件">
         </el-table-column> -->
-        <el-table-column
+        <!-- <el-table-column
           prop="money"
           label="金额（元）"
           width="180">
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column
           label="游戏状态"
           width="180">
@@ -82,16 +82,17 @@
             <el-option label="付费" value="beijing"></el-option>
           </el-select>
         </el-form-item> -->
-        <el-form-item label="金额：" :label-width="formLabelWidth">
+        <!-- <el-form-item label="金额：" :label-width="formLabelWidth">
           <el-input v-model="form.money" autocomplete="off">
             <template slot="append">元</template>
           </el-input>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="游戏文件：" :label-width="formLabelWidth">
           游戏文件
           <el-upload
             class="upload-demo"
             action="http://topteam.ueuc.com/i/topteam/admin/uploadfile"
+            :http-request="handleUpLoadGame"
             :on-preview="handlePreview"
             :on-remove="handleRemove"
             :before-remove="beforeRemove"
@@ -179,7 +180,9 @@ import {
   changeGame,
   pullOnGame,
   gameList,
-  delGame } from '../../service/activity'
+  delGame,
+  uploadGame } from '../../service/activity'
+  import axios from 'axios'
 export default {
   data() {
     return {
@@ -209,6 +212,16 @@ export default {
     this.gameList()
   },
   methods: {
+    async handleUpLoadGame(file) {
+      console.log(file)
+      const config = {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      }
+      const formData = new FormData()
+      formData.append('name', 'game')
+      formData.append('file', file)
+      let res = await axios.post('/i/topteam/admin/uploadfile', formData, config)
+    },
     handleRemove(file, fileList) {
       console.log(file, fileList);
     },

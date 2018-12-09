@@ -349,6 +349,19 @@
             <el-option v-if="activityInfo.coachId" label="视频题" value="4"/>
             <el-option v-if="activityInfo.coachId" label="语音题" value="5"/>
             <el-option v-if="activityInfo.coachId" label="拍照题" value="6"/>
+            <el-option label="游戏题" value="7" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="题目选项" label-width="100px" v-if="taskInfo.type === '7'">
+          <el-select v-model="taskInfo.game_id" placeholder="请选择">
+            <el-option
+              v-for="item in gameList"
+              :key="item.id"
+              :label="item.game_name"
+              :value="item.id">
+              <span style="float: left">{{ item.game_name }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">{{ Number(item.money) === 0 ? '免费' :'¥' + item.money  }}</span>
+            </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="题目描述" label-width="100px">
@@ -811,7 +824,8 @@ import { fetchCoachList,
   chooseTasklib,
   getTacskClassifyList,
   cancelact,
-  moveTask } from './../../service/activity'
+  moveTask,
+  gameList } from './../../service/activity'
 import { getTemplateList } from './../../service/role'
 import { fetchQiNiuToken } from './../../service/common'
 import { getAgentName, getAgentId,
@@ -853,7 +867,8 @@ export default {
         3: '图片题',
         4: '视频题',
         5: '语音题',
-        6: '拍照题'
+        6: '拍照题',
+        7: '游戏题'
       }
       return typeMap[type]
     },
@@ -998,7 +1013,8 @@ export default {
       level: getLevel(),
       taskClassfiyList: [], // 题目分类
       searchLocation: '', // 搜索地址
-      searchService: null         // 地图实例
+      searchService: null,        // 地图实例
+      gameList: []
     }
   },
   computed: {
@@ -1046,6 +1062,18 @@ export default {
     this.init()
   },
   methods: {
+    async getGameList() {
+      this.gameList = []
+      let data = {}
+      let result = await gameList(data)
+      let list = result.data ? result.data : []
+      list.forEach(item => {
+        if (Number(item.status) === 1) {
+          this.gameList.push(item)
+        }
+      })
+      console.log(this.gameList, 'asdfasdf')
+    },
     // 删除定位
     handleDeleteLocation() {
       this.taskInfo.location_point = ''
@@ -1815,7 +1843,8 @@ export default {
         B: null,
         C: null,
         D: null
-      }
+      },
+      this.getGameList()
     },
     // 关闭添加任务对话框
     handleCloseTaskDialog() {

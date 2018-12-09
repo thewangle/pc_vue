@@ -387,3 +387,13 @@ export function delGame(data) {
   })
 }
 
+// 上传游戏
+export function uploadGame(formData, config) {
+  return request({
+    url: '/i/topteam/admin/uploadfile',
+    method: 'post',
+    formData,
+    config
+  })
+}
+
