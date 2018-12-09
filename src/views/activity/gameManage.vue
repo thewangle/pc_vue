@@ -88,17 +88,16 @@
           </el-input>
         </el-form-item> -->
         <el-form-item label="游戏文件：" :label-width="formLabelWidth">
-          游戏文件
           <el-upload
             class="upload-demo"
-            action="http://topteam.ueuc.com/i/topteam/admin/uploadfile"
-            :http-request="handleUpLoadGame"
+            action="/i/topteam/admin/uploadfile"
             :on-preview="handlePreview"
             :on-remove="handleRemove"
             :before-remove="beforeRemove"
-            :limit="3"
+            :limit="1"
             :on-exceed="handleExceed"
             :file-list="fileList"
+            :on-success="getGameUri"
             name="game">
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
@@ -212,16 +211,20 @@ export default {
     this.gameList()
   },
   methods: {
-    async handleUpLoadGame(file) {
-      console.log(file)
-      const config = {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      }
-      const formData = new FormData()
-      formData.append('name', 'game')
-      formData.append('file', file)
-      let res = await axios.post('/i/topteam/admin/uploadfile', formData, config)
+    getGameUri(res) {
+      console.log(res, 'res')
+      this.form.uri = res.data
     },
+    // async handleUpLoadGame(file) {
+    //   console.log(file)
+    //   const config = {
+    //     headers: { 'Content-Type': 'multipart/form-data' }
+    //   }
+    //   const formData = new FormData()
+    //   formData.append('name', 'game')
+    //   formData.append('file', file)
+    //   let res = await axios.post('/i/topteam/admin/uploadfile', formData, config)
+    // },
     handleRemove(file, fileList) {
       console.log(file, fileList);
     },
@@ -229,7 +232,7 @@ export default {
       console.log(file);
     },
     handleExceed(files, fileList) {
-      this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+      this.$message.warning(`只能上传一个文件`);
     },
     beforeRemove(file, fileList) {
       return this.$confirm(`确定移除 ${ file.name }？`);
@@ -245,13 +248,12 @@ export default {
       }
       let result = await gameList(data)
       this.tableData = result.data ? result.data : []
-      console.log(result, 'asdfasdf')
     },
     async saveGame(status) {
+      console.log(this.fileList, '------------')
       this.dialogFormVisible = false
       let data = this.form
       data.type = data.type ? data.type : '0'
-      data.uri = '123'
       data.status = status
       let result
       if (this.updateStatus) {
@@ -260,6 +262,7 @@ export default {
         result = await addGame(data)
       }
       this.gameList()
+      this.dialogAddGame = false
     },
     pullOn(item) {
       // 点击上架
