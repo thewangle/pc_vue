@@ -213,7 +213,11 @@ export default {
   methods: {
     getGameUri(res) {
       console.log(res, 'res')
-      this.form.uri = res.data
+      if (res.error_code === 0) {
+        this.form.uri = res.data
+      } else {
+        this.$message(res.error_msg ? res.error_msg : '上传失败')
+      }
     },
     // async handleUpLoadGame(file) {
     //   console.log(file)
@@ -240,6 +244,13 @@ export default {
     addGame() {
       this.updateStatus = false
       this.dialogAddGame = true
+      this.form = {
+        game_name: '',
+        type: '',
+        money: '',
+        uri: '',
+        status: ''
+      }
     },
     async gameList() {
       let data = {
