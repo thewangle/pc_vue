@@ -290,7 +290,7 @@
             </el-table-column>
             <el-table-column label="描述" min-width="130px">
               <template slot-scope="scope">
-                <span>{{ scope.row.task_desc }}</span>
+                <span v-html="scope.row.task_desc"></span>
               </template>
             </el-table-column>
             <el-table-column label="答案" width="150px" align="center">
@@ -352,7 +352,12 @@
           </el-select>
         </el-form-item>
         <el-form-item label="题目描述" label-width="100px">
-          <el-input v-model="taskInfo.desc" type="textarea" />
+          <!-- <el-input v-model="taskInfo.desc" type="textarea" /> -->
+          <quill-editor 
+            v-model="taskInfo.desc"
+            ref="myQuillEditor" 
+            :options="editorOption">
+          </quill-editor>
         </el-form-item>
         <el-form-item v-if="taskClassfiyList.length" label="题目分类" label-width="100px">
           <el-select v-model="taskInfo.classification">
@@ -616,7 +621,7 @@
             </el-table-column>
             <el-table-column label="描述" min-width="130px">
               <template slot-scope="scope">
-                <span>{{ scope.row.task_desc }}</span>
+                <span v-html="scope.row.task_desc"></span>
               </template>
             </el-table-column>
             <el-table-column label="答案" width="150px" align="center">
@@ -820,12 +825,16 @@ import { qiniuAddress } from './../../config'
 import axios from 'axios'
 import waves from '@/directive/waves' // 水波纹指令
 import { Loading } from 'element-ui'
+import { quillEditor } from 'vue-quill-editor'
 
 export default {
   name: 'ActivityManage',
   directives: {
     waves
   },
+  components: {
+      quillEditor
+  },
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -879,6 +888,13 @@ export default {
   },
   data() {
     return {
+      editorOption:{
+        modules:{
+            toolbar:[
+              ['bold','italic',{ 'color': [] },'clean']
+            ]
+        }
+      },
       jindu:0,
       is_progress:false,
       needCoach: "1",
