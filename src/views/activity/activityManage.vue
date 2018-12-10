@@ -1024,8 +1024,6 @@ export default {
     checkdisabled() {
       if (this.longTime === '1') {
         return true
-      } else if (this.longTime === '2') {
-        return true
       } else {
         return false
       }
