@@ -124,7 +124,7 @@
         </el-form-item>
         <br />
         <el-form-item label="需要教练">
-          <el-select v-model="needCoach" :disabled="activityInfo.type !== '2'" @change="activityInfo.coachId = null">
+          <el-select v-model="needCoach" :disabled="activityInfo.type !== '2'" @change="coachNeed">
             <el-option label="是" value="1"/>
             <el-option label="否" value="2"/>
           </el-select>
@@ -137,7 +137,7 @@
         <br />
 
         <el-form-item label="长期活动">
-          <el-select v-model="longTime" :disabled="activityInfo.type !== '2'" @change="activityInfo.keepTime = ''">
+          <el-select v-model="longTime" :disabled="activityInfo.type !== '2' || needCoach == 1 || needCoach == 2" @change="activityInfo.keepTime = ''">
             <el-option label="是" value="1"/>
             <el-option label="否" value="2"/>
           </el-select>
@@ -168,7 +168,7 @@
         </el-form-item>
         <el-form-item label="起止时间">
           <el-date-picker
-            v-if="activityInfo.type !== '2'"
+            v-if="activityInfo.type !== '2' || longTime === '2'"
             v-model="activityInfo.time"
             type="datetimerange"
             range-separator="-"
@@ -176,7 +176,7 @@
             end-placeholder="结束时间"
             value-format="timestamp"/>
           <el-time-picker
-            v-if="activityInfo.type === '2'"
+            v-if="activityInfo.type === '2' && longTime === '1'  "
             v-model="activityInfo.time"
             is-range
             range-separator="-"
@@ -290,7 +290,7 @@
             </el-table-column>
             <el-table-column label="描述" min-width="130px">
               <template slot-scope="scope">
-                <span>{{ scope.row.task_desc }}</span>
+                <span v-html="scope.row.task_desc"></span>
               </template>
             </el-table-column>
             <el-table-column label="答案" width="150px" align="center">
@@ -365,7 +365,12 @@
           </el-select>
         </el-form-item>
         <el-form-item label="题目描述" label-width="100px">
-          <el-input v-model="taskInfo.desc" type="textarea" />
+          <!-- <el-input v-model="taskInfo.desc" type="textarea" /> -->
+          <quill-editor 
+            v-model="taskInfo.desc"
+            ref="myQuillEditor" 
+            :options="editorOption">
+          </quill-editor>
         </el-form-item>
         <el-form-item v-if="taskClassfiyList.length" label="题目分类" label-width="100px">
           <el-select v-model="taskInfo.classification">
@@ -629,7 +634,7 @@
             </el-table-column>
             <el-table-column label="描述" min-width="130px">
               <template slot-scope="scope">
-                <span>{{ scope.row.task_desc }}</span>
+                <span v-html="scope.row.task_desc"></span>
               </template>
             </el-table-column>
             <el-table-column label="答案" width="150px" align="center">
@@ -834,12 +839,16 @@ import { qiniuAddress } from './../../config'
 import axios from 'axios'
 import waves from '@/directive/waves' // 水波纹指令
 import { Loading } from 'element-ui'
+import { quillEditor } from 'vue-quill-editor'
 
 export default {
   name: 'ActivityManage',
   directives: {
     waves
   },
+  components: {
+      quillEditor
+  },
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -894,6 +903,13 @@ export default {
   },
   data() {
     return {
+      editorOption:{
+        modules:{
+            toolbar:[
+              ['bold','italic',{ 'color': [] },'clean']
+            ]
+        }
+      },
       jindu:0,
       is_progress:false,
       needCoach: "1",
@@ -1072,7 +1088,10 @@ export default {
           this.gameList.push(item)
         }
       })
-      console.log(this.gameList, 'asdfasdf')
+    },
+    coachNeed() {
+      this.activityInfo.coachId = null
+      this.needCoach === '1' ? this.longTime = '2' : this.longTime = '1'
     },
     // 删除定位
     handleDeleteLocation() {
