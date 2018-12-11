@@ -1650,6 +1650,8 @@ export default {
       this.taskInfo.answer_limit = row.answer_limit
       this.taskInfo.answer_type = row.answer_type
       this.taskInfo.limit_time = row.limit_time
+      this.getGameList()
+      this.$set(this.taskInfo, 'game_id', row.game_id)
       this.$set(this.taskInfo, 'classification', row.classification)
       this.$set(this.taskInfo, 'location_point', row.location_point)
       // this.taskInfo.classification = row.classification
