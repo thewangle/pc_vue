@@ -87,6 +87,7 @@
           </el-input>
         </el-form-item> -->
         <el-form-item label="游戏文件：" :label-width="formLabelWidth">
+          {{ this.form.uri }}
           <el-upload
             class="upload-demo"
             action="/i/topteam/admin/uploadfile"
@@ -103,7 +104,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button @click="dialogAddGame = false">取 消</el-button>
         <el-button @click="saveGame(0)">保 存</el-button>
         <el-button type="primary" @click="saveGame(1)">保存并上架</el-button>
       </div>
@@ -212,9 +213,11 @@ export default {
   methods: {
     getGameUri(res) {
       console.log(res, 'res')
+      this.form.uri = ''
       if (res.error_code === 0) {
         this.form.uri = res.data
       } else {
+        this.fileList = []
         this.$message(res.error_msg ? res.error_msg : '上传失败')
       }
     },
@@ -250,6 +253,7 @@ export default {
         uri: '',
         status: ''
       }
+      this.fileList = []
     },
     async gameList() {
       let data = {
@@ -260,9 +264,24 @@ export default {
       this.tableData = result.data ? result.data : []
     },
     async saveGame(status) {
-      console.log(this.fileList, '------------')
-      this.dialogFormVisible = false
       let data = this.form
+      if (!data.game_name) {
+        this.$message({
+          showClose: true,
+          message: '请填写游戏名称',
+          type: 'warning'
+        })
+        return
+      }
+      if (!data.uri) {
+        this.$message({
+          showClose: true,
+          message: '请上传游戏文件',
+          type: 'warning'
+        })
+        return
+      }
+      this.dialogFormVisible = false
       data.type = data.type ? data.type : '0'
       data.status = status
       let result
@@ -278,7 +297,6 @@ export default {
       // 点击上架
       this.chooseId = item.id
       this.onSale(1)
-      // TODO: 上架逻辑
       this.pullOnGame = true
       this.gameList()
     },
