@@ -46,11 +46,6 @@
       fit
       highlight-current-row
       style="width: 100%;">
-      <el-table-column label="序号" align="center" width="65">
-        <template slot-scope="scope">
-          <span>{{scope.$index+(listQuery.page_no - 1) * listQuery.page_size + 1}}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="题目标题" width="150px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
@@ -287,7 +282,7 @@
           <el-input :value="searchLocation" />
         </el-form-item>
       </el-form>
-      
+
       <div id="map-container" style="width: 100%; height: 500px;"/>
 
     </el-dialog>
@@ -398,7 +393,7 @@ export default {
     }
   },
   created() {
-    this._fetchList()   
+    this._fetchList()
   },
   computed: {
     optionsLength() {
@@ -825,7 +820,7 @@ export default {
           this.jindu=0
         })
       }
-      
+
     },
     // 重置任务表单
     _resetTaksForm() {
