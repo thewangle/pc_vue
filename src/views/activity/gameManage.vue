@@ -88,6 +88,7 @@
           </el-input>
         </el-form-item> -->
         <el-form-item label="游戏文件：" :label-width="formLabelWidth">
+          {{ this.form.uri }}
           <el-upload
             class="upload-demo"
             action="/i/topteam/admin/uploadfile"
@@ -213,9 +214,11 @@ export default {
   methods: {
     getGameUri(res) {
       console.log(res, 'res')
+      this.form.uri = ''
       if (res.error_code === 0) {
         this.form.uri = res.data
       } else {
+        this.fileList = []
         this.$message(res.error_msg ? res.error_msg : '上传失败')
       }
     },
@@ -251,6 +254,7 @@ export default {
         uri: '',
         status: ''
       }
+      this.fileList = []
     },
     async gameList() {
       let data = {
