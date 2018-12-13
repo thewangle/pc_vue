@@ -90,7 +90,7 @@
           {{ this.form.uri }}
           <el-upload
             class="upload-demo"
-            :action="'/i/topteam/admin/uploadfile?id=' + form.id"
+            action="/i/topteam/admin/uploadfile"
             :on-preview="handlePreview"
             :on-remove="handleRemove"
             :before-remove="beforeRemove"
@@ -98,7 +98,8 @@
             :on-exceed="handleExceed"
             :file-list="fileList"
             :on-success="getGameUri"
-            name="game">
+            name="game"
+            :data="{'id': form.id}">
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
         </el-form-item>
