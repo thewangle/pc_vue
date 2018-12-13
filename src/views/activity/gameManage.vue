@@ -90,7 +90,7 @@
           {{ this.form.uri }}
           <el-upload
             class="upload-demo"
-            action="/i/topteam/admin/uploadfile"
+            :action="'/i/topteam/admin/uploadfile?id=' + form.id"
             :on-preview="handlePreview"
             :on-remove="handleRemove"
             :before-remove="beforeRemove"
@@ -199,7 +199,8 @@ export default {
         type: '',
         money: '',
         uri: '',
-        status: ''
+        status: '',
+        id: ''
       },
       formLabelWidth: '120px',
       updateStatus: false,
@@ -251,7 +252,8 @@ export default {
         type: '',
         money: '',
         uri: '',
-        status: ''
+        status: '',
+        id: ''
       }
       this.fileList = []
     },
