@@ -1936,45 +1936,75 @@ export default {
       formData.append('token', token)
       formData.append('key', keyname)
       let that=this
-      if(req.file.size/1024 < 1025) { //大于1M，进行压缩上传
-          this.photoCompress(req.file, {
-              quality: 0.2
-          }, function(base64){
-              let bl = that.convertBase64UrlToBlob(base64);
-              bl.uid=req.file.uid
-              bl.name=req.file.name
-              bl.uid=req.file.uid
-              bl.lastModified=req.file.lastModified
-              bl.lastModifiedDate=req.file.lastModifiedDate
-              bl.webkitRelativePath=req.file.webkitRelativePath
-              formData.append('file', bl); // 文件对象
-              axios.post('http://upload.qiniup.com/', formData, config).then(res => {
-                const url = that.qiniuAddress + '/' + res.data.key
-                if (type === 'bgImg') {
-                  that.activityInfo.bgImgUrl = url
-                }
-                if (type === 'icon') {
-                  that.activityInfo.iconUrl = url
-                }
-                if (type === 'gif') {
-                  that.activityInfo.gif_url = url
-                }
-                if (type === 'task') {
-                  that.taskInfo.question_img = url
-                }
-                if (type === 'answer') {
-                  that.taskInfo.answer_url = url
-                }
-                if (type === 'nine') {
-                  that.taskAFileList.push({
-                    name: res.data.key.slice(0, 23),
-                    url: url
-                  })
-                }
-                that.is_progress=false
-                that.jindu=0
-              })
-          });
+      if(req.file.size/1024 > 1025) { //大于1M，进行压缩上传
+          if(req.file.type.indexOf("image/")==-1){  
+            formData.append('file', req.file)
+            axios.post(this.domain, formData, config).then(res => {
+              const url = this.qiniuAddress + '/' + res.data.key
+              if (type === 'bgImg') {
+                this.activityInfo.bgImgUrl = url
+              }
+              if (type === 'icon') {
+                this.activityInfo.iconUrl = url
+              }
+              if (type === 'gif') {
+                this.activityInfo.gif_url = url
+              }
+              if (type === 'task') {
+                this.taskInfo.question_img = url
+              }
+              if (type === 'answer') {
+                this.taskInfo.answer_url = url
+              }
+              if (type === 'nine') {
+                this.taskAFileList.push({
+                  name: res.data.key.slice(0, 23),
+                  url: url
+                })
+              }
+              this.is_progress=false
+              this.jindu=0
+            })  
+          } else {
+            this.photoCompress(req.file, {
+                quality: 0.2
+            }, function(base64){
+                let bl = that.convertBase64UrlToBlob(base64);
+                bl.uid=req.file.uid
+                bl.name=req.file.name
+                bl.uid=req.file.uid
+                bl.lastModified=req.file.lastModified
+                bl.lastModifiedDate=req.file.lastModifiedDate
+                bl.webkitRelativePath=req.file.webkitRelativePath
+                formData.append('file', bl); // 文件对象
+                axios.post('http://upload.qiniup.com/', formData, config).then(res => {
+                  const url = that.qiniuAddress + '/' + res.data.key
+                  if (type === 'bgImg') {
+                    that.activityInfo.bgImgUrl = url
+                  }
+                  if (type === 'icon') {
+                    that.activityInfo.iconUrl = url
+                  }
+                  if (type === 'gif') {
+                    that.activityInfo.gif_url = url
+                  }
+                  if (type === 'task') {
+                    that.taskInfo.question_img = url
+                  }
+                  if (type === 'answer') {
+                    that.taskInfo.answer_url = url
+                  }
+                  if (type === 'nine') {
+                    that.taskAFileList.push({
+                      name: res.data.key.slice(0, 23),
+                      url: url
+                    })
+                  }
+                  that.is_progress=false
+                  that.jindu=0
+                })
+            });
+          } 
       }else{
         formData.append('file', req.file)
         axios.post(this.domain, formData, config).then(res => {

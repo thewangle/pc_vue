@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "axios": "0.18.0",
+    "babel-loader": "^7.1.5",
     "clipboard": "1.7.1",
     "codemirror": "5.39.2",
     "connect": "3.6.6",
@@ -55,6 +56,7 @@
     "vue-splitpane": "1.0.2",
     "vuedraggable": "^2.16.0",
     "vuex": "3.0.1",
+    "webpack": "^4.16.5",
     "xlsx": "^0.11.16"
   },
   "devDependencies": {
