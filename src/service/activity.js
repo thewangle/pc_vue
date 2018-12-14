@@ -341,3 +341,59 @@ export function getPerResultAnalysis(data) {
     data
   })
 }
+
+// 新增游戏
+export function addGame(data) {
+  return request({
+    url: '/i/topteam/admin/addgame',
+    method: 'post',
+    data
+  })
+}
+
+// 修改游戏
+export function changeGame(data) {
+  return request({
+    url: '/i/topteam/admin/updategame',
+    method: 'post',
+    data
+  })
+}
+
+// 上架游戏
+export function pullOnGame(data) {
+  return request({
+    url: '/i/topteam/admin/onsale',
+    method: 'post',
+    data
+  })
+}
+
+// 游戏列表
+export function gameList(data) {
+  return request({
+    url: '/i/topteam/admin/getgamelist',
+    method: 'post',
+    data
+  })
+}
+
+// 删除游戏
+export function delGame(data) {
+  return request({
+    url: '/i/topteam/admin/delgame',
+    method: 'post',
+    data
+  })
+}
+
+// 上传游戏
+export function uploadGame(formData, config) {
+  return request({
+    url: '/i/topteam/admin/uploadfile',
+    method: 'post',
+    formData,
+    config
+  })
+}
+
