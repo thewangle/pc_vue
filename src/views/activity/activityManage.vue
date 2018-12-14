@@ -379,6 +379,9 @@
         <el-form-item label="题目顺序" label-width="100px">
           <el-input v-model="taskInfo.seq" type="number" />
         </el-form-item>
+        <el-form-item label="题目批次" label-width="100px">
+          <el-input v-model="taskInfo.batch_number" type="number" />
+        </el-form-item>
         <el-form-item label="答题人数" label-width="100px">
           <el-input v-model="taskInfo.answer_limit" :disabled="activityInfo.type === '2' || taskInfo.answer_type === '4'" type="number" />
         </el-form-item>
@@ -956,6 +959,7 @@ export default {
         desc: null,
         answer_type: '1',
         seq: null,
+        batch_number: 1,
         question_img: null,
         options: {
           A: null,
@@ -1619,6 +1623,7 @@ export default {
       this.taskInfo.desc = row.task_desc
       this.taskInfo.score = row.score
       this.taskInfo.seq = row.seq
+      this.taskInfo.batch_number = row.batch_number
       this.taskInfo.answer_limit = row.answer_limit
       this.taskInfo.answer_type = row.answer_type
       this.taskInfo.limit_time = row.limit_time
@@ -1937,7 +1942,7 @@ export default {
       formData.append('key', keyname)
       let that=this
       if(req.file.size/1024 > 1025) { //大于1M，进行压缩上传
-          if(req.file.type.indexOf("image/")==-1){  
+          if(req.file.type.indexOf("image/")==-1){
             formData.append('file', req.file)
             axios.post(this.domain, formData, config).then(res => {
               const url = this.qiniuAddress + '/' + res.data.key
@@ -1964,7 +1969,7 @@ export default {
               }
               this.is_progress=false
               this.jindu=0
-            })  
+            })
           } else {
             this.photoCompress(req.file, {
                 quality: 0.2
@@ -2004,7 +2009,7 @@ export default {
                   that.jindu=0
                 })
             });
-          } 
+          }
       }else{
         formData.append('file', req.file)
         axios.post(this.domain, formData, config).then(res => {
