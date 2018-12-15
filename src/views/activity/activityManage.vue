@@ -1670,7 +1670,7 @@ export default {
       this.taskInfo.desc = row.task_desc
       this.taskInfo.score = row.score
       this.taskInfo.seq = row.seq
-      this.taskInfo.batch_number = row.batch_number
+      this.taskInfo.batch_number = row.batch_number || 1
       this.taskInfo.answer_limit = row.answer_limit
       this.taskInfo.answer_type = row.answer_type
       this.taskInfo.limit_time = row.limit_time
@@ -2404,6 +2404,7 @@ export default {
         type: '1',
         desc: null,
         answer_type: '1',
+        batch_number: 1,
         seq: null,
         question_img: null,
         options: {
