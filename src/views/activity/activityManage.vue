@@ -1647,6 +1647,13 @@ export default {
         }
         data.answer = data.answer_url
       }
+
+      if (data.type === '7') {
+        if (!data.game_id) {
+          this.$message({ message: '请选择游戏题目', type: 'error' })
+          return
+        }
+      }
       if (!data.limit_time) {
         delete data.limit_time
       }
@@ -2340,6 +2347,12 @@ export default {
           return
         }
         data.answer = data.answer_url
+      }
+      if (data.type === '7') {
+        if (!data.game_id) {
+          this.$message({ message: '请选择游戏题目', type: 'error' })
+          return
+        }
       }
       if (!data.limit_time) {
         delete data.limit_time
