@@ -124,7 +124,7 @@
         </el-form-item>
         <br />
         <el-form-item label="需要教练">
-          <el-select v-model="needCoach" :disabled="activityInfo.type !== '2'" @change="activityInfo.coachId = null">
+          <el-select v-model="needCoach" :disabled="activityInfo.type !== '2'" @change="coachNeed">
             <el-option label="是" value="1"/>
             <el-option label="否" value="2"/>
           </el-select>
@@ -137,7 +137,7 @@
         <br />
 
         <el-form-item label="长期活动">
-          <el-select v-model="longTime" :disabled="activityInfo.type !== '2'" @change="activityInfo.keepTime = ''">
+          <el-select v-model="longTime" :disabled="activityInfo.type !== '2' || needCoach == 1 || needCoach == 2" @change="activityInfo.keepTime = ''">
             <el-option label="是" value="1"/>
             <el-option label="否" value="2"/>
           </el-select>
@@ -168,7 +168,7 @@
         </el-form-item>
         <el-form-item label="起止时间">
           <el-date-picker
-            v-if="activityInfo.type !== '2'"
+            v-if="activityInfo.type !== '2' || longTime === '2'"
             v-model="activityInfo.time"
             type="datetimerange"
             range-separator="-"
@@ -176,7 +176,7 @@
             end-placeholder="结束时间"
             value-format="timestamp"/>
           <el-time-picker
-            v-if="activityInfo.type === '2'"
+            v-if="activityInfo.type === '2' && longTime === '1'  "
             v-model="activityInfo.time"
             is-range
             range-separator="-"
@@ -290,7 +290,7 @@
             </el-table-column>
             <el-table-column label="描述" min-width="130px">
               <template slot-scope="scope">
-                <span>{{ scope.row.task_desc }}</span>
+                <span v-html="scope.row.task_desc"></span>
               </template>
             </el-table-column>
             <el-table-column label="答案" width="150px" align="center">
@@ -349,10 +349,28 @@
             <el-option v-if="activityInfo.coachId" label="视频题" value="4"/>
             <el-option v-if="activityInfo.coachId" label="语音题" value="5"/>
             <el-option v-if="activityInfo.coachId" label="拍照题" value="6"/>
+            <el-option label="游戏题" value="7" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="题目选项" label-width="100px" v-if="taskInfo.type === '7'">
+          <el-select v-model="taskInfo.game_id" placeholder="请选择">
+            <el-option
+              v-for="item in gameList"
+              :key="item.id"
+              :label="item.game_name"
+              :value="item.id">
+              <span style="float: left">{{ item.game_name }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">{{ Number(item.money) === 0 ? '免费' :'¥' + item.money  }}</span>
+            </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="题目描述" label-width="100px">
-          <el-input v-model="taskInfo.desc" type="textarea" />
+          <!-- <el-input v-model="taskInfo.desc" type="textarea" /> -->
+          <quill-editor 
+            v-model="taskInfo.desc"
+            ref="myQuillEditor" 
+            :options="editorOption">
+          </quill-editor>
         </el-form-item>
         <el-form-item v-if="taskClassfiyList.length" label="题目分类" label-width="100px">
           <el-select v-model="taskInfo.classification">
@@ -379,8 +397,11 @@
         <el-form-item label="题目顺序" label-width="100px">
           <el-input v-model="taskInfo.seq" type="number" />
         </el-form-item>
+        <el-form-item label="题目批次" label-width="100px">
+          <el-input v-model="taskInfo.batch_number" type="number" />
+        </el-form-item>
         <el-form-item label="答题人数" label-width="100px">
-          <el-input v-model="taskInfo.answer_limit" :disabled="activityInfo.type === '2' || taskInfo.answer_type === '4'" type="number" />
+          <el-input v-model="taskInfo.answer_limit" :disabled="activityInfo.type === '2' || taskInfo.answer_type === '4' || checkInfo.type === '2'" type="number" />
         </el-form-item>
         <el-form-item label="题目图片" label-width="100px">
           <el-upload
@@ -616,7 +637,7 @@
             </el-table-column>
             <el-table-column label="描述" min-width="130px">
               <template slot-scope="scope">
-                <span>{{ scope.row.task_desc }}</span>
+                <span v-html="scope.row.task_desc"></span>
               </template>
             </el-table-column>
             <el-table-column label="答案" width="150px" align="center">
@@ -811,7 +832,8 @@ import { fetchCoachList,
   chooseTasklib,
   getTacskClassifyList,
   cancelact,
-  moveTask } from './../../service/activity'
+  moveTask,
+  gameList } from './../../service/activity'
 import { getTemplateList } from './../../service/role'
 import { fetchQiNiuToken } from './../../service/common'
 import { getAgentName, getAgentId,
@@ -820,12 +842,16 @@ import { qiniuAddress } from './../../config'
 import axios from 'axios'
 import waves from '@/directive/waves' // 水波纹指令
 import { Loading } from 'element-ui'
+import { quillEditor } from 'vue-quill-editor'
 
 export default {
   name: 'ActivityManage',
   directives: {
     waves
   },
+  components: {
+      quillEditor
+  },
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -853,7 +879,8 @@ export default {
         3: '图片题',
         4: '视频题',
         5: '语音题',
-        6: '拍照题'
+        6: '拍照题',
+        7: '游戏题'
       }
       return typeMap[type]
     },
@@ -879,6 +906,13 @@ export default {
   },
   data() {
     return {
+      editorOption:{
+        modules:{
+            toolbar:[
+              ['bold','italic',{ 'color': [] },'clean']
+            ]
+        }
+      },
       jindu:0,
       is_progress:false,
       needCoach: "1",
@@ -956,6 +990,7 @@ export default {
         desc: null,
         answer_type: '1',
         seq: null,
+        batch_number: 1,
         question_img: null,
         options: {
           A: null,
@@ -998,7 +1033,8 @@ export default {
       level: getLevel(),
       taskClassfiyList: [], // 题目分类
       searchLocation: '', // 搜索地址
-      searchService: null         // 地图实例
+      searchService: null,        // 地图实例
+      gameList: []
     }
   },
   computed: {
@@ -1046,6 +1082,21 @@ export default {
     this.init()
   },
   methods: {
+    async getGameList() {
+      this.gameList = []
+      let data = {}
+      let result = await gameList(data)
+      let list = result.data ? result.data : []
+      list.forEach(item => {
+        if (Number(item.status) === 1) {
+          this.gameList.push(item)
+        }
+      })
+    },
+    coachNeed() {
+      this.activityInfo.coachId = null
+      this.needCoach === '1' ? this.longTime = '2' : this.longTime = '1'
+    },
     // 删除定位
     handleDeleteLocation() {
       this.taskInfo.location_point = ''
@@ -1596,6 +1647,13 @@ export default {
         }
         data.answer = data.answer_url
       }
+
+      if (data.type === '7') {
+        if (!data.game_id) {
+          this.$message({ message: '请选择游戏题目', type: 'error' })
+          return
+        }
+      }
       if (!data.limit_time) {
         delete data.limit_time
       }
@@ -1619,9 +1677,12 @@ export default {
       this.taskInfo.desc = row.task_desc
       this.taskInfo.score = row.score
       this.taskInfo.seq = row.seq
+      this.taskInfo.batch_number = row.batch_number || 1
       this.taskInfo.answer_limit = row.answer_limit
       this.taskInfo.answer_type = row.answer_type
       this.taskInfo.limit_time = row.limit_time
+      this.getGameList()
+      this.$set(this.taskInfo, 'game_id', row.game_id)
       this.$set(this.taskInfo, 'classification', row.classification)
       this.$set(this.taskInfo, 'location_point', row.location_point)
       // this.taskInfo.classification = row.classification
@@ -1815,7 +1876,8 @@ export default {
         B: null,
         C: null,
         D: null
-      }
+      },
+      this.getGameList()
     },
     // 关闭添加任务对话框
     handleCloseTaskDialog() {
@@ -1937,7 +1999,7 @@ export default {
       formData.append('key', keyname)
       let that=this
       if(req.file.size/1024 > 1025) { //大于1M，进行压缩上传
-          if(req.file.type.indexOf("image/")==-1){  
+          if(req.file.type.indexOf("image/")==-1){
             formData.append('file', req.file)
             axios.post(this.domain, formData, config).then(res => {
               const url = this.qiniuAddress + '/' + res.data.key
@@ -1964,7 +2026,7 @@ export default {
               }
               this.is_progress=false
               this.jindu=0
-            })  
+            })
           } else {
             this.photoCompress(req.file, {
                 quality: 0.2
@@ -2004,7 +2066,7 @@ export default {
                   that.jindu=0
                 })
             });
-          } 
+          }
       }else{
         formData.append('file', req.file)
         axios.post(this.domain, formData, config).then(res => {
@@ -2286,6 +2348,12 @@ export default {
         }
         data.answer = data.answer_url
       }
+      if (data.type === '7') {
+        if (!data.game_id) {
+          this.$message({ message: '请选择游戏题目', type: 'error' })
+          return
+        }
+      }
       if (!data.limit_time) {
         delete data.limit_time
       }
@@ -2349,6 +2417,7 @@ export default {
         type: '1',
         desc: null,
         answer_type: '1',
+        batch_number: 1,
         seq: null,
         question_img: null,
         options: {
