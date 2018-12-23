@@ -397,3 +397,19 @@ export function uploadGame(formData, config) {
   })
 }
 
+// 获取活动列表
+export function getDemoActList() {
+  return request({
+    url: '/i/topteam/admin/getdemoactlist',
+    method: 'get'
+  })
+}
+
+// 创建演示活动
+export function createDemoAct(data) {
+  return request({
+    url: '/i/topteam/admin/adddemoact',
+    method: 'post',
+    data
+  })
+}
