@@ -41,22 +41,74 @@
         </li>
       </ul>
     </div>
+    <el-dialog :close-on-click-modal="false" title="创建测试教练" :visible.sync="dialogFormVisible" @close="handleClose">
+      <el-form :model="agentInfo" label-position="right" label-width="120px">
+        <el-form-item label="教练姓名">
+          <el-input v-model="agentInfo.contacts" />
+        </el-form-item>
+        <el-form-item label="用户名">
+          <el-input v-model="agentInfo.username" />
+        </el-form-item>
+        <el-form-item label="联系电话">
+          <el-input v-model="agentInfo.phone" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleCreateCoach">保存</el-button>
+      </div>
+    </el-dialog>
   </section>
 </template>
 
 <script>
 import { getDemoActList, createDemoAct } from './../../service/activity'
+import { addCoach } from './../../service/info'
 export default {
   data() {
     return {
-      list: []
+      list: [],
+      agentInfo: {
+        contacts: '',
+        username: '',
+        phone: ''
+      },
+      coachId: '',
+      dialogFormVisible: false
     }
   },
   methods: {
+    handleClose() {
+      this.agentInfo = {
+        contacts: '',
+        username: '',
+        phone: ''
+      }
+      this.dialogFormVisible = false
+    },
+    async handleCreateCoach() {
+      try {
+        const res = await addCoach(this.agentInfo)
+        this.$message({
+          message: '创建测试教练成功',
+          type: 'success'
+        })
+        this.coachId = res.data
+        this.handleClose()
+      } catch (e) {
+        console.log(e)
+      }
+    },
     handleCreateDemoAct(type) {
       this._createDemoAct(type)
     },
     async _createDemoAct(type) {
+      if (!this.coachId) {
+        this.$message({ message: '请先创建测试教练', type: 'error' })
+
+        this.dialogFormVisible = true
+        return
+      }
       const res = await createDemoAct({
         coach_id: this.coachId || 0,
         type
