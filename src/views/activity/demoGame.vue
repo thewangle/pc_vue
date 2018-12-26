@@ -16,6 +16,9 @@
           <div class="btn-div">
             <el-button type="primary" :disabled="!!(list[0] && list[0].qcode_url)" @click="handleCreateDemoAct(1)">获取活动二维码</el-button>
           </div>
+          <div class="btn-div" style="margin-top: 20px">
+            <a :href="list[0] && list[0].qcode_url" download :disabled="!(list[0] && list[0].qcode_url)">导出活动二维码</a>
+          </div>
         </li>
         <li>
           <div class="img-haeder">
@@ -27,6 +30,9 @@
           <div class="btn-div">
             <el-button type="primary" :disabled="!!(list[1] && list[1].qcode_url)" @click="handleCreateDemoAct(2)">获取活动二维码</el-button>
           </div>
+          <div class="btn-div" style="margin-top: 20px">
+            <a :href="list[1] && list[1].qcode_url" download :disabled="!(list[1] && list[1].qcode_url)">导出活动二维码</a>
+          </div>
         </li>
         <li>
           <div class="img-haeder">
@@ -37,6 +43,9 @@
           </div>
           <div class="btn-div">
             <el-button type="primary" :disabled="!!(list[2] && list[2].qcode_url)" @click="handleCreateDemoAct(3)">获取活动二维码</el-button>
+          </div>
+          <div class="btn-div" style="margin-top: 20px">
+            <a :href="list[2] && list[2].qcode_url" download :disabled="!(list[2] && list[2].qcode_url)">导出活动二维码</a>
           </div>
         </li>
       </ul>
@@ -103,9 +112,8 @@ export default {
       this._createDemoAct(type)
     },
     async _createDemoAct(type) {
-      if (!this.coachId) {
+      if (!this.coachId && type !== 3) {
         this.$message({ message: '请先创建测试教练', type: 'error' })
-
         this.dialogFormVisible = true
         return
       }
