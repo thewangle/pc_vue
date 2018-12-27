@@ -17,7 +17,7 @@
             <el-button type="primary" :disabled="!!(list[0] && list[0].qcode_url)" @click="handleCreateDemoAct(1)">获取活动二维码</el-button>
           </div>
           <div class="btn-div" style="margin-top: 20px">
-            <a :href="list[0] && list[0].qcode_url" download :disabled="!(list[0] && list[0].qcode_url)">导出活动二维码</a>
+            <a :href="'/i/topteam/admin/downloadqrcode?act_id='+list[0].id" :disabled="!(list[0] && list[0].qcode_url)">导出活动二维码</a>
           </div>
         </li>
         <li>
@@ -31,7 +31,7 @@
             <el-button type="primary" :disabled="!!(list[1] && list[1].qcode_url)" @click="handleCreateDemoAct(2)">获取活动二维码</el-button>
           </div>
           <div class="btn-div" style="margin-top: 20px">
-            <a :href="list[1] && list[1].qcode_url" download :disabled="!(list[1] && list[1].qcode_url)">导出活动二维码</a>
+            <a :href="'/i/topteam/admin/downloadqrcode?act_id='+list[1].id" :disabled="!(list[1] && list[1].qcode_url)">导出活动二维码</a>
           </div>
         </li>
         <li>
@@ -45,7 +45,7 @@
             <el-button type="primary" :disabled="!!(list[2] && list[2].qcode_url)" @click="handleCreateDemoAct(3)">获取活动二维码</el-button>
           </div>
           <div class="btn-div" style="margin-top: 20px">
-            <a :href="list[2] && list[2].qcode_url" download :disabled="!(list[2] && list[2].qcode_url)">导出活动二维码</a>
+            <a :href="'/i/topteam/admin/downloadqrcode?act_id='+list[2].id" :disabled="!(list[2] && list[2].qcode_url)">导出活动二维码</a>
           </div>
         </li>
       </ul>
