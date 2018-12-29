@@ -60,7 +60,7 @@ const tableRouter = {
       component: () => import('@/views/activity/demoGame'),
       name: 'demoGame',
       meta: { title: '演示活动', icon: 'documentation' },
-      hidden: false
+      hidden: true
     }
   ]
 }

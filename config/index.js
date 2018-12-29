@@ -11,7 +11,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/i': {
-        target: 'http://topteam.ueuc.com',
+        target: 'http://topteam.siygo.com',
         changeOrigin: true
       }
     },

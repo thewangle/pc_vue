@@ -22,6 +22,7 @@
       :data="list"
       border
       fit
+      :filter-method="filterMethod"
       highlight-current-row
       style="width: 100%;">
       <el-table-column label="序号" align="center" width="65">
@@ -367,10 +368,10 @@
         <el-form-item label="题目描述" label-width="100px">
           <!-- <el-input v-model="taskInfo.desc" type="textarea" /> -->
           <quill-editor 
-            v-model="taskInfo.desc"
-            ref="myQuillEditor" 
-            :options="editorOption">
-          </quill-editor>
+            v-model="taskInfo.desc"
+            ref="myQuillEditor"
+            :options="editorOption">
+          </quill-editor>
         </el-form-item>
         <el-form-item v-if="taskClassfiyList.length" label="题目分类" label-width="100px">
           <el-select v-model="taskInfo.classification">
@@ -1082,6 +1083,9 @@ export default {
     this.init()
   },
   methods: {
+    filterMethod (value, row, column) {
+      console.log(1)
+    },
     async getGameList() {
       this.gameList = []
       let data = {}
@@ -2374,7 +2378,7 @@ export default {
         const res = await fetchActivityList(param)
         const { data } = res
         this.listLoading = false
-        this.list = data.list
+        this.list = data.list.filter((item) => item.act_use !== '3' )
         this.total = data.total
       } catch (e) {
         this.listLoading = false
