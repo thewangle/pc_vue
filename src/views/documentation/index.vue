@@ -18,8 +18,11 @@
               </el-button>
             </div>
             <div class="content-item">
-              <el-button type="primary" size="mini">
-                <a href="http://cdnimg.bxunion.com/用户使用说明.pdf">用户使用说明文档下载</a>
+              <el-button type="primary" size="mini" v-if="is_agent">
+                <a href="http://cdnimg.bxunion.com/downagent-inst.pdf">用户使用说明文档下载</a>
+              </el-button>
+              <el-button type="primary" size="mini" v-if="is_operator">
+                <a href="http://cdnimg.bxunion.com/downoperate-inst.pdf">用户使用说明文档下载</a>
               </el-button>
             </div>
             <div class="content-item">
@@ -38,6 +41,29 @@ export default {
   name: 'Documentation',
   data() {
     return {
+      is_operator: false,
+      is_agent: false,
+      is_admin: false,
+      level:'level'
+    }
+  },
+  mounted () {
+    this.getCookie(this.level)
+  },
+  methods: {
+    getCookie (cookieName) {
+      let strCookie = document.cookie;
+      let arrCookie = strCookie.split("; ");
+      for(var i = 0; i < arrCookie.length; i++){
+          var arr = arrCookie[i].split("=");
+          if(cookieName == arr[0]){
+              if(arr[1] == 5){
+                this.is_operator = true
+              }else if(arr[1] == 2 || arr[1] == 3 || arr[1] == 4 || arr[1] == 1){
+                this.is_agent = true
+              }
+          }
+      }
     }
   }
 }
