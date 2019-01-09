@@ -13,16 +13,17 @@
       <el-table
         :data="tableData"
         stripe
+        border
+        fit
+        highlight-current-row
         style="width: 100%">
          <el-table-column
          label="序号"
-          type="index"
-          width="50">
+          type="index">
         </el-table-column>
         <el-table-column
           prop="game_name"
-          label="游戏名称"
-          width="320">
+          label="游戏名称">
         </el-table-column>
         <!-- <el-table-column
           prop="type"
@@ -39,16 +40,14 @@
           width="180">
         </el-table-column> -->
         <el-table-column
-          label="游戏状态"
-          width="180">
+          label="游戏状态">
           <template slot-scope="scope">
             <div>{{Number(scope.row.status) === 1 ? '可用' : '已下架'}}</div>
           </template>
         </el-table-column>
         <el-table-column
           prop="name"
-          label="操作"
-          width="180">
+          label="操作">
           <template slot-scope="scope">
             <el-button @click="updateGame(scope.row)" type="text" size="small">修改</el-button>
             <el-button v-if="Number(scope.row.status) === 1" @click="pullOff(scope.row, 0)" type="text" size="small">下架</el-button>
@@ -88,6 +87,7 @@
           </el-input>
         </el-form-item> -->
         <el-form-item label="游戏文件：" :label-width="formLabelWidth">
+          {{ this.form.uri }}
           <el-upload
             class="upload-demo"
             action="/i/topteam/admin/uploadfile"
@@ -98,7 +98,8 @@
             :on-exceed="handleExceed"
             :file-list="fileList"
             :on-success="getGameUri"
-            name="game">
+            name="game"
+            :data="{'id': form.id}">
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
         </el-form-item>
@@ -128,7 +129,7 @@
       <span>下架后，运营商将无法调取此游戏。</span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="pullOfGame1 = false">取 消</el-button>
-        <el-button type="primary" @click="pullOfGame1 = false">确 认</el-button>
+        <el-button type="primary" @click="dialogPullOff">确 认</el-button>
       </span>
     </el-dialog>
     <el-dialog
@@ -199,7 +200,8 @@ export default {
         type: '',
         money: '',
         uri: '',
-        status: ''
+        status: '',
+        id: ''
       },
       formLabelWidth: '120px',
       updateStatus: false,
@@ -213,9 +215,11 @@ export default {
   methods: {
     getGameUri(res) {
       console.log(res, 'res')
+      this.form.uri = ''
       if (res.error_code === 0) {
         this.form.uri = res.data
       } else {
+        this.fileList = []
         this.$message(res.error_msg ? res.error_msg : '上传失败')
       }
     },
@@ -249,8 +253,10 @@ export default {
         type: '',
         money: '',
         uri: '',
-        status: ''
+        status: '',
+        id: ''
       }
+      this.fileList = []
     },
     async gameList() {
       let data = {
@@ -301,12 +307,13 @@ export default {
       // 点击下架
       this.chooseId = item.id
       this.pullOfGame1 = true
-      this.onSale(0)
-      this.gameList()
+      // this.onSale(0)
+      // this.gameList()
     },
     dialogPullOff() {
       this.changeGame = false
       this.delGame2 = false
+      this.pullOfGame1 = false
       this.onSale(0)
       this.gameList()
     },

@@ -47,12 +47,20 @@ const tableRouter = {
       hidden: true
     },
     {
-      id: 9,
+      id: 65,
       path: 'game-manage',
       component: () => import('@/views/activity/gameManage'),
       name: 'gameManage',
       meta: { title: '游戏管理', icon: 'documentation' },
-      hidden: false
+      hidden: true
+    },
+    {
+      id: 66,
+      path: 'demo-game',
+      component: () => import('@/views/activity/demoGame'),
+      name: 'demoGame',
+      meta: { title: '演示活动', icon: 'documentation' },
+      hidden: true
     }
   ]
 }

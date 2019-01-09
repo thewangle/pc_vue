@@ -22,6 +22,7 @@
       :data="list"
       border
       fit
+      :filter-method="filterMethod"
       highlight-current-row
       style="width: 100%;">
       <el-table-column label="序号" align="center" width="65">
@@ -367,10 +368,10 @@
         <el-form-item label="题目描述" label-width="100px">
           <!-- <el-input v-model="taskInfo.desc" type="textarea" /> -->
           <quill-editor 
-            v-model="taskInfo.desc"
-            ref="myQuillEditor" 
-            :options="editorOption">
-          </quill-editor>
+            v-model="taskInfo.desc"
+            ref="myQuillEditor"
+            :options="editorOption">
+          </quill-editor>
         </el-form-item>
         <el-form-item v-if="taskClassfiyList.length" label="题目分类" label-width="100px">
           <el-select v-model="taskInfo.classification">
@@ -397,8 +398,11 @@
         <el-form-item label="题目顺序" label-width="100px">
           <el-input v-model="taskInfo.seq" type="number" />
         </el-form-item>
+        <el-form-item label="题目批次" label-width="100px">
+          <el-input v-model="taskInfo.batch_number" type="number" />
+        </el-form-item>
         <el-form-item label="答题人数" label-width="100px">
-          <el-input v-model="taskInfo.answer_limit" :disabled="activityInfo.type === '2' || taskInfo.answer_type === '4'" type="number" />
+          <el-input v-model="taskInfo.answer_limit" :disabled="activityInfo.type === '2' || taskInfo.answer_type === '4' || checkInfo.type === '2'" type="number" />
         </el-form-item>
         <el-form-item label="题目图片" label-width="100px">
           <el-upload
@@ -987,6 +991,7 @@ export default {
         desc: null,
         answer_type: '1',
         seq: null,
+        batch_number: 1,
         question_img: null,
         options: {
           A: null,
@@ -1078,6 +1083,9 @@ export default {
     this.init()
   },
   methods: {
+    filterMethod (value, row, column) {
+      console.log(1)
+    },
     async getGameList() {
       this.gameList = []
       let data = {}
@@ -1643,6 +1651,13 @@ export default {
         }
         data.answer = data.answer_url
       }
+
+      if (data.type === '7') {
+        if (!data.game_id) {
+          this.$message({ message: '请选择游戏题目', type: 'error' })
+          return
+        }
+      }
       if (!data.limit_time) {
         delete data.limit_time
       }
@@ -1666,6 +1681,7 @@ export default {
       this.taskInfo.desc = row.task_desc
       this.taskInfo.score = row.score
       this.taskInfo.seq = row.seq
+      this.taskInfo.batch_number = row.batch_number || 1
       this.taskInfo.answer_limit = row.answer_limit
       this.taskInfo.answer_type = row.answer_type
       this.taskInfo.limit_time = row.limit_time
@@ -1986,45 +2002,75 @@ export default {
       formData.append('token', token)
       formData.append('key', keyname)
       let that=this
-      if(req.file.size/1024 < 1025) { //大于1M，进行压缩上传
-          this.photoCompress(req.file, {
-              quality: 0.2
-          }, function(base64){
-              let bl = that.convertBase64UrlToBlob(base64);
-              bl.uid=req.file.uid
-              bl.name=req.file.name
-              bl.uid=req.file.uid
-              bl.lastModified=req.file.lastModified
-              bl.lastModifiedDate=req.file.lastModifiedDate
-              bl.webkitRelativePath=req.file.webkitRelativePath
-              formData.append('file', bl); // 文件对象
-              axios.post('http://upload.qiniup.com/', formData, config).then(res => {
-                const url = that.qiniuAddress + '/' + res.data.key
-                if (type === 'bgImg') {
-                  that.activityInfo.bgImgUrl = url
-                }
-                if (type === 'icon') {
-                  that.activityInfo.iconUrl = url
-                }
-                if (type === 'gif') {
-                  that.activityInfo.gif_url = url
-                }
-                if (type === 'task') {
-                  that.taskInfo.question_img = url
-                }
-                if (type === 'answer') {
-                  that.taskInfo.answer_url = url
-                }
-                if (type === 'nine') {
-                  that.taskAFileList.push({
-                    name: res.data.key.slice(0, 23),
-                    url: url
-                  })
-                }
-                that.is_progress=false
-                that.jindu=0
-              })
-          });
+      if(req.file.size/1024 > 1025) { //大于1M，进行压缩上传
+          if(req.file.type.indexOf("image/")==-1){
+            formData.append('file', req.file)
+            axios.post(this.domain, formData, config).then(res => {
+              const url = this.qiniuAddress + '/' + res.data.key
+              if (type === 'bgImg') {
+                this.activityInfo.bgImgUrl = url
+              }
+              if (type === 'icon') {
+                this.activityInfo.iconUrl = url
+              }
+              if (type === 'gif') {
+                this.activityInfo.gif_url = url
+              }
+              if (type === 'task') {
+                this.taskInfo.question_img = url
+              }
+              if (type === 'answer') {
+                this.taskInfo.answer_url = url
+              }
+              if (type === 'nine') {
+                this.taskAFileList.push({
+                  name: res.data.key.slice(0, 23),
+                  url: url
+                })
+              }
+              this.is_progress=false
+              this.jindu=0
+            })
+          } else {
+            this.photoCompress(req.file, {
+                quality: 0.2
+            }, function(base64){
+                let bl = that.convertBase64UrlToBlob(base64);
+                bl.uid=req.file.uid
+                bl.name=req.file.name
+                bl.uid=req.file.uid
+                bl.lastModified=req.file.lastModified
+                bl.lastModifiedDate=req.file.lastModifiedDate
+                bl.webkitRelativePath=req.file.webkitRelativePath
+                formData.append('file', bl); // 文件对象
+                axios.post('http://upload.qiniup.com/', formData, config).then(res => {
+                  const url = that.qiniuAddress + '/' + res.data.key
+                  if (type === 'bgImg') {
+                    that.activityInfo.bgImgUrl = url
+                  }
+                  if (type === 'icon') {
+                    that.activityInfo.iconUrl = url
+                  }
+                  if (type === 'gif') {
+                    that.activityInfo.gif_url = url
+                  }
+                  if (type === 'task') {
+                    that.taskInfo.question_img = url
+                  }
+                  if (type === 'answer') {
+                    that.taskInfo.answer_url = url
+                  }
+                  if (type === 'nine') {
+                    that.taskAFileList.push({
+                      name: res.data.key.slice(0, 23),
+                      url: url
+                    })
+                  }
+                  that.is_progress=false
+                  that.jindu=0
+                })
+            });
+          }
       }else{
         formData.append('file', req.file)
         axios.post(this.domain, formData, config).then(res => {
@@ -2306,6 +2352,12 @@ export default {
         }
         data.answer = data.answer_url
       }
+      if (data.type === '7') {
+        if (!data.game_id) {
+          this.$message({ message: '请选择游戏题目', type: 'error' })
+          return
+        }
+      }
       if (!data.limit_time) {
         delete data.limit_time
       }
@@ -2326,7 +2378,7 @@ export default {
         const res = await fetchActivityList(param)
         const { data } = res
         this.listLoading = false
-        this.list = data.list
+        this.list = data.list.filter((item) => item.act_use !== '3' )
         this.total = data.total
       } catch (e) {
         this.listLoading = false
@@ -2369,6 +2421,7 @@ export default {
         type: '1',
         desc: null,
         answer_type: '1',
+        batch_number: 1,
         seq: null,
         question_img: null,
         options: {
