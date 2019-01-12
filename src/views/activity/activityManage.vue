@@ -135,6 +135,11 @@
             <el-option v-for="item in coachList" :label="item.name" :value="item.id" :key="item.id" />
           </el-select>
         </el-form-item>
+        <el-form-item label="首页模板" v-if="activityInfo.type === '1'">
+          <el-select v-model="values" @change="model_select">
+            <el-option v-for="item in models" :label="item.name" :value="item.id" :key="item.id" />
+          </el-select>
+        </el-form-item>
         <br />
 
         <el-form-item label="长期活动">
@@ -187,6 +192,9 @@
         </el-form-item>
         <el-form-item label="活动描述">
           <el-input v-model="activityInfo.actDesc" :autosize="{ minRows: 1 }" class="act-textarea" type="textarea" maxlength="300"/>
+        </el-form-item>
+        <el-form-item label="首页描述" v-if="activityInfo.type === '1'">
+          <el-input v-model="story" class="act-textarea" type="textarea" maxlength="300"/>
         </el-form-item>
         <div>
           <el-form-item label="活动封面">
@@ -412,7 +420,6 @@
             :action="domain"
             :file-list="taskQFileList"
             list-type="picture-card"
-            accept="image/jpeg,image/gif,image/png"
           >
             <el-button>上传图片</el-button>
           </el-upload>
@@ -812,6 +819,12 @@
         </div>
       </div>
     </div>
+    <!-- 首页模板预览弹窗 -->
+    <el-dialog title="首页模板预览" :visible.sync="model_yu">
+      <div style="width:100%;height:100%;display: flex;align-items: center;justify-content: center;">
+        <img :src="model_img" alt="">
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -907,6 +920,26 @@ export default {
   },
   data() {
     return {
+      model_yu:false,
+      model_img:require('../../assets/img/keji.png'),
+      values:'',
+      models:[{
+          id: '1',
+          name: '科技风'
+        }, {
+          id: '2',
+          name: '户外风'
+      }, {
+          id: '3',
+          name: '江南风'
+      }, {
+          id: '4',
+          name: '红色风'
+      }, {
+          id: '5',
+          name: '淡雅风'
+      }],
+      story:'',
       editorOption:{
         modules:{
             toolbar:[
@@ -1083,6 +1116,27 @@ export default {
     this.init()
   },
   methods: {
+    //首页模板选择展示
+    model_select(e) {
+      this.model_yu = true
+      switch (Number(e)) {
+        case 1:
+          this.model_img = require('../../assets/img/keji.png')
+          break
+        case 2:
+          this.model_img = require('../../assets/img/huwai.png')
+          break
+        case 3:
+          this.model_img = require('../../assets/img/jiangnan.png')
+          break
+        case 4:
+          this.model_img = require('../../assets/img/tanm.png')
+          break
+        case 5:
+          this.model_img = require('../../assets/img/danya.png')
+          break
+      }
+    },
     filterMethod (value, row, column) {
       console.log(1)
     },
@@ -1863,6 +1917,8 @@ export default {
       if (this.dialogActivitytype === 'add') {
         this.activityId = null
         this.taskList = []
+        this.values = ''
+        this.story = ''
         this._resetActivityInfo()
         this._fetchActivityList()
       }
@@ -2244,6 +2300,10 @@ export default {
       data.icon = iconUrl
       // 金额
       data.money = price
+      //首页模板
+      data.model = this.values
+      //首页故事叙述
+      data.story = this.story
       // 长期时间
       if (this.longTime === '1') {
         data.keep_time = 0
