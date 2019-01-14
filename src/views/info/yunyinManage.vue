@@ -47,7 +47,7 @@
       </el-table-column>
       <el-table-column label="活动价(元)" align="center" width="95">
         <template slot-scope="scope">
-          <span>{{ scope.row.price / 100 }}</span>
+          <span>{{ scope.row.price }}</span>
         </template>
       </el-table-column>
       <el-table-column label="所在地区" class-name="status-col" width="180">
@@ -292,7 +292,7 @@ export default {
         agent_id: getAgentId(),
         contacts: row.contacts,
         phone: row.phone,
-        price: row.price / 100,
+        price: row.price,
         selectArea: [row.province_id, row.city_id, row.county_id]
       }
     },

@@ -816,6 +816,7 @@
         <div class="progress_bg"></div>
         <div class="progress_content">
           <el-progress  :percentage='jindu' type="circle"></el-progress>
+          <div style="text-align: center;">{{ img_num }} / {{ img_nums }}</div>
         </div>
       </div>
     </div>
@@ -920,6 +921,7 @@ export default {
   },
   data() {
     return {
+<<<<<<< HEAD
       model_yu:false,
       model_img:require('../../assets/img/keji.png'),
       values:'',
@@ -940,6 +942,10 @@ export default {
           name: '淡雅风'
       }],
       story:'',
+=======
+      img_num: 0,
+      img_nums: 0,
+>>>>>>> 5a85dd5ecb2a9c958b78865c934cf913bea35660
       editorOption:{
         modules:{
             toolbar:[
@@ -1444,16 +1450,19 @@ export default {
       const ImgObj = {}
       const ImgInput = document.querySelector('#ImgInput')
       const length = ImgInput.files.length
+      this.img_nums = length
       const config = {
         headers: { 'Content-Type': 'multipart/form-data' },
-        onUploadProgress: progressEvent => {
-          this.jindu=progressEvent.loaded / progressEvent.total * 100 | 0
-          console.log(progressEvent.loaded / progressEvent.total * 100 | 0) + '%'
-        }
+        // onUploadProgress: progressEvent => {
+        //   this.jindu=progressEvent.loaded / progressEvent.total * 100 | 0
+        //   console.log(progressEvent.loaded / progressEvent.total * 100 | 0) + '%'
+        // }
       }
       let count = 0;
       // let loadingInstance = Loading.service({ fullscreen: true, text: `上传中` })
       for(let item of ImgInput.files) {
+        this.img_num = this.img_num + 1
+        this.jindu = Math.floor(this.img_num / (length) * 100)
         const fileType = item.type.split('/')[1]
         const keyname = 'top-team' + Date.now() + '' + (Math.random() * 100) + '.' + fileType
         const token = await this._fetchQiNiuToken()
@@ -1478,6 +1487,9 @@ export default {
                 const name = item.name.split('.')[0]
                 ImgObj[name] = url
                 if (Object.keys(ImgObj).length === length) {
+                  that.is_progress = false
+                  that.jindu = 0
+                  that.img_num = 0
                   axios.post(
                     '/i/topteam/admin/MatchTaskPic',
                     { activity_id: that.activityId, match_list: JSON.stringify(ImgObj) }
@@ -1491,8 +1503,6 @@ export default {
                     e.target.value = ''
                   })
                 }
-                that.is_progress=false
-                that.jindu=0
               })
           });
         }else{
@@ -1503,6 +1513,9 @@ export default {
               const name = item.name.split('.')[0]
               ImgObj[name] = url
               if (Object.keys(ImgObj).length === length) {
+                this.is_progress = false
+                this.jindu = 0
+                this.img_num = 0
                 axios.post(
                   '/i/topteam/admin/MatchTaskPic',
                   { activity_id: this.activityId, match_list: JSON.stringify(ImgObj) }
@@ -1516,8 +1529,6 @@ export default {
                   e.target.value = ''
                 })
               }
-              this.is_progress=false
-              this.jindu=0
             })
           } catch (error) {
             console.log(error)
