@@ -921,7 +921,6 @@ export default {
   },
   data() {
     return {
-<<<<<<< HEAD
       model_yu:false,
       model_img:require('../../assets/img/keji.png'),
       values:'',
@@ -942,10 +941,8 @@ export default {
           name: '淡雅风'
       }],
       story:'',
-=======
       img_num: 0,
       img_nums: 0,
->>>>>>> 5a85dd5ecb2a9c958b78865c934cf913bea35660
       editorOption:{
         modules:{
             toolbar:[
