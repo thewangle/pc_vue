@@ -11,7 +11,9 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/i': {
-        target: 'http://topteam.siygo.com',
+        target: 'http://topteam.siygo.com', //预发布
+        // target: 'http://topteam.ueuc.com', // 开发环境
+        // target: 'http://bxunion.com', // 线上
         changeOrigin: true
       }
     },
