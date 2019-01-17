@@ -412,7 +412,7 @@
         <el-form-item label="答题人数" label-width="100px">
           <el-input v-model="taskInfo.answer_limit" :disabled="activityInfo.type === '2' || taskInfo.answer_type === '4' || checkInfo.type === '2'" type="number" />
         </el-form-item>
-        <el-form-item label="题目图片" label-width="100px">
+        <el-form-item label="题目示例" label-width="100px">
           <el-upload
             :http-request="handleUpLoadTaksImg"
             :on-preview="handleTaskImgPreview"
@@ -421,7 +421,7 @@
             :file-list="taskQFileList"
             list-type="picture-card"
           >
-            <el-button>上传图片</el-button>
+            <el-button>上传示例</el-button>
           </el-upload>
           <el-dialog :visible.sync="dialogTaskImgVisible">
             <img :src="dialogTaskImageUrl" width="100%" alt="">
