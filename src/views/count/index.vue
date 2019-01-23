@@ -48,7 +48,7 @@
       </el-table-column>
       <el-table-column label="总计价格(元)" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.total_price / 100 }}</span>
+          <span>{{ scope.row.total_price }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
@@ -86,7 +86,7 @@
         </el-table-column>
         <el-table-column label="活动价(元)">
           <template slot-scope="scope">
-            <span>{{ scope.row.price / 100 }}</span>
+            <span>{{ scope.row.price }}</span>
           </template>
         </el-table-column>
         <el-table-column label="支付方式">
