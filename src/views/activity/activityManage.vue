@@ -131,7 +131,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="选择教练">
-          <el-select v-model="activityInfo.coachId" :disabled="(dialogActivitytype === 'edit' && !activityInfo.coachId) || needCoach === '2'" :clearable="!(dialogActivitytype === 'edit' && activityInfo.coachId)">
+          <el-select v-model="activityInfo.coachId" :disabled="needCoach === '2'" :clearable="!(dialogActivitytype === 'edit' && activityInfo.coachId)">
             <el-option v-for="item in coachList" :label="item.name" :value="item.id" :key="item.id" />
           </el-select>
         </el-form-item>
@@ -796,7 +796,11 @@
         <el-input placeholder="请输入地址（如需搜索城市请加上城市所在上级地址）" v-model="searchLocation" style="width: 400px; margin-bottom: 10px;"/>
         <el-button type="primary" @click="handleSearchLocation">搜索</el-button>
       </div>
-
+      <div class="search-area">
+        <el-input placeholder="请输入纬度" maxlength="10" v-model="serch_lat" style="width: 198px; margin-bottom: 10px;"/>
+        <el-input placeholder="请输入经度" maxlength="10" v-model="serch_lng" style="width: 198px; margin-bottom: 10px;"/>
+        <el-button type="primary" @click="handleSearchLocation_byLatLng">定位</el-button>
+      </div>
       <div id="map-container" style="width: 100%; height: 500px;"/>
       <div style="text-align: center; margin-top: 20px">
         <el-button type="primary" @click="handleSaveLocation">保存定位</el-button>
@@ -1038,6 +1042,9 @@ export default {
       taskClassfiyList: [], // 题目分类
       searchLocation: '', // 搜索地址
       searchService: null,        // 地图实例
+      cityService: null, //城市服务实例
+      serch_lat: '',
+      serch_lng: '',
       gameList: []
     }
   },
@@ -1177,6 +1184,18 @@ export default {
       }
       this.searchService.search(this.searchLocation)
     },
+    //根据经纬度定位
+    handleSearchLocation_byLatLng() {
+      let reg=/^[0-9]+.?[0-9]*$/
+      if(!reg.test(this.serch_lat) || !reg.test(this.serch_lng)) {
+          this.$message({ message: '请输入数字经纬度', type: 'error' })
+      } else {
+        //设置经纬度信息
+        let latLng = new qq.maps.LatLng(this.serch_lat, this.serch_lng);
+        //调用城市经纬度查询接口实现经纬查询
+        this.cityService.searchCityByLatLng(latLng);
+      }
+    },
     handleSaveLocation() {
       this.$set(this.taskInfo, 'location_point', this.chooseLocation.join())
       // this.taskInfo.location_point = this.chooseLocation.join()
@@ -1235,10 +1254,13 @@ export default {
             map.setZoom(18)
             map.setCenter(result.detail.latLng);
             marker.setPosition(result.detail.latLng)
+            console.log(result.detail.latLng)
           }
         })
         // 保存搜索服务实例
         this.searchService = searchService
+        // 保存设置城市服务实例
+        this.cityService = cityService
 
         // 地址和经纬度之间进行转换服务
         const geocoder = new qq.maps.Geocoder()
@@ -1406,6 +1428,11 @@ export default {
       for(let item of ImgInput.files) {
         this.img_num = this.img_num + 1
         this.jindu = Math.floor(this.img_num / (length) * 100)
+        if (this.img_num == this.img_nums) {
+          this.is_progress = false
+          this.jindu = 0
+          this.img_num = 0
+        }
         const fileType = item.type.split('/')[1]
         const keyname = 'top-team' + Date.now() + '' + (Math.random() * 100) + '.' + fileType
         const token = await this._fetchQiNiuToken()
@@ -1429,10 +1456,8 @@ export default {
                 const url = that.qiniuAddress + '/' + res.data.key
                 const name = item.name.split('.')[0]
                 ImgObj[name] = url
+                console.log(Object.keys(ImgObj).length)
                 if (Object.keys(ImgObj).length === length) {
-                  that.is_progress = false
-                  that.jindu = 0
-                  that.img_num = 0
                   axios.post(
                     '/i/topteam/admin/MatchTaskPic',
                     { activity_id: that.activityId, match_list: JSON.stringify(ImgObj) }
@@ -1455,10 +1480,8 @@ export default {
               const url = this.qiniuAddress + '/' + res.data.key
               const name = item.name.split('.')[0]
               ImgObj[name] = url
+              console.log(Object.keys(ImgObj).length)
               if (Object.keys(ImgObj).length === length) {
-                this.is_progress = false
-                this.jindu = 0
-                this.img_num = 0
                 axios.post(
                   '/i/topteam/admin/MatchTaskPic',
                   { activity_id: this.activityId, match_list: JSON.stringify(ImgObj) }
