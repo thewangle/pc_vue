@@ -1569,14 +1569,16 @@ export default {
       this.dialogVisible = true
     },
     handleRemoveimg() {
-      this.activityInfo.bgImgUrl = ''
+      this.activityInfo.bgImgUrl = 'src/assets/404_images/bg_img.jpg'
+      this.dialogImageUrl = this.activityInfo.bgImgUrl
     },
     handleIconCardPreview() {
       this.dialogImageUrl = this.activityInfo.iconUrl
       this.dialogVisible = true
     },
     handleIconCardicon() {
-      this.activityInfo.iconUrl = ''
+      this.activityInfo.iconUrl = 'src/assets/404_images/bg_img.jpg'
+      this.dialogImageUrl = this.activityInfo.iconUrl
     },
     handleGifCardPreview() {
       this.dialogImageUrl = this.activityInfo.gif_url
