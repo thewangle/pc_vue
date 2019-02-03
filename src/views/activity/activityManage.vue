@@ -193,6 +193,7 @@
             <el-upload
               :http-request="handleUpLoadIconImg"
               :on-preview="handleIconCardPreview"
+              :on-remove="handleIconCardicon"
               :limit="1"
               :action="domain"
               :file-list="iconFilelist"
@@ -208,6 +209,7 @@
             <el-upload
               :http-request="handleUpLoadBgImg"
               :on-preview="handleBgCardPreview"
+              :on-remove="handleRemoveimg"
               :limit="1"
               :action="domain"
               :file-list="bgFileList"
@@ -220,6 +222,7 @@
             <el-upload
               :http-request="handleUpLoadGifImg"
               :on-preview="handleGifCardPreview"
+              :on-remove="handleGifCardgif"
               :limit="1"
               :action="domain"
               :file-list="gifFileList"
@@ -1565,13 +1568,22 @@ export default {
       this.dialogImageUrl = this.activityInfo.bgImgUrl
       this.dialogVisible = true
     },
+    handleRemoveimg() {
+      this.activityInfo.bgImgUrl = ''
+    },
     handleIconCardPreview() {
       this.dialogImageUrl = this.activityInfo.iconUrl
       this.dialogVisible = true
     },
+    handleIconCardicon() {
+      this.activityInfo.iconUrl = ''
+    },
     handleGifCardPreview() {
       this.dialogImageUrl = this.activityInfo.gif_url
       this.dialogVisible = true
+    },
+    handleGifCardgif() {
+      this.activityInfo.gif_url = ''
     },
     handleTaskImgPreview() {
       this.dialogTaskImageUrl = this.taskInfo.question_img
