@@ -1675,17 +1675,17 @@ export default {
         data.answer = data.answer2
       }
       if (data.type === '4') {
-        if (!data.answer_url) {
-          this.$message({ message: '请上传视频', type: 'error' })
-          return
-        }
+        // if (!data.answer_url) {
+        //   this.$message({ message: '请上传视频', type: 'error' })
+        //   return
+        // }
         data.answer = data.answer_url
       }
       if (data.type === '5') {
-        if (!data.answer_url) {
-          this.$message({ message: '请上音频', type: 'error' })
-          return
-        }
+        // if (!data.answer_url) {
+        //   this.$message({ message: '请上音频', type: 'error' })
+        //   return
+        // }
         data.answer = data.answer_url
       }
       // 拍照题
@@ -2377,17 +2377,17 @@ export default {
         data.answer = data.answer2
       }
       if (data.type === '4') {
-        if (!data.answer_url) {
-          this.$message({ message: '请上传视频', type: 'error' })
-          return
-        }
+        // if (!data.answer_url) {
+        //   this.$message({ message: '请上传视频', type: 'error' })
+        //   return
+        // }
         data.answer = data.answer_url
       }
       if (data.type === '5') {
-        if (!data.answer_url) {
-          this.$message({ message: '请上传音频', type: 'error' })
-          return
-        }
+        // if (!data.answer_url) {
+        //   this.$message({ message: '请上传音频', type: 'error' })
+        //   return
+        // }
         data.answer = data.answer_url
       }
       if (data.type === '6') {
