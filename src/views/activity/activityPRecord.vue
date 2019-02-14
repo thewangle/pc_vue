@@ -257,6 +257,7 @@ export default {
   },
   data() {
     return {
+      rowtemplate_id: 0,
       list: null,
       listLoading: false,
       total: 0,
@@ -354,7 +355,7 @@ export default {
     },
     handledialogCurrentChange(val) {
       this.dilogQuery.page_no = val;
-      this._fetchDetial();
+      this._fetchDetial1();
     },
     handleSizeChange(size) {
       this.listQuery.page_size = size;
@@ -374,11 +375,28 @@ export default {
       this._fetchDetial(row);
     },
     async _fetchDetial(row) {
+      console.log(this.dilogQuery)
+      this.rowtemplate_id = row.template_id
       row.id && (this.dilogQuery.act_id = row.id);
       let res = null;
       if (row.template_id > 0) {
         this.template_id = row.template_id;
         const list = await getTagList(row.template_id);
+        this.tagList = list.data.list;
+        res = await getPTloginfo(this.dilogQuery);
+      } else {
+        res = await getactteamloginfo(this.dilogQuery);
+      }
+      const { data } = res;
+      this.gridData = data.list;
+      this.dialogTotal = +data.total;
+      this.filterList = data.head;
+    },
+    async _fetchDetial1() {
+      let res = null;
+      if (this.rowtemplate_id > 0) {
+        this.template_id = this.rowtemplate_id;
+        const list = await getTagList(this.rowtemplate_id);
         this.tagList = list.data.list;
         res = await getPTloginfo(this.dilogQuery);
       } else {
