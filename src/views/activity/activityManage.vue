@@ -2262,6 +2262,10 @@ export default {
       data.icon = iconUrl
       // 金额
       data.money = price
+      //首页模板
+      data.model = this.values
+      //首页故事叙述
+      data.story = this.story
       // 长期时间
       if (this.longTime === '1') {
         data.keep_time = 0
