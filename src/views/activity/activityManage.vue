@@ -1865,11 +1865,13 @@ export default {
         agent_name, agent_id, act_desc, set_start_time, score,
         set_stop_time, activity_status, type, coach_id, name,
         score_type, score_show_type, keep_time, money, bg_img,
-        icon, gif_url, template_id
+        icon, gif_url, template_id, model, story
       } = this.activity
 
       this.activityInfo.score = score
       this.activityInfo.tplId = template_id
+      this.values = model
+      this.story = story
       if (template_id !== '0') {
         this.needTpl = '1'
       } else {
