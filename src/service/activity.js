@@ -9,7 +9,7 @@ import request from '@/utils/request'
  */
 export function addActivity(data) {
   return request({
-    url: '/i/topteam/admin/addactivity',
+    url: '/i/aaa/admin/addactivity',
     method: 'post',
     data
   })
@@ -20,7 +20,7 @@ export function addActivity(data) {
  */
 export function fetchActivityList(data) {
   return request({
-    url: '/i/topteam/admin/GetActivityList',
+    url: '/i/aaa/admin/GetActivityList',
     method: 'post',
     data
   })
@@ -31,7 +31,7 @@ export function fetchActivityList(data) {
  */
 export function fetchCoachList() {
   return request({
-    url: '/i/topteam/admin/getcoachlist',
+    url: '/i/aaa/admin/getcoachlist',
     method: 'get'
   })
 }
@@ -42,7 +42,7 @@ export function fetchCoachList() {
  */
 export function deleteActivity(id) {
   return request({
-    url: `/i/topteam/admin/delactivity?act_id=${id}`,
+    url: `/i/aaa/admin/delactivity?act_id=${id}`,
     method: 'get'
   })
 }
@@ -53,7 +53,7 @@ export function deleteActivity(id) {
  */
 export function fetchTaskList(data) {
   return request({
-    url: '/i/topteam/admin/GetTaskList',
+    url: '/i/aaa/admin/GetTaskList',
     method: 'post',
     data
   })
@@ -65,7 +65,7 @@ export function fetchTaskList(data) {
  */
 export function addTask(data) {
   return request({
-    url: 'i/topteam/admin/addTask',
+    url: 'i/aaa/admin/addTask',
     method: 'post',
     data
   })
@@ -77,7 +77,7 @@ export function addTask(data) {
  */
 export function fetchActivityInfo(data) {
   return request({
-    url: '/i/topteam/admin/getactivityinfo',
+    url: '/i/aaa/admin/getactivityinfo',
     method: 'post',
     data
   })
@@ -88,7 +88,7 @@ export function fetchActivityInfo(data) {
  */
 export function auditact(data) {
   return request({
-    url: '/i/topteam/admin/auditact',
+    url: '/i/aaa/admin/auditact',
     method: 'post',
     data
   })
@@ -99,7 +99,7 @@ export function auditact(data) {
  */
 export function creatOrder(data) {
   return request({
-    url: '/i/topteam/api/createorder',
+    url: '/i/aaa/api/createorder',
     method: 'post',
     data
   })
@@ -110,7 +110,7 @@ export function creatOrder(data) {
  */
 export function getPayInfo(data) {
   return request({
-    url: '/i/topteam/api/getpayinfo',
+    url: '/i/aaa/api/getpayinfo',
     method: 'post',
     data
   })
@@ -122,7 +122,7 @@ export function getPayInfo(data) {
  */
 export function updateActivity(data) {
   return request({
-    url: '/i/topteam/admin/updateactivity',
+    url: '/i/aaa/admin/updateactivity',
     method: 'post',
     data
   })
@@ -133,7 +133,7 @@ export function updateActivity(data) {
  */
 export function delTask(id) {
   return request({
-    url: `/i/topteam/admin/delTask?id=${id}`,
+    url: `/i/aaa/admin/delTask?id=${id}`,
     method: 'get'
   })
 }
@@ -143,7 +143,7 @@ export function delTask(id) {
  */
 export function editTask(data) {
   return request({
-    url: '/i/topteam/admin/ModifyTask',
+    url: '/i/aaa/admin/ModifyTask',
     method: 'post',
     data
   })
@@ -154,7 +154,7 @@ export function editTask(data) {
  */
 export function fetchList(data) {
   return request({
-    url: '/i/topteam/admin/GetActivityList',
+    url: '/i/aaa/admin/GetActivityList',
     method: 'post',
     data
   })
@@ -165,7 +165,7 @@ export function fetchList(data) {
  */
 export function getActivityDetial(id) {
   return request({
-    url: `/i/topteam/admin/getactteamloginfo?act_id=${id}`,
+    url: `/i/aaa/admin/getactteamloginfo?act_id=${id}`,
     method: 'get'
   })
 }
@@ -175,7 +175,7 @@ export function getActivityDetial(id) {
  */
 export function fetchTaskLibList(data) {
   return request({
-    url: '/i/topteam/admin/getTaskLibList',
+    url: '/i/aaa/admin/getTaskLibList',
     method: 'post',
     data
   })
@@ -187,7 +187,7 @@ export function fetchTaskLibList(data) {
  */
 export function delTaskLib(id) {
   return request({
-    url: `/i/topteam/admin/delTaskLib?id=${id}`,
+    url: `/i/aaa/admin/delTaskLib?id=${id}`,
     method: 'get'
   })
 }
@@ -197,7 +197,7 @@ export function delTaskLib(id) {
  */
 export function addTaskLib(data) {
   return request({
-    url: '/i/topteam/admin/addTaskLib',
+    url: '/i/aaa/admin/addTaskLib',
     method: 'post',
     data
   })
@@ -208,7 +208,7 @@ export function addTaskLib(data) {
  */
 export function updateTaskLib(data) {
   return request({
-    url: '/i/topteam/admin/ModifyTaskLib',
+    url: '/i/aaa/admin/ModifyTaskLib',
     method: 'post',
     data
   })
@@ -220,7 +220,7 @@ export function updateTaskLib(data) {
 
 export function chooseTasklib(data) {
   return request({
-    url: '/i/topteam/admin/ChooseTasklib',
+    url: '/i/aaa/admin/ChooseTasklib',
     method: 'post',
     data
   })
@@ -231,7 +231,7 @@ export function chooseTasklib(data) {
  */
 export function getTacskClassifyList(data = { page_no: 1, page_size: 1000 }) {
   return request({
-    url: '/i/topteam/admin/getclassifylist',
+    url: '/i/aaa/admin/getclassifylist',
     method: 'get',
     data
   })
@@ -242,7 +242,7 @@ export function getTacskClassifyList(data = { page_no: 1, page_size: 1000 }) {
  */
 export function addClassfiy(data) {
   return request({
-    url: '/i/topteam/admin/addclassify',
+    url: '/i/aaa/admin/addclassify',
     method: 'post',
     data
   })
@@ -254,7 +254,7 @@ export function addClassfiy(data) {
  */
 export function delClassify(data) {
   return request({
-    url: '/i/topteam/admin/delclassify',
+    url: '/i/aaa/admin/delclassify',
     method: 'post',
     data
   })
@@ -266,7 +266,7 @@ export function delClassify(data) {
  */
 export function updateClassfiy(data) {
   return request({
-    url: '/i/topteam/admin/Modifyclassify',
+    url: '/i/aaa/admin/Modifyclassify',
     method: 'post',
     data
   })
@@ -277,7 +277,7 @@ export function updateClassfiy(data) {
  */
 export function getactteamloginfo(data) {
   return request({
-    url: '/i/topteam/admin/getactploginfo',
+    url: '/i/aaa/admin/getactploginfo',
     method: 'post',
     data
   })
@@ -288,7 +288,7 @@ export function getactteamloginfo(data) {
  */
 export function cancelact(id) {
   return request({
-    url: `/i/topteam/admin/cancelact?act_id=${id}`,
+    url: `/i/aaa/admin/cancelact?act_id=${id}`,
     method: 'get'
   })
 }
@@ -300,7 +300,7 @@ export function cancelact(id) {
  */
 export function moveTask(id, type) {
   return request({
-    url: `/i/topteam/admin/MoveTask?id=${id}&move_type=${type}`
+    url: `/i/aaa/admin/MoveTask?id=${id}&move_type=${type}`
   })
 }
 
@@ -309,7 +309,7 @@ export function moveTask(id, type) {
  */
 export function getPTloginfo(data) {
   return request({
-    url: '/i/topteam/admin/getactptloginfo',
+    url: '/i/aaa/admin/getactptloginfo',
     method: 'post',
     data
   })
@@ -318,7 +318,7 @@ export function getPTloginfo(data) {
 // 个人特殊活动统计分析
 export function getAnalysis(data) {
   return request({
-    url: '/i/topteam/admin/getfenxipact',
+    url: '/i/aaa/admin/getfenxipact',
     method: 'post',
     data
   })
@@ -327,7 +327,7 @@ export function getAnalysis(data) {
 // 个人答题结果列表
 export function getPerResult(data) {
   return request({
-    url: '/i/topteam/admin/getanswerrecord',
+    url: '/i/aaa/admin/getanswerrecord',
     method: 'post',
     data
   })
@@ -336,7 +336,7 @@ export function getPerResult(data) {
 // 个人答题统计分析
 export function getPerResultAnalysis(data) {
   return request({
-    url: '/i/topteam/admin/getanswerstatistics',
+    url: '/i/aaa/admin/getanswerstatistics',
     method: 'post',
     data
   })
@@ -345,7 +345,7 @@ export function getPerResultAnalysis(data) {
 // 新增游戏
 export function addGame(data) {
   return request({
-    url: '/i/topteam/admin/addgame',
+    url: '/i/aaa/admin/addgame',
     method: 'post',
     data
   })
@@ -354,7 +354,7 @@ export function addGame(data) {
 // 修改游戏
 export function changeGame(data) {
   return request({
-    url: '/i/topteam/admin/updategame',
+    url: '/i/aaa/admin/updategame',
     method: 'post',
     data
   })
@@ -363,7 +363,7 @@ export function changeGame(data) {
 // 上架游戏
 export function pullOnGame(data) {
   return request({
-    url: '/i/topteam/admin/onsale',
+    url: '/i/aaa/admin/onsale',
     method: 'post',
     data
   })
@@ -372,7 +372,7 @@ export function pullOnGame(data) {
 // 游戏列表
 export function gameList(data) {
   return request({
-    url: '/i/topteam/admin/getgamelist',
+    url: '/i/aaa/admin/getgamelist',
     method: 'post',
     data
   })
@@ -381,7 +381,7 @@ export function gameList(data) {
 // 删除游戏
 export function delGame(data) {
   return request({
-    url: '/i/topteam/admin/delgame',
+    url: '/i/aaa/admin/delgame',
     method: 'post',
     data
   })
@@ -390,7 +390,7 @@ export function delGame(data) {
 // 上传游戏
 export function uploadGame(formData, config) {
   return request({
-    url: '/i/topteam/admin/uploadfile',
+    url: '/i/aaa/admin/uploadfile',
     method: 'post',
     formData,
     config
@@ -400,7 +400,7 @@ export function uploadGame(formData, config) {
 // 获取活动列表
 export function getDemoActList() {
   return request({
-    url: '/i/topteam/admin/getdemoactlist',
+    url: '/i/aaa/admin/getdemoactlist',
     method: 'get'
   })
 }
@@ -408,7 +408,7 @@ export function getDemoActList() {
 // 创建演示活动
 export function createDemoAct(data) {
   return request({
-    url: '/i/topteam/admin/adddemoact',
+    url: '/i/aaa/admin/adddemoact',
     method: 'post',
     data
   })

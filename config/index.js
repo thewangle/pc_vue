@@ -10,6 +10,7 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
+      //服务器代理
       // '/i': {
       //   // target: 'http://topteam.siygo.com', //预发布
       //   // target: 'http://topteam.ueuc.com', // 开发环境

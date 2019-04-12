@@ -70,6 +70,21 @@ export const asyncRouterMap = [
       }
     ]
   },
+  {
+    path: '/table',
+    id: 2,
+    component: Layout,
+    redirect: 'dashboard',
+    hidden: true,
+    children: [
+      {
+        path: 'table',
+        component: () => import('@/views/table/index'),
+        name: 'Table',
+        meta: { title: '表格展现', icon: 'dashboard', noCache: true }
+      }
+    ]
+  },
   // {
   //   path: '/documentation',
   //   component: Layout,
