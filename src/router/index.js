@@ -56,7 +56,7 @@ export const constantRouterMap = [
 
 export const asyncRouterMap = [
   {
-    path: '',
+    path: '/',
     id: 1,
     component: Layout,
     redirect: 'dashboard',
@@ -70,114 +70,44 @@ export const asyncRouterMap = [
       }
     ]
   },
-  {
-    path: '/documentation',
-    component: Layout,
-    redirect: '/documentation/index',
-    hidden: true,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/documentation/index'),
-        name: 'Documentation',
-        meta: { title: '文档', icon: 'documentation', noCache: true }
-      }
-    ]
-  },
-  tableRouter,
-  infoRouter,
-  {
-    id: 4,
-    path: '/count',
-    component: Layout,
-    redirct: '/count/show',
-    name: 'Count',
-    meta: {
-      title: '财务统计',
-      icon: 'money'
-    },
-    hidden: true,
-    children: [
-      {
-        id: 14,
-        path: 'show',
-        component: () => import('@/views/count/index'),
-        name: 'Show',
-        meta: { title: '财务统计', icon: 'money' },
-        hidden: true
-      },
-      {
-        id: 54,
-        path: 'personCounte',
-        component: () => import('@/views/count/personCounte'),
-        name: 'PersonCounte',
-        meta: { title: '个人版财务统计', icon: 'money' },
-        hidden: true
-      },
-      {
-        id: 15,
-        path: 'recharge',
-        component: () => import('@/views/count/recharge'),
-        name: 'Recharge',
-        meta: { title: '充值记录', icon: 'money' },
-        hidden: true
-      }
-    ]
-  },
-  {
-    id: 5,
-    path: '/system',
-    component: Layout,
-    redirect: '/system/activitystatusmanage',
-    name: 'System',
-    meta: {
-      title: '系统设置',
-      icon: 'edit'
-    },
-    hidden: true,
-    children: [
-      {
-        id: 12,
-        path: 'usermanage',
-        component: () => import('@/views/system/userManage'),
-        name: 'UserManage',
-        meta: { title: '用户管理', icon: 'user', noCache: true },
-        hidden: true
-      },
-      {
-        id: 13,
-        path: 'rolemanage',
-        component: () => import('@/views/system/roleManage'),
-        name: 'RoleManage',
-        meta: { title: '角色管理', icon: 'edit', noCache: true },
-        hidden: true
-      },
-      {
-        id: 51,
-        path: 'operatorLog',
-        component: () => import('@/views/system/operatorLog'),
-        name: 'OperatorLog',
-        meta: { title: '操作日志', icon: 'edit', noCache: true },
-        hidden: true
-      },
-      {
-        id: 55,
-        path: 'taskClassify',
-        component: () => import('@/views/system/taskClassify'),
-        name: 'TaskClassfiy',
-        meta: { title: '题目分类字典', icon: 'edit', noCache: true },
-        hidden: true
-      },
-      {
-        id: 62,
-        path: 'dictionaryInfo',
-        component: () => import('@/views/system/dictionaryInfo'),
-        name: 'DictionaryInfo',
-        meta: { title: '采集信息字典', icon: 'edit', noCache: true },
-        hidden: true
-      }
-    ]
-  },
+  // {
+  //   path: '/documentation',
+  //   component: Layout,
+  //   redirect: '/documentation/index',
+  //   hidden: true,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/documentation/index'),
+  //       name: 'Documentation',
+  //       meta: { title: '文档', icon: 'documentation', noCache: true }
+  //     }
+  //   ]
+  // },
+  // tableRouter,
+  // infoRouter,
+  // {
+  //   id: 4,
+  //   path: '/count',
+  //   component: Layout,
+  //   redirct: '/count/show',
+  //   name: 'Count',
+  //   meta: {
+  //     title: '财务统计',
+  //     icon: 'money'
+  //   },
+  //   hidden: true,
+  //   children: [
+  //     {
+  //       id: 14,
+  //       path: 'show',
+  //       component: () => import('@/views/count/index'),
+  //       name: 'Show',
+  //       meta: { title: '财务统计', icon: 'money' },
+  //       hidden: true
+  //     },
+  //   ]
+  // },
   { path: '*', redirect: '/404', hidden: true }
 ]
 

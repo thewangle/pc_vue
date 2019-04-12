@@ -22,21 +22,44 @@ router.beforeEach(async(to, from, next) => {
     } else {
       // router.addRoutes(asyncRouterMap) // 动态添加可访问路由表
       // next({ ...to, replace: true })
-      if (!menuList) {
-        const res = await fetchMenuList()
-        menuList = res.data
-        store.dispatch('GenerateRoutes', menuList)
-      }
+      // if (!menuList) {
+      //   const res = await fetchMenuList()
+      //   menuList = res.data
+      //   store.dispatch('GenerateRoutes', menuList)
+      // }
+      let menuList = [
+        {
+            "id": "1",
+            "menu_name": "首页",
+            "url": "",
+            "parent_id": "0",
+            "type": "page",
+            "childs": []
+        },
+      ]
+      store.dispatch('GenerateRoutes', menuList)
       next()
     }
   } else {
+    let menuList = [
+      {
+          "id": "1",
+          "menu_name": "首页",
+          "url": "",
+          "parent_id": "0",
+          "type": "page",
+          "childs": []
+      },
+    ]
+    store.dispatch('GenerateRoutes', menuList)
+    next()
     /* has no token*/
-    if (whiteList.indexOf(to.path) !== -1) { // 在免登录白名单，直接进入
-      next()
-    } else {
-      next('/login') // 否则全部重定向到登录页
-      NProgress.done() // if current page is login will not trigger afterEach hook, so manually handle it
-    }
+    // if (whiteList.indexOf(to.path) !== -1) { // 在免登录白名单，直接进入
+    //   next()
+    // } else {
+    //   next('/login') // 否则全部重定向到登录页
+    //   NProgress.done() // if current page is login will not trigger afterEach hook, so manually handle it
+    // }
   }
 })
 

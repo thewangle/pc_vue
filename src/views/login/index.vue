@@ -138,16 +138,18 @@ export default {
           this.loading = true
           this.logins='登录中...'
           const { username, password } = this.loginForm
-          try {
-            const res = await login({ user_name: username, passwd: password })
-            setUserInfo(res.data)
-            this.loading = false
-            this.logins='登录'
-            this.$router.push({ path: '/' })
-          } catch (e) {
-            this.loading = false
-            this.logins='登录'  
-          }
+          this.$router.push({ path: '/' })
+          setUserInfo(this.loginForm)
+          // try {
+          //   const res = await login({ user_name: username, passwd: password })
+          //   setUserInfo(res.data)
+          //   this.loading = false
+          //   this.logins='登录'
+          //   this.$router.push({ path: '/' })
+          // } catch (e) {
+          //   this.loading = false
+          //   this.logins='登录'  
+          // }
         } else {
           console.log('error submit!!')
           return false

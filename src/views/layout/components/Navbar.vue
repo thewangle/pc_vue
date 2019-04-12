@@ -2,7 +2,7 @@
   <el-menu class="navbar" mode="horizontal">
     <hamburger :toggle-click="toggleSideBar" :is-active="sidebar.opened" class="hamburger-container"/>
 
-    <div class="system-name">Mind Tower 印塔管理系统</div>
+    <div class="system-name">Enjoy the joy 乐享悦动</div>
 
     <div class="user-name">{{ name }}</div>
 
@@ -21,12 +21,12 @@
         <theme-picker class="theme-switch right-menu-item"/>
       </el-tooltip> -->
 
-      <div class="tips">
+      <!-- <div class="tips">
         <router-link to="/documentation">消息</router-link>
       </div>
       <div class="download">
         <router-link to="/documentation">下载中心</router-link>
-      </div>
+      </div> -->
 
       <el-dropdown class="avatar-container right-menu-item" trigger="click">
         <div class="avatar-wrapper">

@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function fetchQiNiuToken() {
   return request({
-    url: '/i/topteam/api/uptoken',
+    url: '/i/aaa/api/uptoken',
     method: 'post'
   })
 }
@@ -15,7 +15,7 @@ export function fetchQiNiuToken() {
  */
 export function fetchMenuList() {
   return request({
-    url: '/i/topteam/admin/getmenulist',
+    url: '/i/aaa/admin/getmenulist',
     method: 'get'
   })
 }
@@ -27,7 +27,7 @@ export function fetchMenuList() {
  */
 export function login(data) {
   return request({
-    url: '/i/topteam/admin/login',
+    url: '/i/aaa/admin/login',
     method: 'post',
     data
   })
@@ -38,7 +38,7 @@ export function login(data) {
  */
 export function logout() {
   return request({
-    url: '/i/topteam/admin/logout',
+    url: '/i/aaa/admin/logout',
     method: 'get'
   })
 }
@@ -48,7 +48,7 @@ export function logout() {
  */
 export function fetchCityList() {
   return request({
-    url: '/i/topteam/api/getcitylist',
+    url: '/i/aaa/api/getcitylist',
     method: 'get'
   })
 }

@@ -10,12 +10,12 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/i': {
-        target: 'http://topteam.siygo.com', //预发布
-        // target: 'http://topteam.ueuc.com', // 开发环境
-        // target: 'http://bxunion.com', // 线上
-        changeOrigin: true
-      }
+      // '/i': {
+      //   // target: 'http://topteam.siygo.com', //预发布
+      //   // target: 'http://topteam.ueuc.com', // 开发环境
+      //   // target: 'http://bxunion.com', // 线上
+      //   changeOrigin: true
+      // }
     },
 
     // Various Dev Server settings
@@ -23,7 +23,7 @@ module.exports = {
     // can be overwritten by process.env.HOST
     // if you want dev by ip, please set host: '0.0.0.0'
     host: 'localhost',
-    port: 9527, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
+    port: 5555, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     autoOpenBrowser: true,
     errorOverlay: true,
     notifyOnErrors: false,

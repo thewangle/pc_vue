@@ -14,54 +14,22 @@ const tableRouter = {
   },
   hidden: true,
   children: [
-    {
-      id: 6,
-      path: 'activity-manage',
-      component: () => import('@/views/activity/activityManage'),
-      name: 'ActivityManage',
-      meta: { title: '我的活动', icon: 'documentation' },
-      hidden: true
-    },
-    {
-      id: 7,
-      path: 'activity-record',
-      component: () => import('@/views/activity/activityRecord'),
-      name: 'AtivityRecord',
-      meta: { title: '团队版活动记录', icon: 'documentation' },
-      hidden: true
-    },
-    {
-      id: 53,
-      path: 'activityprecord',
-      component: () => import('@/views/activity/activityPRecord'),
-      name: 'AtivityPRecord',
-      meta: { title: '个人版活动记录', icon: 'documentation' },
-      hidden: true
-    },
-    {
-      id: 8,
-      path: 'activity-subkectlib',
-      component: () => import('@/views/activity/subjectLib'),
-      name: 'SubkectLib',
-      meta: { title: '题库管理', icon: 'documentation' },
-      hidden: true
-    },
-    {
-      id: 65,
-      path: 'game-manage',
-      component: () => import('@/views/activity/gameManage'),
-      name: 'gameManage',
-      meta: { title: '游戏管理', icon: 'documentation' },
-      hidden: true
-    },
-    {
-      id: 66,
-      path: 'demo-game',
-      component: () => import('@/views/activity/demoGame'),
-      name: 'demoGame',
-      meta: { title: '演示活动', icon: 'documentation' },
-      hidden: true
-    }
+    // {
+    //   id: 6,
+    //   path: 'activity-manage',
+    //   component: () => import('@/views/activity/activityManage'),
+    //   name: 'ActivityManage',
+    //   meta: { title: '我的活动', icon: 'documentation' },
+    //   hidden: true
+    // },
+    // {
+    //   id: 7,
+    //   path: 'activity-record',
+    //   component: () => import('@/views/activity/activityRecord'),
+    //   name: 'AtivityRecord',
+    //   meta: { title: '团队版活动记录', icon: 'documentation' },
+    //   hidden: true
+    // },
   ]
 }
 export default tableRouter
