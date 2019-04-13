@@ -81,8 +81,38 @@ export const asyncRouterMap = [
         path: 'table',
         component: () => import('@/views/table/index'),
         name: 'Table',
-        meta: { title: '表格展现', icon: 'dashboard', noCache: true }
+        meta: { title: '表格展现', icon: 'documentation', noCache: true }
       }
+    ]
+  },
+  {
+    id: 3,
+    path: '/count',
+    component: Layout,
+    redirct: '/features/one',
+    name: 'Features',
+    meta: {
+      title: '功能集锦',
+      icon: 'edit'
+    },
+    hidden: true,
+    children: [
+      {
+        id: 14,
+        path: 'one',
+        component: () => import('@/views/features/one'),
+        name: 'One',
+        meta: { title: '功能一', icon: 'edit' },
+        hidden: true
+      },
+      {
+        id: 15,
+        path: 'two',
+        component: () => import('@/views/features/one'),
+        name: 'Two',
+        meta: { title: '功能二', icon: 'edit' },
+        hidden: true
+      },
     ]
   },
   // {
@@ -101,28 +131,6 @@ export const asyncRouterMap = [
   // },
   // tableRouter,
   // infoRouter,
-  // {
-  //   id: 4,
-  //   path: '/count',
-  //   component: Layout,
-  //   redirct: '/count/show',
-  //   name: 'Count',
-  //   meta: {
-  //     title: '财务统计',
-  //     icon: 'money'
-  //   },
-  //   hidden: true,
-  //   children: [
-  //     {
-  //       id: 14,
-  //       path: 'show',
-  //       component: () => import('@/views/count/index'),
-  //       name: 'Show',
-  //       meta: { title: '财务统计', icon: 'money' },
-  //       hidden: true
-  //     },
-  //   ]
-  // },
   { path: '*', redirect: '/404', hidden: true }
 ]
 

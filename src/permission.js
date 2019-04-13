@@ -32,21 +32,46 @@ router.beforeEach(async(to, from, next) => {
   } else {
     let menuList = [
       {
-          "id": "1",
-          "menu_name": "首页",
-          "url": "",
-          "parent_id": "0",
-          "type": "page",
-          "childs": []
+        "id": "1",
+        "menu_name": "首页",
+        "url": "",
+        "parent_id": "0",
+        "type": "page",
+        "childs": []
       },
       {
-          "id": "2",
-          "menu_name": "表格展示",
-          "url": "",
-          "parent_id": "0",
-          "type": "page",
-          "childs": []
-        },
+        "id": "2",
+        "menu_name": "表格展示",
+        "url": "",
+        "parent_id": "0",
+        "type": "page",
+        "childs": []
+      },
+      {
+        "id": "3",
+        "menu_name": "功能集锦",
+        "url": "",
+        "parent_id": "0",
+        "type": "page",
+        "childs": [
+          {
+            "id": "14",
+            "menu_name": "功能一",
+            "url": "",
+            "parent_id": "3",
+            "type": "page",
+            "childs": []
+          },
+          {
+            "id": "15",
+            "menu_name": "功能二",
+            "url": "",
+            "parent_id": "3",
+            "type": "page",
+            "childs": []
+          },
+        ]
+      },
     ]
     store.dispatch('GenerateRoutes', menuList)
     next()
