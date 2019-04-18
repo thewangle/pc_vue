@@ -48,7 +48,7 @@
 <script>
 import { login } from './../../service/common'
 import { fetchRoleMenulist } from './../../service/role'
-import { setUserInfo, getRoleId } from '@/utils/auth'
+import { setUserInfo, getRoleId, setPassword, getPassword, setUserName, getUserName, removeUserName, removePassword } from '@/utils/auth'
 
 export default {
   name: 'Login',
@@ -84,7 +84,8 @@ export default {
     }
   },
   mounted(){
-    this.getCookie();
+    this.getCookie()
+    // this.getuser_name_pass()
   },
   created() {
     // window.addEventListener('hashchange', this.afterQRScan)
@@ -93,6 +94,11 @@ export default {
     // window.removeEventListener('hashchange', this.afterQRScan)
   },
   methods: {
+    //通过cookie.js的方式获取username和password
+    getuser_name_pass() {
+      this.loginForm.username = this.getUserName()
+      this.loginForm.password = this.getPassword()
+    },
     //设置cookie
     setCookie(c_name, c_pwd, exdays) {
         var exdate = new Date();
@@ -130,8 +136,14 @@ export default {
     handleLogin() {
       if (this.user_record) {
         this.setCookie(this.loginForm.username, this.loginForm.password, 7);
+        //利用cookie.js的方式
+        // this.setUserName(this.loginForm.username)
+        // this.setPassword(this.loginForm.password)
       }else{
         this.clearCookie();
+        //利用cookie.js的方式
+        // this.removeUserName()
+        // this.removePassword()
       }
       this.$refs.loginForm.validate(async valid => {
         if (valid) {
@@ -139,7 +151,7 @@ export default {
           this.logins='登录中...'
           const { username, password } = this.loginForm
           this.$router.push({ path: '/' })
-          setUserInfo(this.loginForm)
+          // setUserInfo(this.loginForm)
           // try {
           //   const res = await login({ user_name: username, passwd: password })
           //   setUserInfo(res.data)
