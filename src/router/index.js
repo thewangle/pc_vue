@@ -108,9 +108,9 @@ export const asyncRouterMap = [
       {
         id: 15,
         path: 'two',
-        component: () => import('@/views/features/one'),
+        component: () => import('@/views/qiniu/upload'),
         name: 'Two',
-        meta: { title: '功能二', icon: 'edit' },
+        meta: { title: '上传功能', icon: 'edit' },
         hidden: true
       },
     ]

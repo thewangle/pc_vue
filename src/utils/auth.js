@@ -42,6 +42,7 @@ export function removeAgentId() {
   return Cookies.remove(AgentKey)
 }
 
+//用户名和密码
 const UserName = 'user_name' // 用户名
 export function getUserName() {
   return Cookies.get(UserName)
@@ -53,6 +54,19 @@ export function setUserName(userName) {
 
 export function removeUserName() {
   return Cookies.remove(UserName)
+}
+
+const PassWord = 'password' // 密码
+export function getPassword() {
+  return Cookies.get(PassWord)
+}
+
+export function setPassword(password) {
+  return Cookies.set(PassWord, password)
+}
+
+export function removePassword() {
+  return Cookies.remove(PassWord)
 }
 
 const AgentName = 'agent_name'

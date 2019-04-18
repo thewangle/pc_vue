@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function fetchQiNiuToken() {
   return request({
-    url: '/i/aaa/api/uptoken',
+    url: '/i/topteam/api/uptoken',
     method: 'post'
   })
 }

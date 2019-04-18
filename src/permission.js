@@ -64,7 +64,7 @@ router.beforeEach(async(to, from, next) => {
           },
           {
             "id": "15",
-            "menu_name": "功能二",
+            "menu_name": "上传功能",
             "url": "",
             "parent_id": "3",
             "type": "page",
