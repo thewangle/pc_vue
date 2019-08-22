@@ -2,31 +2,31 @@
   <el-menu class="navbar" mode="horizontal">
     <hamburger :toggle-click="toggleSideBar" :is-active="sidebar.opened" class="hamburger-container"/>
 
-    <div class="system-name">Enjoy the joy 乐享悦动</div>
+    <div class="system-name">(⊙o⊙)一目了然(⊙o⊙)大数据管理系统</div>
 
     <div class="user-name">{{ name }}</div>
 
     <breadcrumb class="breadcrumb-container"/>
 
     <div class="right-menu">
-      <!-- <error-log class="errLog-container right-menu-item"/> -->
+      <!-- <error-log class="errLog-container right-menu-item"/>
 
-      <!-- <el-tooltip :content="$t('navbar.screenfull')" effect="dark" placement="bottom">
+      <el-tooltip :content="$t('navbar.screenfull')" effect="dark" placement="bottom">
         <screenfull class="screenfull right-menu-item"/>
-      </el-tooltip> -->
+      </el-tooltip>
 
-      <!-- <lang-select class="international right-menu-item"/> -->
+      <lang-select class="international right-menu-item"/>
 
-      <!-- <el-tooltip :content="$t('navbar.theme')" effect="dark" placement="bottom">
+      <el-tooltip :content="$t('navbar.theme')" effect="dark" placement="bottom">
         <theme-picker class="theme-switch right-menu-item"/>
       </el-tooltip> -->
 
-      <!-- <div class="tips">
+      <div class="tips">
         <router-link to="/documentation">消息</router-link>
       </div>
       <div class="download">
         <router-link to="/documentation">下载中心</router-link>
-      </div> -->
+      </div>
 
       <el-dropdown class="avatar-container right-menu-item" trigger="click">
         <div class="avatar-wrapper">
@@ -40,7 +40,7 @@
             </el-dropdown-item>
           </router-link>
           <el-dropdown-item divided>
-            <span style="display:block;" @click="logout">登出</span>
+            <span style="display:block;" @click="logout">退出登陆</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -150,7 +150,7 @@ export default {
         .user-avatar {
           width: 40px;
           height: 40px;
-          border-radius: 10px;
+          border-radius: 50%;
         }
         .el-icon-caret-bottom {
           position: absolute;

@@ -38,6 +38,11 @@ export const constantRouterMap = [
     hidden: true
   },
   {
+    path: '/registered',
+    component: () => import('@/views/login/registered'),
+    hidden: true
+  },
+  {
     path: '/authredirect',
     component: () => import('@/views/login/authredirect'),
     hidden: true
@@ -71,25 +76,234 @@ export const asyncRouterMap = [
     ]
   },
   {
-    path: '/table',
-    id: 2,
+    path: '/report',
+    id: 20,
     component: Layout,
     redirect: 'dashboard',
+    meta: {
+      title: '经营分析',
+      icon: 'tab'
+    },
     hidden: true,
     children: [
       {
-        path: 'table',
-        component: () => import('@/views/table/index'),
-        name: 'Table',
-        meta: { title: '表格展现', icon: 'documentation', noCache: true }
+        id:24,
+        path: 'sales',
+        component: () => import('@/views/report/sales'),
+        name: 'Sales',
+        meta: { title: '销售分析', icon: 'component', noCache: true },
+        hidden: true
+      },
+      {
+        id:29,
+        path: 'unsalable',
+        component: () => import('@/views/report/unsalable'),
+        name: 'Unsalable',
+        meta: { title: '滞销分析', icon: 'lock', noCache: true },
+        hidden: true
+      },
+      {
+        id:27,
+        path: 'storagegoods',
+        component: () => import('@/views/report/storagegoods'),
+        name: 'Storagegoods',
+        meta: { title: '新入库分析', icon: 'chart', noCache: true },
+        hidden: true
+      },
+      {
+        id:25,
+        path: 'returngoods',
+        component: () => import('@/views/report/returngoods'),
+        name: 'Returngoods',
+        meta: { title: '退货分析', icon: 'eye', noCache: true },
+        hidden: true
+      },
+      {
+        id:26,
+        path: 'lossgoods',
+        component: () => import('@/views/report/lossgoods'),
+        name: 'Lossgoods',
+        meta: { title: '报损分析', icon: 'dashboard', noCache: true },
+        hidden: true
+      },
+      {
+        id:22,
+        path: 'stock',
+        component: () => import('@/views/report/stock'),
+        name: 'Stock',
+        meta: { title: '库存分析', icon: 'example', noCache: true },
+        hidden: true
+      },
+      {
+        id:28,
+        path: 'memberanalysis',
+        component: () => import('@/views/report/memberanalysis'),
+        name: 'Memberanalysis',
+        meta: { title: '会员分析', icon: 'peoples', noCache: true },
+        hidden: true
+      },
+      {
+        id:21,
+        path: 'organization',
+        component: () => import('@/views/report/organization'),
+        name: 'Organization',
+        meta: { title: '组织架构', icon: 'user', noCache: true },
+        hidden: true
+      },
+      {
+        id:23,
+        path: 'pricechange',
+        component: () => import('@/views/report/pricechange'),
+        name: 'Pricechange',
+        meta: { title: '价格分析', icon: 'money', noCache: true },
+        hidden: true
       }
+    ]
+  },
+  {
+    path: '/goods',
+    id: 12,
+    component: Layout,
+    redirect: 'dashboard',
+    meta: {
+      title: '商品管理',
+      icon: 'shoppingCard'
+    },
+    hidden: true,
+    children: [
+      {
+        id: 16,
+        path: 'addgoods',
+        component: () => import('@/views/goods/addgoods'),
+        name: 'Addgoods',
+        meta: { title: '添加商品', icon: 'edit' },
+        hidden: true
+      },
+      {
+        id: 13,
+        path: 'sort',
+        component: () => import('@/views/goods/sort'),
+        name: 'Sort',
+        meta: { title: '分类管理', icon: 'tab' },
+        hidden: true
+      },
+      {
+        id: 17,
+        path: 'goodslist',
+        component: () => import('@/views/goods/goodslist'),
+        name: 'Goodslist',
+        meta: { title: '商品列表', icon: 'list' },
+        hidden: true
+      },
+      {
+        id: 18,
+        path: 'pricelog',
+        component: () => import('@/views/goods/pricelog'),
+        name: 'Pricelog',
+        meta: { title: '价格变动记录', icon: 'chart' },
+        hidden: true
+      },
+      {
+        id: 19,
+        path: 'numslog',
+        component: () => import('@/views/goods/numslog'),
+        name: 'Numslog',
+        meta: { title: '库存变动记录', icon: 'component' },
+        hidden: true
+      }
+    ]
+  },
+  {
+    path: '/user',
+    id: 2,
+    component: Layout,
+    redirect: 'dashboard',
+    meta: {
+      title: '账号管理',
+      icon: 'peoples'
+    },
+    hidden: true,
+    children: [
+      {
+        id:4,
+        path: 'adduser',
+        component: () => import('@/views/user/index'),
+        name: 'Adduser',
+        meta: { title: '新增账号', icon: 'user', noCache: true }
+      },
+      {
+        id: 5,
+        path: 'userlist',
+        component: () => import('@/views/user/userlist'),
+        name: 'Userlist',
+        meta: { title: '账号列表', icon: 'list' },
+        hidden: true
+      },
+    ]
+  },
+  {
+    path: '/member',
+    id: 6,
+    component: Layout,
+    redirect: 'dashboard',
+    meta: {
+      title: '会员管理',
+      icon: 'peoples'
+    },
+    hidden: true,
+    children: [
+      {
+        id:7,
+        path: 'member',
+        component: () => import('@/views/member/index'),
+        name: 'Member',
+        meta: { title: '新增会员', icon: 'people', noCache: true },
+        hidden: true
+      },
+      {
+        id: 8,
+        path: 'memberlist',
+        component: () => import('@/views/member/memberlist'),
+        name: 'Memberlist',
+        meta: { title: '会员列表', icon: 'list' },
+        hidden: true
+      },
+    ]
+  },
+  {
+    path: '/supplier',
+    id: 9,
+    component: Layout,
+    redirect: 'dashboard',
+    meta: {
+      title: '供应商管理',
+      icon: 'people'
+    },
+    hidden: true,
+    children: [
+      {
+        id:10,
+        path: 'supplier',
+        component: () => import('@/views/supplier/index'),
+        name: 'Supplier',
+        meta: { title: '新增供应商', icon: 'edit', noCache: true },
+        hidden: true
+      },
+      {
+        id: 11,
+        path: 'supplierlist',
+        component: () => import('@/views/supplier/supplierlist'),
+        name: 'Supplierlist',
+        meta: { title: '供应商列表', icon: 'list' },
+        hidden: true
+      },
     ]
   },
   {
     id: 3,
     path: '/count',
     component: Layout,
-    redirct: '/features/one',
+    redirct: 'dashboard',
     name: 'Features',
     meta: {
       title: '功能集锦',

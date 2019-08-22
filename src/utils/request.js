@@ -12,12 +12,16 @@ const service = axios.create({
 service.interceptors.request.use(
   config => {
     // Do something before request is sent
+    //与yii2框架对应好token
+    // var token = 'tk'; //这个地方为了测试是写死的，实际情况应该是在cookie中动态获取，来判断时候有了token
+    // config.headers.common["Authorization"] = `Bearer ${token}`;
+    console.log('22222222')
     return config
   },
   error => {
     // Do something with request error
     console.log(error) // for debug
-    Promise.reject(error)
+    return Promise.reject(error)
   }
 )
 
@@ -31,10 +35,12 @@ service.interceptors.response.use(
    * 以下代码均为样例，请结合自生需求加以修改，若不需要，则可删除
    */
   response => {
+    console.log('22222222')
     const res = response.data
     if (res.error_code !== 0) {
       Message({
-        message: res.error_msg,
+        // message: res.error_msg,
+        message: '返回数据出错',
         type: 'error',
         duration: 2 * 1000
       })
@@ -54,7 +60,7 @@ service.interceptors.response.use(
       }
       return Promise.reject(response.data)
     } else {
-      return response.data
+      return response
     }
   },
   error => {
@@ -67,7 +73,8 @@ service.interceptors.response.use(
       })
     } else {
       Message({
-        message: error.message,
+        // message: error.message,
+        message: '网络断了，请检查网络！',
         type: 'error',
         duration: 5 * 1000
       })

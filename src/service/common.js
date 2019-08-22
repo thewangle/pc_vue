@@ -27,7 +27,7 @@ export function fetchMenuList() {
  */
 export function login(data) {
   return request({
-    url: '/i/aaa/admin/login',
+    url: 'http://localhost/yii2/frontend/web/?r=login/login',
     method: 'post',
     data
   })

@@ -1,17 +1,16 @@
 <template>
-  <div class="dashboard-editor-container">
-    <div ref="pie" style="width: 100%;height:400px;margin:20px 0;"></div>
-    <el-button style="margin: 10px;" type="primary" icon="el-icon-search" @click="zhu_show">点击出现柱状图</el-button>
-    <div ref="zhu" style="width: 100%;height:400px;"></div>
+  <div class="dashboard-editor-container animated bounceInLeft">
+    <div ref="mapChart" style="width: 100%;height: 700px;"></div>
   </div>
 </template>
 
 <script>
 import echarts from 'echarts'
+import { getmapforshandong } from '@/api/loginanduser' //请求函数
 export default {
   name: 'DashboardAdmin',
   mounted() {
-    this.pie_show()
+    this.Getmapforshandong()
   },
   components: {
     
@@ -25,84 +24,77 @@ export default {
     
   },
   methods: {
-    pie_show() {
-      let pieChart = echarts.init(this.$refs.pie)
-      let option = {
-        toolbox: {
-          feature: {
-            saveAsImage: {
-              title: '下载'
-            }
-          },
-        },
-        title: {
-          text: '我是一个大大大饼图',
-        },
-        tooltip: {
-          trigger: "item",
-          formatter: "{b} : {c} ({d}%)"
-        },
-        series: [
-          {
-            type: "pie",
-            data: [
-              {
-                value: 200,
-                name: '中国',
-              },
-              { value: 100,
-                name: '美国',
-              },
-              { value: 50,
-                name: '欧盟',
-              },
-              { value: 20,
-                name: '日本',
-              }
-            ],
-          }
-        ]
-      }
-      pieChart.clear()  
-      pieChart.setOption(option)
-    },
-    zhu_show() {
-      let zhuChart = echarts.init(this.$refs.zhu)
-      let option = {
-          toolbox: {
-            feature: {
-              saveAsImage: {
-                title: '保存'
-              }
+    Getmapforshandong() {
+      let mapChart = echarts.init(this.$refs.mapChart)
+      getmapforshandong().then(res => {
+        let {data} = res
+        echarts.registerMap('HK', data);
+        let option = {
+            title : {
+                text: '山东省一目了然会员区域分布图',
+                textStyle: {
+                    color: 'black',
+                },
+                x:'center',
+                top: 15
             },
-          },
-          title: {
-            text: '中小学安全教育总体分析表'
-          },
-          grid: {left:'2%',right:'2%',bottom:'10%',containLabel:true},
-          tooltip: {},
-          xAxis: {
-            data: ['中国','美国','日本'],
-            axisLabel:{
-              formatter: (value) => {
-                return value.split("").join("\n")
-              }
-            }
-          },
-          yAxis: {},
-          series: [{
-            name: '占比',
-            type: 'bar',
-            data: [10, 20, 36]
-          }]
+            tooltip: {
+                trigger: 'item',
+                formatter: '{b}一目了然会员<br/>{c}个'
+            },
+            visualMap: {
+                text:['High','Low'],
+                realtime: false,
+                calculable: true,
+                right: 30,
+                textStyle: {
+                    color: 'white',
+                },
+                inRange: {
+                    color: ['lightskyblue','yellow', 'orangered']
+                }
+            },
+            series: [
+                {
+                    name: '香港18区人口密度',
+                    type: 'map',
+                    mapType: 'HK', // 自定义扩展图表类型
+                    itemStyle:{
+                        normal:{label:{show:true}},
+                        emphasis:{label:{show:true}}
+                    },
+                    data:[
+                        {name: '济南市', value: 100},
+                        {name: '德州市', value: 120},
+                        {name: '滨州市', value: 110},
+                        {name: '东营市', value: 90},
+                        {name: '淄博市', value: 130},
+                        {name: '潍坊市', value: 70},
+                        {name: '烟台市', value: 20},
+                        {name: '青岛市', value: 40},
+                        {name: '威海市', value: 150},
+                        {name: '日照市', value: 90},
+                        {name: '临沂市', value: 160},
+                        {name: '枣庄市', value: 60},
+                        {name: '济宁市', value: 10},
+                        {name: '菏泽市', value: 200},
+                        {name: '泰安市', value: 100},
+                        {name: '聊城市', value: 80}
+                    ],
+                }
+            ]
         }
-      zhuChart.clear()  
-      zhuChart.setOption(option)
+        mapChart.clear() 
+        mapChart.setOption(option);
+        window.addEventListener('resize',function() {
+            mapChart.resize()
+        })
+      })
     },
   }
 }
 </script>
 
-<style rel="stylesheet/scss">
+<style rel="stylesheet/scss" scoped>
 
 </style>

@@ -1,15 +1,18 @@
 <template>
   <div class="login-container">
+    <canvas id="cas" position="absolute" z-index="-1"></canvas>
     <section class="login_Img">
-      <h3 class="title">Mind Tower 印塔管理系统</h3>
-      <div class="logo"/>
       <div class="form-container">
         <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
-          <el-form-item prop="username">
+          <el-form-item prop="username" class="animated bounceInLeft">
             <span class="svg-container svg-container_login">
               <svg-icon icon-class="user" />
             </span>
             <el-input
+              @focus="btHover"
+              @blur="btblur"
+              id="usernameInp"
+              @keyup.enter.native="handleLogin"
               v-model="loginForm.username"
               placeholder="请输入用户名"
               name="username"
@@ -18,11 +21,14 @@
             />
           </el-form-item>
 
-          <el-form-item prop="password">
+          <el-form-item prop="password" class="animated bounceInRight">
             <span class="svg-container">
               <svg-icon icon-class="password" />
             </span>
             <el-input
+              @focus="btHover1"
+              @blur="btblur1"
+              id="usernameInp1"
               :type="passwordType"
               v-model="loginForm.password"
               placeholder="请输入密码"
@@ -34,9 +40,10 @@
             </span>
           </el-form-item>
 
-          <el-checkbox v-model="user_record" style="margin-bottom:20px;">记住密码</el-checkbox>
+          <el-checkbox v-model="user_record" class="animated bounceInUp" style="margin-bottom:20px;">记住密码</el-checkbox>
 
-          <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">{{ logins }}</el-button>
+          <el-button :loading="loading" type="primary" class="animated bounceInDown" style="width:100%;background: transparent;" @click.native.prevent="handleLogin">{{ logins }}</el-button>
+          <!-- <div class="add_new_user" @click="add_new_users">注册新用户</div> -->
 
         </el-form>
       </div>
@@ -46,8 +53,12 @@
 </template>
 
 <script>
+import $ from 'jquery'
 import { login } from './../../service/common'
+import axios from 'axios'
 import { fetchRoleMenulist } from './../../service/role'
+import moment from 'moment' //日期转换插件
+import { loginByUsername, getuserinfoByusername} from '@/api/loginanduser' //请求函数
 import { setUserInfo, getRoleId, setPassword, getPassword, setUserName, getUserName, removeUserName, removePassword } from '@/utils/auth'
 
 export default {
@@ -68,7 +79,7 @@ export default {
       }
     }
     return {
-      user_record: false,
+      user_record: true,
       logins:'登录',
       loginForm: {
         username: '',
@@ -86,6 +97,99 @@ export default {
   mounted(){
     this.getCookie()
     // this.getuser_name_pass()
+    //背景粒子动画开始 ----------------------------------------------------------
+    var canvas = document.getElementById("cas");
+    var ctx = canvas.getContext("2d");
+    resize();
+    window.onresize = resize;
+    function resize() {
+        canvas.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        canvas.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+    }
+    var RAF = (function() {
+        return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(callback) {
+                window.setTimeout(callback, 1000 / 60);
+            };
+    })();
+    // 鼠标活动时，获取鼠标坐标
+    var warea = {x: null, y: null, max: 20000};
+    window.onmousemove = function(e) {
+        e = e || window.event;
+        warea.x = e.clientX;
+        warea.y = e.clientY;
+    };
+    window.onmouseout = function(e) {
+        warea.x = null;
+        warea.y = null;
+    };
+    // 添加粒子
+    // x，y为粒子坐标，xa, ya为粒子xy轴加速度，max为连线的最大距离
+    var dots = [];
+    for (var i = 0; i < 100; i++) {
+        var x = Math.random() * canvas.width;
+        var y = Math.random() * canvas.height;
+        var xa = Math.random() * 2 - 1;
+        var ya = Math.random() * 2 - 1;
+        dots.push({
+            x: x,
+            y: y,
+            xa: xa,
+            ya: ya,
+            max: 6000
+        })
+    }
+    // 延迟100秒开始执行动画，如果立即执行有时位置计算会出错
+    setTimeout(function() {
+        animate();
+    }, 100);
+    // 每一帧循环的逻辑
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // 将鼠标坐标添加进去，产生一个用于比对距离的点数组
+        var ndots = [warea].concat(dots);
+        dots.forEach(function(dot) {
+            // 粒子位移
+            dot.x += dot.xa;
+            dot.y += dot.ya;
+            // 遇到边界将加速度反向
+            dot.xa *= (dot.x > canvas.width || dot.x < 0) ? -1 : 1;
+            dot.ya *= (dot.y > canvas.height || dot.y < 0) ? -1 : 1;
+            // 绘制点
+            ctx.fillRect(dot.x - 0.5, dot.y - 0.5, 1, 1);
+            // 循环比对粒子间的距离
+            for (var i = 0; i < ndots.length; i++) {
+                var d2 = ndots[i];
+                if (dot === d2 || d2.x === null || d2.y === null) continue;
+                var xc = dot.x - d2.x;
+                var yc = dot.y - d2.y;
+                // 两个粒子之间的距离
+                var dis = xc * xc + yc * yc;
+                // 距离比
+                var ratio;
+                // 如果两个粒子之间的距离小于粒子对象的max值，则在两个粒子间画线
+                if (dis < d2.max) {
+                    // 如果是鼠标，则让粒子向鼠标的位置移动
+                    if (d2 === warea && dis > (d2.max / 2)) {
+                        dot.x -= xc * 0.03;
+                        dot.y -= yc * 0.03;
+                    }
+                    // 计算距离比
+                    ratio = (d2.max - dis) / d2.max;
+                    // 画线
+                    ctx.beginPath();
+                    ctx.lineWidth = ratio / 2;
+                    ctx.strokeStyle = 'rgba(255,255,255,' + (ratio + 0.2) + ')';
+                    ctx.moveTo(dot.x, dot.y);
+                    ctx.lineTo(d2.x, d2.y);
+                    ctx.stroke();
+                }
+            }
+            // 将已经计算过的粒子从数组中删除
+            ndots.splice(ndots.indexOf(dot), 1);
+        });
+        RAF(animate);
+    }
+    //背景粒子动画结束 ----------------------------------------------------------
   },
   created() {
     // window.addEventListener('hashchange', this.afterQRScan)
@@ -94,6 +198,19 @@ export default {
     // window.removeEventListener('hashchange', this.afterQRScan)
   },
   methods: {
+    //动画特效
+    btHover() {
+      $('#usernameInp').addClass('animated jello')
+    },
+    btblur() {
+      $('#usernameInp').removeClass('animated jello')
+    },
+    btHover1() {
+      $('#usernameInp1').addClass('animated jello')
+    },
+    btblur1() {
+      $('#usernameInp1').removeClass('animated jello')
+    },
     //通过cookie.js的方式获取username和password
     getuser_name_pass() {
       this.loginForm.username = this.getUserName()
@@ -133,6 +250,11 @@ export default {
         this.passwordType = 'password'
       }
     },
+    //注册新用户
+    add_new_users() {
+      this.$router.push({ path: '/registered' })
+    },
+    //登陆
     handleLogin() {
       if (this.user_record) {
         this.setCookie(this.loginForm.username, this.loginForm.password, 7);
@@ -146,22 +268,56 @@ export default {
         // this.removePassword()
       }
       this.$refs.loginForm.validate(async valid => {
+        let self = this
         if (valid) {
-          this.loading = true
-          this.logins='登录中...'
-          const { username, password } = this.loginForm
-          this.$router.push({ path: '/' })
-          // setUserInfo(this.loginForm)
-          // try {
-          //   const res = await login({ user_name: username, passwd: password })
-          //   setUserInfo(res.data)
-          //   this.loading = false
-          //   this.logins='登录'
-          //   this.$router.push({ path: '/' })
-          // } catch (e) {
-          //   this.loading = false
-          //   this.logins='登录'  
-          // }
+          let user = {
+            username: this.loginForm.username
+          }
+          getuserinfoByusername(user).then(res => {
+            let { data } = res
+            if (data.code == 200) {
+              let nowtime = moment(new Date()).valueOf()
+              let usertime = moment(data.data.addtime).valueOf()
+              if (data.data.role != 0 && usertime < nowtime) {
+                this.$message({
+                  type: 'warning',
+                  message: '您的账号已经到期，请联系管理员！'
+                });
+              } else {
+                this.loading = true
+                this.logins='登录中...'
+                const { username, password } = this.loginForm
+                let data = {
+                  username: username,
+                  password: password
+                }
+                loginByUsername(data).then(res => {
+                  let { data } = res
+                  if (data.code == 200) {
+                    setUserInfo(data.data)
+                    this.loading = false
+                    this.logins='登录'
+                    this.$router.push({ path: '/' })
+                  }
+                  if (data.code == 201) {
+                    self.$message(data.message)
+                    setTimeout(function() {
+                      self.loading = false
+                      self.logins='登录'
+                    },3000)
+                  }
+                  
+                }).catch(error => {
+                  this.$message(error.message)
+                })
+              }
+            }
+            if (data.code == 201) {
+              console.log(data)
+            }
+          }).catch(error => {
+            this.$message(error.message)
+          })
         } else {
           console.log('error submit!!')
           return false
@@ -177,11 +333,9 @@ export default {
 <style rel="stylesheet/scss" lang="scss">
   /* 修复input 背景不协调 和光标变色 */
   /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
-
   $bg:#283443;
   $light_gray: #1a6ceb;
   $cursor: #000000;
-
   @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
     .login-container .el-input input{
       color: $cursor;
@@ -205,7 +359,7 @@ export default {
         padding: 12px 5px 12px 15px;
         color: $light_gray;
         height: 47px;
-        caret-color: $cursor;
+        caret-color: white;
         &:-webkit-autofill {
           -webkit-box-shadow: 0 0 0px 1000px #ccc inset !important;
           -webkit-text-fill-color: $cursor !important;
@@ -222,6 +376,13 @@ export default {
 </style>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
+.add_new_user {
+  color:#1a6ceb;
+  text-align:center;
+  padding: 5px 0;
+  font-size: 14px;
+  cursor:pointer;
+}
 $bg:#2d3a4b;
 $dark_gray:#889aa4;
 $light_gray:#eee;
@@ -230,12 +391,16 @@ $light_gray:#eee;
   position: fixed;
   height: 100%;
   width: 100%;
-  background-image: linear-gradient( 153deg, rgb(88,138,251) 0%, rgb(47,55,104) 100%);
+  background-image: url("./img/bg1.jpg");
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
   .login_Img {
-    position: relative;
+    position: absolute;
     width: 754px;
     height: 535px;
-    background-image: url("./img/bg.png");
+    background:rgba(0,0,0,0);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -260,9 +425,11 @@ $light_gray:#eee;
     .form-container {
       width: 370px;
       height: 470px;
-      background: #fff;
+      background: #35394a;
+      background: linear-gradient(230deg, rgba(53, 57, 74, 0) 0%, rgb(0, 0, 0) 100%);
+      box-shadow: -15px 15px 15px rgba(6, 17, 47, 0.7);
       position: absolute;
-      left: 418px;
+      left: 200px;
       top: 30px;
       border-radius: 10px;
     }

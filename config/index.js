@@ -16,7 +16,11 @@ module.exports = {
       //   // target: 'http://topteam.ueuc.com', // 开发环境
       //   // target: 'http://bxunion.com', // 线上
       //   changeOrigin: true
-      // }
+      // // }
+      '/yii2': {
+        target: 'http://localhost:80',
+        changeOrigin: true
+      }
     },
 
     // Various Dev Server settings

@@ -14,7 +14,7 @@ export function removeToken() {
   return Cookies.remove(TokenKey)
 }
 
-const RoleKey = 'role_id' // 角色d
+const RoleKey = 'role' // 角色id
 // 获取Role_id
 export function getRoleId() {
   return Cookies.get(RoleKey)
@@ -29,16 +29,16 @@ export function removeRoleId() {
   return Cookies.remove(RoleKey)
 }
 
-const AgentKey = 'agent_id' // 权限id
-export function getAgentId() {
+const AgentKey = 'partantid' // 上级账号id
+export function getpartantId() {
   return Cookies.get(AgentKey)
 }
 
-export function setAgentId(agentId) {
-  return Cookies.set(AgentKey, agentId)
+export function setpartantId(partantId) {
+  return Cookies.set(AgentKey, partantId)
 }
 
-export function removeAgentId() {
+export function removepartantId() {
   return Cookies.remove(AgentKey)
 }
 
@@ -69,41 +69,45 @@ export function removePassword() {
   return Cookies.remove(PassWord)
 }
 
-const AgentName = 'agent_name'
-export function getAgentName() {
+//部门名称
+const AgentName = 'department'
+export function getdepartmentName() {
   return Cookies.get(AgentName)
 }
-export function setAgentName(agentName) {
-  return Cookies.set(AgentName, agentName)
+export function setdepartmentName(departmentName) {
+  return Cookies.set(AgentName, departmentName)
 }
-export function removeAgentName() {
+export function removedepartmentName() {
   return Cookies.remove(AgentName)
 }
 
-const ProvinceId = 'province_id'
-export function getProvinceId() {
+//管理员名称
+const ProvinceId = 'adminname'
+export function getadminname() {
   return Cookies.get(ProvinceId)
 }
 
-export function setProvinceId(provinceId) {
-  return Cookies.set(ProvinceId, provinceId)
+export function setadminname(adminnames) {
+  return Cookies.set(ProvinceId, adminnames)
 }
 
-export function removeProvinceId() {
+export function removeadminname() {
   return Cookies.remove(ProvinceId)
 }
 
-const Level = 'level'
-export function getLevel() {
-  return Cookies.get(Level)
+
+//用户id
+const userId = 'id'
+export function getUserid() {
+  return Cookies.get(userId)
 }
 
-export function setLevel(level) {
-  return Cookies.set(Level, level)
+export function setUserid(id) {
+  return Cookies.set(userId, id)
 }
 
-export function removeLevel() {
-  return Cookies.remove(Level)
+export function removeUserid() {
+  return Cookies.remove(userId)
 }
 
 const Price = 'price'
@@ -140,30 +144,23 @@ export function removeCityIp() {
 }
 // 保存用户信息
 export function setUserInfo(user) {
-  const { role_id, agent_id, user_name,
-    agent_name, province_id, level, price, city_name,
-    city_ip
-  } = user
-  setRoleId(role_id)
-  setAgentId(agent_id)
-  setUserName(user_name)
-  setAgentName(agent_name)
-  setProvinceId(province_id)
-  setLevel(level)
-  setPrice(price / 100)
-  setCityName(city_name)
-  setCityIp(city_ip)
+  const { username, PHPSESSID, role, partantid, department, adminname,id } = user
+  setUserName(username)
+  setToken(PHPSESSID)
+  setRoleId(role)
+  setpartantId(partantid)
+  setdepartmentName(department)
+  setadminname(adminname)
+  setUserid(id)
 }
 
 // 清楚用户信息
 export function removeUserInfo() {
   removeRoleId()
-  removeAgentId()
   removeUserName()
-  removeAgentName()
-  removeProvinceId()
-  removeLevel()
-  removePrice()
-  removeCityName()
-  removeCityIp()
+  removepartantId()
+  removedepartmentName()
+  removeadminname()
+  removeToken()
+  removeUserid()
 }
