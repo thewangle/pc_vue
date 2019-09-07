@@ -15,7 +15,6 @@ service.interceptors.request.use(
     //与yii2框架对应好token
     // var token = 'tk'; //这个地方为了测试是写死的，实际情况应该是在cookie中动态获取，来判断时候有了token
     // config.headers.common["Authorization"] = `Bearer ${token}`;
-    console.log('22222222')
     return config
   },
   error => {

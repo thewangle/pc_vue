@@ -1,5 +1,5 @@
 <template>
-  <div class="page_wrap animated flipInY">
+  <div class="page_wrap animated rotateIn">
     <div class="tab_model_wrap">
       <div class="tag1_wrap">
         <span class="tabSpan">滞销时间段：</span>
@@ -26,20 +26,20 @@
       </div>
       <div class="salesTag">
         <div class="salesTagList" style="width:32%;" @click="zeOver" id="zonge">
-          <div class="salesTagListBiao">{{tab2name}}滞销数量</div>
-          <div><span class="salesTagListnum">{{tab1info.zongnums}}</span></div>
+          <div class="salesTagListBiao">{{tab2name}} 滞销产品种类</div>
+          <div><span class="salesTagListnum">{{tab1info.zongnums}}</span> 种</div>
         </div>
         <div class="salesTagList" @click="zeOver1" id="zonge1" style="width:32%;background-image: linear-gradient(104deg, #6bb3ff, #58a4ff);">
-          <div class="salesTagListBiao">{{tab2name}}滞销成本</div>
+          <div class="salesTagListBiao">{{tab2name}} 滞销成本</div>
           <div><span class="salesTagListnum">{{tab1info.zoninprice}}</span>元</div>
         </div>
         <div class="salesTagList" @click="zeOver2" id="zonge2" style="width:32%;background-image: linear-gradient(104deg, #ffbb3f, #ff9e47);">
-          <div class="salesTagListBiao">{{tab2name}}滞销预售总额</div>
+          <div class="salesTagListBiao">{{tab2name}} 滞销预售总额</div>
           <div><span class="salesTagListnum">{{tab1info.zongprice}}</span>元</div>
         </div>
       </div>
       <div style="width: 100%;padding-right:15px;">
-        <div class="fengebr" @click="zeOver4" id="zonge4"><h2>报损成本占比图例分析</h2></div>
+        <div class="fengebr" @click="zeOver4" id="zonge4"><h2>滞销成本占比图例分析</h2></div>
         <div ref="zbChart" style="width: 100%;height:400px;margin:20px 0;"></div>
       </div>
       <!-- 商品列表table -->
@@ -262,7 +262,6 @@ export default {
       this.listLoading = true //加载动画
       getunsalablegoodslist(query).then(res => {
         let { data } = res
-        console.log(data)
         if (data.code == 200) {
           this.listLoading = false
           this.total = data.data.count

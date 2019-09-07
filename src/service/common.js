@@ -56,12 +56,12 @@ export function fetchCityList() {
 /**
  * 获取定位
  */
-export function getGeolaction() {
-  return request({
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    url: 'https://apis.map.qq.com/ws/location/v1/ip?key=HQIBZ-5C6KQ-WSY57-GMDB4-PHGDT-IKBC3',
-    method: 'get'
-  })
-}
+// export function getGeolaction() {
+//   return request({
+//     headers: {
+//       'Content-Type': 'application/x-www-form-urlencoded'
+//     },
+//     url: 'https://apis.map.qq.com/ws/location/v1/ip?key=HQIBZ-5C6KQ-WSY57-GMDB4-PHGDT-IKBC3',
+//     method: 'get'
+//   })
+// }

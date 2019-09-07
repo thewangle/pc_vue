@@ -24,7 +24,7 @@ router.beforeEach(async(to, from, next) => {
       // router.addRoutes(asyncRouterMap) // 动态添加可访问路由表
       // next({ ...to, replace: true })
       if (!menuList) {
-        let url = 'http://localhost/yii2/frontend/web/?r=login/menulist'
+        let url = process.env.BASE_API + 'yii2/frontend/web/?r=login/menulist'
         let data = {
           username: getUserName()
         }

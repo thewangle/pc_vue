@@ -13,7 +13,7 @@
       <div class="salesTag">
         <div class="salesTagList" style="width:32%;" @click="zeOver" id="zonge">
           <div class="salesTagListBiao">{{tab2name}}会员数量</div>
-          <div><span class="salesTagListnum">{{tab1info.zongnums}}</span></div>
+          <div><span class="salesTagListnum">{{tab1info.zongnums}}</span>个</div>
         </div>
         <div class="salesTagList" @click="zeOver1" id="zonge1" style="width:32%;background-image: linear-gradient(104deg, #6bb3ff, #58a4ff);">
           <div class="salesTagListBiao">{{tab2name}}男会员数量</div>
