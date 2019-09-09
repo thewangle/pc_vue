@@ -208,14 +208,15 @@ export default {
         });
         return
       }
-      if (this.maxnums < this.minnums) {
+      console.log(this.maxnums,this.minnums)
+      if (Number(this.maxnums) < Number(this.minnums)) {
         this.$message({
           message: '库存上线不得小于库存下线',
           type: 'warning'
         });
         return
       }
-      if (this.outprice < this.inprice) {
+      if (Number(this.outprice) < Number(this.inprice)) {
         this.$message({
           message: '售价不得小于进价',
           type: 'warning'

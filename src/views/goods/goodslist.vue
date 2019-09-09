@@ -36,7 +36,7 @@
           <span>{{ scope.row.code }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="商品分类" width="200px" align="center">
+      <!-- <el-table-column label="商品分类" width="200px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.sortid }}</span>
         </template>
@@ -45,7 +45,7 @@
         <template slot-scope="scope">
           <span>{{ scope.row.supplierid }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="商品规格" width="200px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.format }}</span>

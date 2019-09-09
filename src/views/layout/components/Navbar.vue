@@ -2,7 +2,7 @@
   <el-menu class="navbar" mode="horizontal">
     <hamburger :toggle-click="toggleSideBar" :is-active="sidebar.opened" class="hamburger-container"/>
 
-    <div class="system-name">(⊙o⊙)一目了然(⊙o⊙)大数据管理系统</div>
+    <div class="system-name">五指科技大数据管理系统</div>
 
     <div class="user-name">{{ name }}</div>
 

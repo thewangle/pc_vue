@@ -23,11 +23,11 @@
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="分类下产品数" width="200" align="center">
+      <!-- <el-table-column label="分类下产品数" width="200" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.nums }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="备注" min-width="200px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.remark }}</span>
@@ -154,6 +154,7 @@ export default {
             type: 'success'
           });
           this.dialogaddsort = false
+          this._fetchActivityList()
         } else {
           this.$message.error('对不起！添加失败！')
           this.dialogaddsort = false
