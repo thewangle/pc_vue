@@ -23,6 +23,7 @@
         <span class="tabSpan">滞销数量：</span>
         <el-input placeholder="请输入滞销数量" v-model="listQuery2.unsalableNum" style="width: 200px;margin-left:10px;"></el-input>
         <el-button style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter2">查询</el-button>
+        <el-button style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="toExcle">导出</el-button>
       </div>
       <div class="salesTag">
         <div class="salesTagList" style="width:32%;" @click="zeOver" id="zonge">
@@ -42,13 +43,14 @@
         <div class="fengebr" @click="zeOver4" id="zonge4"><h2>滞销成本占比图例分析</h2></div>
         <div ref="zbChart" style="width: 100%;height:400px;margin:20px 0;"></div>
       </div>
+      <div class="fengebr"><h2>滞销商品列表</h2></div>
       <!-- 商品列表table -->
       <el-table
         v-loading="listLoading"
         :data="list"
         border
         fit
-        max-height="400"
+        id="out-table"
         highlight-current-row
         style="width: 100%;">
         <el-table-column label="序号" align="center" width="65">
@@ -121,6 +123,7 @@ import { getgoodschangeQushi } from '@/api/goods' //请求函数
 import { getSortinfoone, getSortinfoall } from '@/api/sort' //请求函数
 import { getunsalablegoodsinfo, getunsalablegoodsinfoForzb, getunsalablegoodslist, getunsalablegoods } from '@/api/report' //请求函数
 import { getSupplierall } from '@/api/supplier' //获取供应商
+import XLSX from 'xlsx' //导出excle
 export default {
   name: 'DashboardAdmin',
   components: {
@@ -230,6 +233,11 @@ export default {
     
   },
   methods: {
+    //导出excle
+    toExcle() {
+      var wb = XLSX.utils.table_to_book(document.getElementById('out-table'));
+      XLSX.writeFile(wb, "滞销商品列表.xlsx")
+    },
     //系列动画函数
     zeOver() {
       $('#zonge').toggleClass('animated wobble')
@@ -421,33 +429,40 @@ export default {
     zbChart() {
         let myChart = echarts.init(this.$refs.zbChart);
         let option = {
-            tooltip : {
-                trigger: 'item',
-                formatter: "{a} <br/>{b} : {c} 元 ({d}%)"
+          toolbox: {
+            feature: {
+              saveAsImage: {
+                title: '下载'
+              }
             },
-            legend: {
-                top: 95,
-                left: 55,
-                itemGap: 20,
-                formatter: function (a) {
-                    return a;
-                },
-                orient: 'vertical',
-                data: this.itemnames
-            },
-            series : [
-                {
-                    name: '销售额占比',
-                    type: 'pie',
-                    radius: '80%',
-                    roseType: 'angle',
-                    center: ['50%', '50%'],
-                    label: {
-                        formatter: '{b}: {d}%'
-                    },
-                    data:this.itemnums
-                }
-            ]
+          },
+          tooltip : {
+              trigger: 'item',
+              formatter: "{a} <br/>{b} : {c} 元 ({d}%)"
+          },
+          legend: {
+              top: 95,
+              left: 55,
+              itemGap: 20,
+              formatter: function (a) {
+                  return a;
+              },
+              orient: 'vertical',
+              data: this.itemnames
+          },
+          series : [
+              {
+                  name: '销售额占比',
+                  type: 'pie',
+                  radius: '80%',
+                  roseType: 'angle',
+                  center: ['50%', '50%'],
+                  label: {
+                      formatter: '{b}: {d}%'
+                  },
+                  data:this.itemnums
+              }
+          ]
         };
         // 使用刚指定的配置项和数据显示图表。
         myChart.clear() 

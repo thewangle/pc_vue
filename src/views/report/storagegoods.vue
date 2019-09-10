@@ -36,12 +36,12 @@
         </div>
       </div>
       <div style="width: 100%;padding-right:15px;">
-        <div class="fengebr" @click="zeOver3" id="zonge3"><h2>报损趋势图例分析</h2></div>
+        <div class="fengebr" @click="zeOver3" id="zonge3"><h2>新入库商品图例分析</h2></div>
         <div ref="pie_change_qushi" style="width: 100%;height:400px;margin:20px 0;"></div>
-        <div class="fengebr" @click="zeOver4" id="zonge4"><h2>报损成本占比图例分析</h2></div>
+        <div class="fengebr" @click="zeOver4" id="zonge4"><h2>新入库成本占比图例分析</h2></div>
         <div ref="zbChart" style="width: 100%;height:400px;margin:20px 0;"></div>
       </div>
-      <div v-if="isgz" class="fengebr" @click="zeOver9" id="zonge13"><h2>退货商品列表</h2></div>
+      <div v-if="isgz" class="fengebr" @click="zeOver9" id="zonge13"><h2>新入库商品列表</h2></div>
       <!-- 条件搜索 -->
       <div class="filter-container" v-if="isgz" style="padding: 20px;">
         <el-date-picker
@@ -64,6 +64,7 @@
           <el-option v-for="item in suppliers" :label="item.label" :value="item.value"/>
         </el-select>
         <el-button style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
+        <el-button style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="toExcle">导出</el-button>
       </div>
       <!-- 商品列表table -->
       <el-table
@@ -71,8 +72,8 @@
         :data="list"
         border
         fit
+        id="out-table"
         v-if="isgz"
-        max-height="400"
         highlight-current-row
         style="width: 100%;">
         <el-table-column label="序号" align="center" width="65">
@@ -150,6 +151,7 @@ import { getgoodschangeQushi } from '@/api/goods' //请求函数
 import { getSortinfoone, getSortinfoall } from '@/api/sort' //请求函数
 import { Getstoragegoods, GetstoragegoodsByGroup, getstorageGoodsinfo } from '@/api/report' //请求函数
 import { getSupplierall } from '@/api/supplier' //获取供应商
+import XLSX from 'xlsx' //导出excle
 export default {
   name: 'DashboardAdmin',
   components: {
@@ -267,6 +269,11 @@ export default {
     
   },
   methods: {
+    //导出excle
+    toExcle() {
+      var wb = XLSX.utils.table_to_book(document.getElementById('out-table'));
+      XLSX.writeFile(wb, "新入库商品列表.xlsx")
+    },
     //系列动画函数
     zeOver() {
       $('#zonge').toggleClass('animated wobble')

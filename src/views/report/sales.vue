@@ -48,8 +48,8 @@
         <div ref="dateChart" style="width: 100%;height:400px;margin:20px 0;"></div>
         <div class="fengebr" @click="zeOver8" id="zonge12"><h2>销售额时间段占比图例分析</h2></div>
         <div ref="timeChart" style="width: 100%;height:400px;margin:20px 0;"></div>
-        <div class="fengebr" @click="zeOver6" id="zonge10"><h2>销售额完成率图例分析</h2></div>
-        <div ref="completeChart" style="width: 100%;height:400px;margin:20px 0;"></div>
+        <!-- <div class="fengebr" @click="zeOver6" id="zonge10"><h2>销售额完成率图例分析</h2></div>
+        <div ref="completeChart" style="width: 100%;height:400px;margin:20px 0;"></div> -->
       </div>
       <div v-if="isgz" class="fengebr" @click="zeOver9" id="zonge13"><h2>销售商品列表</h2></div>
       <!-- 条件搜索 -->
@@ -74,6 +74,7 @@
           <el-option v-for="item in suppliers" :label="item.label" :value="item.value"/>
         </el-select>
         <el-button style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
+        <el-button style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="toExcle">导出</el-button>
       </div>
       <!-- 商品列表table -->
       <el-table
@@ -81,8 +82,8 @@
         :data="list"
         border
         fit
+        id="out-table"
         v-if="isgz"
-        max-height="400"
         highlight-current-row
         style="width: 100%;">
         <el-table-column label="序号" align="center" width="65">
@@ -165,6 +166,7 @@ import { getgoodschangeQushi, getGoodsinfo } from '@/api/goods' //请求函数
 import { getSortinfoone, getSortinfoall } from '@/api/sort' //请求函数
 import { Getsoldgoods, GetsoldgoodsByGroup, getsoldGoodsinfo } from '@/api/report' //请求函数
 import { getSupplierall } from '@/api/supplier' //获取供应商
+import XLSX from 'xlsx' //导出excle
 export default {
   name: 'DashboardAdmin',
   components: {
@@ -294,7 +296,7 @@ export default {
     this.time_select()
     this.time_select2()
     this.handleFilter2()
-    this.completeChart()
+    // this.completeChart()
     if (getRoleId() !=3) {
       this.getAllUserByidthis()
     }
@@ -316,6 +318,11 @@ export default {
     
   },
   methods: {
+    //导出excle
+    toExcle() {
+      var wb = XLSX.utils.table_to_book(document.getElementById('out-table'));
+      XLSX.writeFile(wb, "出售商品列表.xlsx")
+    },
     //系列动画函数
     zeOver() {
       $('#zonge').toggleClass('animated wobble')
@@ -349,10 +356,10 @@ export default {
       $('#zonge9').toggleClass('animated bounce')
       setTimeout(function(){ $('#zonge9').removeClass('animated bounce') }, 1000);
     },
-    zeOver6() {
-      $('#zonge10').toggleClass('animated bounce')
-      setTimeout(function(){ $('#zonge10').removeClass('animated bounce') }, 1000);
-    },
+    // zeOver6() {
+    //   $('#zonge10').toggleClass('animated bounce')
+    //   setTimeout(function(){ $('#zonge10').removeClass('animated bounce') }, 1000);
+    // },
     zeOver7() {
       $('#zonge11').toggleClass('animated bounce')
       setTimeout(function(){ $('#zonge11').removeClass('animated bounce') }, 1000);
@@ -598,43 +605,51 @@ export default {
         } else {
           data.data.leftdata.forEach((item,index) => {
             let itemnums = 0
-            let sjnum = Math.floor(0 + Math.random() * (4 - 0));
+            item.forEach((item1,index1) => {
+              itemnums += item1.nums
+            })
+            // let sjnum = Math.floor(0 + Math.random() * (4 - 0));
             if (this.listQuery2.role == 1 && this.listQuery2.bm == '') {
               getUserByuid({uid:item[0].pid}).then(res => {
                 let {data} = res
                 this.itemnames.push(data.department)
+                this.itemnums.push({value:itemnums,name: data.department})
               })
             }
             if (this.listQuery2.role == 1 && this.listQuery2.bm != '') {
               getUserByuid({uid:item[0].uid}).then(res => {
                 let {data} = res
                 this.itemnames.push(data.department)
+                this.itemnums.push({value:itemnums,name: data.department})
               })
             }
             if (this.listQuery2.role == 2 && this.listQuery2.gz == '') {
               getUserByuid({uid:item[0].uid}).then(res => {
                 let {data} = res
                 this.itemnames.push(data.department)
+                this.itemnums.push({value:itemnums,name: data.department})
               })
             }
             if (this.listQuery2.role == 2 && this.listQuery2.gz != '') {
               getSortinfoone({id:item[0].sortid}).then(res => {
                 let {data} = res
                 this.itemnames.push(data[0].name)
+                this.itemnums.push({value:itemnums,name: data[0].name})
               })
             }
             if (this.listQuery2.role == 3) {
               getSortinfoone({id:item[0].sortid}).then(res => {
                 let {data} = res
                 this.itemnames.push(data[0].name)
+                this.itemnums.push({value:itemnums,name: data[0].name})
               })
             }
-            item.forEach((item1,index1) => {
-              itemnums += item1.nums
-            })
-            this.bodyMax += itemnums
-            this.itemnums.push({value:itemnums,symbol: this.symbols[sjnum]})
-            this.itemnums2.push({value:1,symbol: this.symbols[sjnum]})
+            // item.forEach((item1,index1) => {
+            //   itemnums += item1.nums
+            // })
+            // this.bodyMax += itemnums
+            // this.itemnums.push({value:itemnums,symbol: this.symbols[sjnum]})
+            // this.itemnums2.push({value:1,symbol: this.symbols[sjnum]})
           })
           let self = this
           setTimeout(function() {
@@ -687,99 +702,138 @@ export default {
       })
     },
     //占比美女echarts图
+    // zbChart() {
+    //     if (this.itemnames.length <= 3) {
+    //       this.itemnames.push('','','','')
+    //     }
+    //     let myChart = echarts.init(this.$refs.zbChart);
+    //     // 指定图表的配置项和数据
+    //     let bodyMax = this.bodyMax;
+    //     let labelSetting = {
+    //         normal: {
+    //             show: true,
+    //             position: 'outside',
+    //             offset: [0, -20],
+    //             formatter: function (param) {
+    //                 return (param.value / bodyMax * 100).toFixed(0) + '%';
+    //             },
+    //             textStyle: {
+    //                 fontSize: 18,
+    //                 fontFamily: 'Arial'
+    //             }
+    //         }
+    //     };
+    //     let markLineSetting = {
+    //         symbol: 'none',
+    //         lineStyle: {
+    //             normal: {
+    //                 opacity: 0.3
+    //             }
+    //         },
+    //         data: [{
+    //             type: 'max',
+    //             label: {
+    //                 normal: {
+    //                     formatter: 'max: {c}'
+    //                 }
+    //             }
+    //         }, {
+    //             type: 'min',
+    //             label: {
+    //                 normal: {
+    //                     formatter: 'min: {c}'
+    //                 }
+    //             }
+    //         }]
+    //     };
+    //     let option = {
+    //         toolbox: {
+    //           feature: {
+    //             saveAsImage: {
+    //               title: '下载'
+    //             }
+    //           },
+    //         },
+    //         tooltip: {
+    //         },
+    //         xAxis: {
+    //             data: this.itemnames,
+    //             axisTick: {show: true},
+    //             axisLine: {show: true},
+    //             axisLabel: {show: true}
+    //         },
+    //         yAxis: {
+    //             max: bodyMax,
+    //             offset: 20,
+    //             splitLine: {show: false}
+    //         },
+    //         grid: {
+    //             top: 'center',
+    //             height: 230
+    //         },
+    //         markLine: {
+    //             z: -100
+    //         },
+    //         series: [{
+    //             name: '销售额度',
+    //             type: 'pictorialBar',
+    //             symbolClip: true,
+    //             symbolBoundingData: bodyMax,
+    //             label: labelSetting,
+    //             data: this.itemnums,
+    //             markLine: markLineSetting,
+    //             z: 10
+    //         }, {
+    //             name: 'full',
+    //             type: 'pictorialBar',
+    //             symbolBoundingData: bodyMax,
+    //             animationDuration: 0,
+    //             itemStyle: {
+    //                 normal: {
+    //                     color: '#ccc'
+    //                 }
+    //             },
+    //             data: this.itemnums2
+    //         }]
+    //     };
+    //     // 使用刚指定的配置项和数据显示图表。
+    //     myChart.clear() 
+    //     myChart.setOption(option);
+    //     window.addEventListener('resize',function() {
+    //       myChart.resize()
+    //     })
+    // },
+    //日期占比饼图
     zbChart() {
-        if (this.itemnames.length <= 3) {
-          this.itemnames.push('','','','')
-        }
         let myChart = echarts.init(this.$refs.zbChart);
-        // 指定图表的配置项和数据
-        let bodyMax = this.bodyMax;
-        let labelSetting = {
-            normal: {
-                show: true,
-                position: 'outside',
-                offset: [0, -20],
-                formatter: function (param) {
-                    return (param.value / bodyMax * 100).toFixed(0) + '%';
-                },
-                textStyle: {
-                    fontSize: 18,
-                    fontFamily: 'Arial'
-                }
-            }
-        };
-        let markLineSetting = {
-            symbol: 'none',
-            lineStyle: {
-                normal: {
-                    opacity: 0.3
-                }
-            },
-            data: [{
-                type: 'max',
-                label: {
-                    normal: {
-                        formatter: 'max: {c}'
-                    }
-                }
-            }, {
-                type: 'min',
-                label: {
-                    normal: {
-                        formatter: 'min: {c}'
-                    }
-                }
-            }]
-        };
         let option = {
-            toolbox: {
-              feature: {
-                saveAsImage: {
-                  title: '下载'
-                }
-              },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} 元 ({d}%)"
             },
-            tooltip: {
-            },
-            xAxis: {
-                data: this.itemnames,
-                axisTick: {show: true},
-                axisLine: {show: true},
-                axisLabel: {show: true}
-            },
-            yAxis: {
-                max: bodyMax,
-                offset: 20,
-                splitLine: {show: false}
-            },
-            grid: {
-                top: 'center',
-                height: 230
-            },
-            markLine: {
-                z: -100
-            },
-            series: [{
-                name: '销售额度',
-                type: 'pictorialBar',
-                symbolClip: true,
-                symbolBoundingData: bodyMax,
-                label: labelSetting,
-                data: this.itemnums,
-                markLine: markLineSetting,
-                z: 10
-            }, {
-                name: 'full',
-                type: 'pictorialBar',
-                symbolBoundingData: bodyMax,
-                animationDuration: 0,
-                itemStyle: {
-                    normal: {
-                        color: '#ccc'
-                    }
+            legend: {
+                top: 95,
+                left: 55,
+                itemGap: 20,
+                formatter: function (a) {
+                    return a;
                 },
-                data: this.itemnums2
-            }]
+                orient: 'vertical',
+                data: this.itemnames
+            },
+            series : [
+                {
+                    name: '销售额占比',
+                    type: 'pie',
+                    radius: '80%',
+                    roseType: 'angle',
+                    center: ['50%', '50%'],
+                    label: {
+                        formatter: '{b}: {d}%'
+                    },
+                    data:this.itemnums
+                }
+            ]
         };
         // 使用刚指定的配置项和数据显示图表。
         myChart.clear() 
@@ -867,48 +921,48 @@ export default {
         })
     },
     //完成率仪表图
-    completeChart() {
-      let pieChart = echarts.init(this.$refs.completeChart)
-      let option = {
-        tooltip : {
-          formatter: "{a} <br/>{b} : {c}%"
-        },
-        toolbox: {
-          feature: {
-            saveAsImage: {
-              title: '下载'
-            }
-          },
-        },
-        series: [
-          {
-            name: '业务指标',
-            axisLabel: {
-                backgroundColor: 'auto',
-                borderRadius: 2,
-                color: '#eee',
-                padding: 3,
-                textShadowBlur: 2,
-                textShadowOffsetX: 1,
-                textShadowOffsetY: 1,
-                textShadowColor: '#222'
-            },
-            title : {
-                fontWeight: 'bolder',
-                fontSize: 20,
-            },
-            type: 'gauge',
-            detail: {formatter:'{value}%'},
-            data: [{value: 40, name: '完成率'}]
-          }
-        ]
-      };
-      pieChart.clear()  
-      pieChart.setOption(option)
-      window.addEventListener('resize',function() {
-        pieChart.resize()
-      })
-    },
+    // completeChart() {
+    //   let pieChart = echarts.init(this.$refs.completeChart)
+    //   let option = {
+    //     tooltip : {
+    //       formatter: "{a} <br/>{b} : {c}%"
+    //     },
+    //     toolbox: {
+    //       feature: {
+    //         saveAsImage: {
+    //           title: '下载'
+    //         }
+    //       },
+    //     },
+    //     series: [
+    //       {
+    //         name: '业务指标',
+    //         axisLabel: {
+    //             backgroundColor: 'auto',
+    //             borderRadius: 2,
+    //             color: '#eee',
+    //             padding: 3,
+    //             textShadowBlur: 2,
+    //             textShadowOffsetX: 1,
+    //             textShadowOffsetY: 1,
+    //             textShadowColor: '#222'
+    //         },
+    //         title : {
+    //             fontWeight: 'bolder',
+    //             fontSize: 20,
+    //         },
+    //         type: 'gauge',
+    //         detail: {formatter:'{value}%'},
+    //         data: [{value: 40, name: '完成率'}]
+    //       }
+    //     ]
+    //   };
+    //   pieChart.clear()  
+    //   pieChart.setOption(option)
+    //   window.addEventListener('resize',function() {
+    //     pieChart.resize()
+    //   })
+    // },
   }
 }
 </script>

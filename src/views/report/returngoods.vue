@@ -68,6 +68,7 @@
           <el-option v-for="item in suppliers" :label="item.label" :value="item.value"/>
         </el-select>
         <el-button style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
+        <el-button style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="toExcle">导出</el-button>
       </div>
       <!-- 商品列表table -->
       <el-table
@@ -75,8 +76,8 @@
         :data="list"
         border
         fit
+        id="out-table"
         v-if="isgz"
-        max-height="400"
         highlight-current-row
         style="width: 100%;">
         <el-table-column label="序号" align="center" width="65">
@@ -149,6 +150,7 @@ import { getgoodschangeQushi } from '@/api/goods' //请求函数
 import { getSortinfoone, getSortinfoall } from '@/api/sort' //请求函数
 import { Getreturngoods, GetreturngoodsByGroup, getreturnGoodsinfo } from '@/api/report' //请求函数
 import { getSupplierall } from '@/api/supplier' //获取供应商
+import XLSX from 'xlsx' //导出excle
 export default {
   name: 'DashboardAdmin',
   components: {
@@ -290,6 +292,11 @@ export default {
     
   },
   methods: {
+    //导出excle
+    toExcle() {
+      var wb = XLSX.utils.table_to_book(document.getElementById('out-table'));
+      XLSX.writeFile(wb, "退货商品列表.xlsx")
+    },
     //系列动画函数
     zeOver() {
       $('#zonge').toggleClass('animated bounce')

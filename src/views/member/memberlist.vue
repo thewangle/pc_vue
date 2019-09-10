@@ -4,13 +4,14 @@
       <el-input v-model="listQuery.name" placeholder="请输入会员姓名" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-input v-model="listQuery.phone" placeholder="请输入会员手机号" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
+      <el-button style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="toExcle">导出</el-button>
     </div>
     <el-table
       v-loading="listLoading"
       :data="list"
       border
       fit
-      max-height="400"
+      id="out-table"
       highlight-current-row
       style="width: 100%;">
       <el-table-column label="序号" align="center" width="65">
@@ -112,6 +113,7 @@ import $ from 'jquery'
 import { getpartantId, getRoleId, getUserid } from '@/utils/auth'
 import moment from 'moment' //日期转换插件 
 import { getMemberinfo, editeMemberinfo, deleteMemberinfo } from '@/api/member' //请求函数
+import XLSX from 'xlsx' //导出excle
 export default {
   name: 'Dashboard',
   data() {
@@ -141,6 +143,11 @@ export default {
     
   },
   methods: {
+    //导出excle
+    toExcle() {
+      var wb = XLSX.utils.table_to_book(document.getElementById('out-table'));
+      XLSX.writeFile(wb, "会员列表.xlsx")
+    },
     //点击编辑
     handleShowDetial(row_data) {
       this.table_info = row_data

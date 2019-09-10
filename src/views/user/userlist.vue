@@ -6,13 +6,14 @@
         <el-option v-for="item in members" :label="item.label" :value="item.value"/>
       </el-select>
       <el-button style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
+      <el-button style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="toExcle">导出</el-button>
     </div>
     <el-table
       v-loading="listLoading"
       :data="list"
       border
       fit
-      max-height="400"
+      id="out-table"
       highlight-current-row
       style="width: 100%;">
       <el-table-column label="序号" align="center" width="65">
@@ -109,6 +110,7 @@ import $ from 'jquery'
 import { getUserName, getRoleId } from '@/utils/auth'
 import moment from 'moment' //日期转换插件 
 import { editeUser, renewalFee, deletUser, getUserByPermission } from '@/api/loginanduser' //请求函数
+import XLSX from 'xlsx' //导出excle
 export default {
   name: 'Dashboard',
   data() {
@@ -183,6 +185,11 @@ export default {
     }
   },
   methods: {
+    //导出excle
+    toExcle() {
+      var wb = XLSX.utils.table_to_book(document.getElementById('out-table'));
+      XLSX.writeFile(wb, "账号列表.xlsx")
+    },
     //点击查看
     handleShowDetial(row_data) {
       this.table_info = row_data
