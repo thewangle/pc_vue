@@ -208,7 +208,6 @@ export default {
         });
         return
       }
-      console.log(this.maxnums,this.minnums)
       if (Number(this.maxnums) < Number(this.minnums)) {
         this.$message({
           message: '库存上线不得小于库存下线',
@@ -249,15 +248,15 @@ export default {
           let { data } = res
           if (data.code == 200) {
             self.$message({
-              message: '恭喜您！注册成功！',
+              message: '恭喜您！添加商品成功！',
               type: 'success'
             });
             self.$router.push({ path: '/goods/goodslist' })
           } else {
-            self.$message.error('对不起！注册失败！')
+            self.$message.error('对不起！添加商品失败！')
           }
         }).catch(error => {
-          self.$message.error('对不起！注册失败！')
+          self.$message.error('对不起！添加商品失败！')
         })
       }
     },

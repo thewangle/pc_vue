@@ -134,7 +134,7 @@
         <el-input v-model="table_info.minnums" autocomplete="off"></el-input>
       </div>
       <div class="dialog_div">
-        <span>会员描述</span>
+        <span>商品描述</span>
         <el-input
           type="textarea"
           :rows="2"
@@ -387,7 +387,7 @@ export default {
       this.zcOutprice = row_data.outprice //暂存售价，用于选择更改种类时恢复原价
       this.dialogVisible1 = true
     },
-    //点击更改进/售价
+    //点击更出入库
     handleShownums(row_data) {
       this.table_info2 = row_data
       this.table_info2.inpricenow = row_data.inprice
@@ -413,7 +413,7 @@ export default {
         });
         return
       }
-      if (this.table_info.maxnums < this.table_info.minnums) {
+      if (Number(this.table_info.maxnums) < Number(this.table_info.minnums)) {
         this.$message({
           message: '库存上线不得小于库存下线',
           type: 'warning'
@@ -443,7 +443,7 @@ export default {
         });
         return
       }
-      if (this.table_info.outprice < this.table_info.inprice) {
+      if (Number(this.table_info1.outprice) < Number(this.table_info1.inprice)) {
         this.$message({
           message: '售价不得小于进价',
           type: 'warning'
@@ -466,14 +466,20 @@ export default {
     //更改商品出入库
     editegoodsinfo2() {
       //验证表单是否填写完整
-      if (this.table_info2.changenums == '' || this.table_info2.numtype == '' || this.table_info2.date == '' || this.table_info2.time == '' || this.table_info2.inpricenow == '' || this.table_info2.outpricenow == '') {
+      if (this.table_info2.changenums == '' || this.table_info2.numtype == '' || this.table_info2.inpricenow == '' || this.table_info2.outpricenow == '') {
         this.$message({
           message: '请您填写完整信息',
           type: 'warning'
         });
         return
       }
-      console.log(this.table_info2)
+      if (!this.table_info2.date || !this.table_info2.time) {
+        this.$message({
+          message: '请您选择日期和时间',
+          type: 'warning'
+        });
+        return
+      }
       this.table_info2.type = 2
       editeGoodsinfo(this.table_info2).then(res => {
         this.dialogVisible2 = false

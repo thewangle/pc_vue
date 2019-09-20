@@ -44,7 +44,7 @@
           v-model="remark">
         </el-input>
       </div>
-      <el-button class="submit" :loading="loading" type="primary" @click.native.prevent="handleLogin">注 册</el-button>
+      <el-button class="submit" :loading="loading" type="primary" @click.native.prevent="handleLogin">确 定</el-button>
     </div>
   </div>
 </template>
