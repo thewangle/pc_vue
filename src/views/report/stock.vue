@@ -33,7 +33,12 @@
             <div><span>总毛利率：</span><span>{{tab1info.zonlilv}}</span> %</div>
           </div>
         </div>
-        <div ref="pie" style="width: 80%;height:400px;margin:20px 0;"></div>
+        <div ref="pie" style="width: 80%;height:400px;margin:20px 0;">
+          <div class="noDate">
+            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+            <span class="nodataSpan">暂无数据</span>
+          </div>
+        </div>
       </div>
     </div>
     <div class="tab_model_wrap">
@@ -49,7 +54,12 @@
             <div><span>新入库：</span><span>{{tab1change.changein}}</span> </div>
           </div>
         </div>
-        <div ref="ku_change_pie" style="width: 80%;height:400px;margin:20px 0;"></div>
+        <div ref="ku_change_pie" style="width: 80%;height:400px;margin:20px 0;">
+          <div class="noDate">
+            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+            <span class="nodataSpan">暂无数据</span>
+          </div>
+        </div>
       </div>
     </div>
     <div class="tab_model_wrap">
@@ -82,7 +92,12 @@
             <div><span>趋势所属：</span><span>{{tab2name}}</span></div>
           </div>
         </div>
-        <div ref="pie_change_qushi" style="width: 80%;height:400px;margin:20px 0;"></div>
+        <div ref="pie_change_qushi" style="width: 80%;height:400px;margin:20px 0;">
+          <div class="noDate">
+            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+            <span class="nodataSpan">暂无数据</span>
+          </div>
+        </div>
       </div>
     </div>
     <div class="tab_model_wrap" v-if="is_gz">
@@ -112,7 +127,12 @@
             <div><span>趋势所属：</span><span>{{tab2name}}</span></div>
           </div>
         </div>
-        <div ref="pie_change_qushi1" style="width: 80%;height:400px;margin:20px 0;"></div>
+        <div ref="pie_change_qushi1" style="width: 80%;height:400px;margin:20px 0;">
+          <div class="noDate">
+            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+            <span class="nodataSpan">暂无数据</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>

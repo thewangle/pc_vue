@@ -37,9 +37,19 @@
       </div>
       <div style="width: 100%;padding-right:15px;">
         <div class="fengebr" @click="zeOver3" id="zonge3"><h2>新入库商品图例分析</h2></div>
-        <div ref="pie_change_qushi" style="width: 100%;height:400px;margin:20px 0;"></div>
+        <div ref="pie_change_qushi" style="width: 100%;height:400px;margin:20px 0;">
+          <div class="noDate">
+            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+            <span class="nodataSpan">暂无数据</span>
+          </div>
+        </div>
         <div class="fengebr" @click="zeOver4" id="zonge4"><h2>新入库成本占比图例分析</h2></div>
-        <div ref="zbChart" style="width: 100%;height:400px;margin:20px 0;"></div>
+        <div ref="zbChart" style="width: 100%;height:400px;margin:20px 0;">
+          <div class="noDate">
+            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+            <span class="nodataSpan">暂无数据</span>
+          </div>
+        </div>
       </div>
       <div v-if="isgz" class="fengebr" @click="zeOver9" id="zonge13"><h2>新入库商品列表</h2></div>
       <!-- 条件搜索 -->

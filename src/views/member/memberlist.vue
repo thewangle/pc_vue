@@ -201,7 +201,7 @@ export default {
     },
     //点击删除
     copyTask(row_data) {
-      this.$confirm('此操作将永久删除该账号, 是否继续?', '提示', {
+      this.$confirm('此操作将永久删除该会员, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -254,12 +254,12 @@ export default {
         if (data.code == 201) {
           this.list = []
           this.listLoading = false
-          this.$message('没有更多用户!')
+          this.$message('没有更多会员!')
         }
       }).catch(error => {
         this.list = []
         this.listLoading = false
-        this.$message('获取用户信息失败')
+        this.$message('获取会员信息失败')
       })
     },
     //顶部搜索框搜索功能

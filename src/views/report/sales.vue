@@ -41,13 +41,33 @@
       </div>
       <div style="width: 100%;padding-right:15px;">
         <div class="fengebr" @click="zeOver4" id="zonge8"><h2>销售额趋势图例分析</h2></div>
-        <div ref="pie_change_qushi" style="width: 100%;height:400px;margin:20px 0;"></div>
+        <div ref="pie_change_qushi" style="width: 100%;height:400px;margin:20px 0;">
+          <div class="noDate">
+            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+            <span class="nodataSpan">暂无数据</span>
+          </div>
+        </div>
         <div class="fengebr" @click="zeOver5" id="zonge9"><h2>销售额占比图例分析</h2></div>
-        <div ref="zbChart" style="width: 100%;height:400px;margin:20px 0;"></div>
+        <div ref="zbChart" style="width: 100%;height:400px;margin:20px 0;">
+          <div class="noDate" v-if="itemnums">
+            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+            <span class="nodataSpan">暂无数据</span>
+          </div>
+        </div>
         <div class="fengebr" @click="zeOver7" id="zonge11"><h2>销售额日期占比图例分析</h2></div>
-        <div ref="dateChart" style="width: 100%;height:400px;margin:20px 0;"></div>
+        <div ref="dateChart" style="width: 100%;height:400px;margin:20px 0;">
+          <div class="noDate" v-if="Datenums">
+            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+            <span class="nodataSpan">暂无数据</span>
+          </div>
+        </div>
         <div class="fengebr" @click="zeOver8" id="zonge12"><h2>销售额时间段占比图例分析</h2></div>
-        <div ref="timeChart" style="width: 100%;height:400px;margin:20px 0;"></div>
+        <div ref="timeChart" style="width: 100%;height:400px;margin:20px 0;">
+          <div class="noDate" v-if="Timenums">
+            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+            <span class="nodataSpan">暂无数据</span>
+          </div>
+        </div>
         <!-- <div class="fengebr" @click="zeOver6" id="zonge10"><h2>销售额完成率图例分析</h2></div>
         <div ref="completeChart" style="width: 100%;height:400px;margin:20px 0;"></div> -->
       </div>
@@ -517,7 +537,7 @@ export default {
         let {data} = res
         if (data.code == 201) {
           this.$message({
-            message: '没有更多库存变化信息！',
+            message: '没有更多商品信息！',
             type: 'warning',
             duration:5000
           });
@@ -598,7 +618,7 @@ export default {
         if (data.code == 201) {
           // loading.close()
           this.$message({
-            message: '没有更多库存变化信息！',
+            message: '没有更多商品信息！',
             type: 'warning',
             duration:5000
           });
@@ -665,6 +685,17 @@ export default {
     pie_kucunChangeQushi() {
       let pieChart = echarts.init(this.$refs.pie_change_qushi)
       let option = {
+        noDataLoadingOption:{
+          text: '暂无数据',
+          effect: 'bubble',
+          effectOption:
+          {
+            effect:
+            {
+              n: 0
+            }
+          }
+        },
         toolbox: {
           feature: {
             saveAsImage: {
@@ -971,12 +1002,12 @@ export default {
 .filter-container {
   padding: 10px;
 }
-.fengebr {
+/*.fengebr {
   width: 100%;
   padding: 10px 0;
   text-align: center;
   cursor: pointer;
-}
+}*/
 .salesTag {
   width: 100%;
   padding: 15px;

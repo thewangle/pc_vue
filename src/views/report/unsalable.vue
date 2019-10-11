@@ -2,8 +2,8 @@
   <div class="page_wrap animated rotateIn">
     <div class="tab_model_wrap">
       <div class="tag1_wrap">
-        <span class="tabSpan">滞销时间段：</span>
-        <el-date-picker
+        <span class="tabSpan">入库时间：</span>
+        <!-- <el-date-picker
           v-model="time_tab2"
           @change="time_select2"
           type="daterange"
@@ -13,14 +13,15 @@
           range-separator="至"
           end-placeholder="结束日期"
           :picker-options="pickerOptions">
-        </el-date-picker>
+        </el-date-picker> -->
+        <el-input placeholder="请输入入库时间" v-model="listQuery2.unsoledtime" style="width: 200px;margin-left:10px;"></el-input>
         <el-select v-if="is_zzh" v-model="listQuery2.bm" placeholder="请选择部门" clearable style="width: 200px;margin-left:10px;" class="filter-item" @change="handleFilter2(1)">
           <el-option v-for="item in bms" :label="item.label" :value="item.value"/>
         </el-select>
         <el-select v-if="is_bm" v-model="listQuery2.gz" placeholder="请选择柜组" clearable style="width: 200px;margin-left:10px;" class="filter-item" @change="handleFilter2(2)">
           <el-option v-for="item in gzs" :label="item.label" :value="item.value"/>
         </el-select>
-        <span class="tabSpan">滞销数量：</span>
+        <span class="tabSpan">销售数量：</span>
         <el-input placeholder="请输入滞销数量" v-model="listQuery2.unsalableNum" style="width: 200px;margin-left:10px;"></el-input>
         <el-button style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter2">查询</el-button>
         <el-button style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="toExcle">导出</el-button>
@@ -40,8 +41,13 @@
         </div>
       </div>
       <div style="width: 100%;padding-right:15px;">
-        <div class="fengebr" @click="zeOver4" id="zonge4"><h2>滞销成本占比图例分析</h2></div>
-        <div ref="zbChart" style="width: 100%;height:400px;margin:20px 0;"></div>
+        <div class="fengebr" @click="zeOver4" id="zonge4"><h2>滞销商品库存数量占比图例分析</h2></div>
+        <div ref="zbChart" style="width: 100%;height:400px;margin:20px 0;">
+          <div class="noDate">
+            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+            <span class="nodataSpan">暂无数据</span>
+          </div>
+        </div>
       </div>
       <div class="fengebr"><h2>滞销商品列表</h2></div>
       <!-- 商品列表table -->
@@ -61,6 +67,11 @@
         <el-table-column label="商品名称" width="150px" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.name }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="库存数量" min-width="150px">
+          <template slot-scope="scope">
+            <span>{{ scope.row.nums }}</span>
           </template>
         </el-table-column>
         <el-table-column label="商品编码" min-width="150px">
@@ -132,7 +143,7 @@ export default {
   data() {
     return {
       listQuery: { //动态请求table数据时传递的参数
-        time: [],
+        // time: [],
         page_no: 1, //页码
         page_size: 10,//每页显示条数
         role: getRoleId(),
@@ -148,13 +159,14 @@ export default {
       series_data_change: [],
       changeQushixAxis: [],
       changeQushiseries: [],
-      time_tab2: [moment().subtract(7, "days").format(),moment().format()],
+      // time_tab2: [moment().subtract(7, "days").format(),moment().format()],
       listQuery2: { 
         page_no: 1, //页码
         page_size: 10,//每页显示条数
-        time: [],
+        // time: [],
         bm: '',
         gz: '',
+        unsoledtime: 30,
         unsalableNum: 1,
         role: getRoleId(),
         uid: getUserid(),
@@ -175,33 +187,33 @@ export default {
       is_zzh: false,
       is_gz: false,
       //日期组件的快捷选项设置
-      pickerOptions: {
-        shortcuts: [{
-          text: '最近一周',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-            picker.$emit('pick', [start, end]);
-          }
-        }, {
-          text: '最近一个月',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-            picker.$emit('pick', [start, end]);
-          }
-        }, {
-          text: '最近三个月',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-            picker.$emit('pick', [start, end]);
-          }
-        }]
-      },
+      // pickerOptions: {
+      //   shortcuts: [{
+      //     text: '最近一周',
+      //     onClick(picker) {
+      //       const end = new Date();
+      //       const start = new Date();
+      //       start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+      //       picker.$emit('pick', [start, end]);
+      //     }
+      //   }, {
+      //     text: '最近一个月',
+      //     onClick(picker) {
+      //       const end = new Date();
+      //       const start = new Date();
+      //       start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+      //       picker.$emit('pick', [start, end]);
+      //     }
+      //   }, {
+      //     text: '最近三个月',
+      //     onClick(picker) {
+      //       const end = new Date();
+      //       const start = new Date();
+      //       start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+      //       picker.$emit('pick', [start, end]);
+      //     }
+      //   }]
+      // },
     }
   },
   computed: {
@@ -210,7 +222,7 @@ export default {
     if (getRoleId() == 3) {
       this.isgz = true
     }
-    this.time_select2()
+    // this.time_select2()
     this.handleFilter2()
     if (getRoleId() !=3) {
       this.getAllUserByidthis()
@@ -309,10 +321,10 @@ export default {
       })
     },
     //日期选择函数
-    time_select2(query) {
-      this.listQuery2.time[0] = moment(this.time_tab2[0]).valueOf()/1000
-      this.listQuery2.time[1] = moment(this.time_tab2[1]).valueOf()/1000
-    },
+    // time_select2(query) {
+    //   this.listQuery2.time[0] = moment(this.time_tab2[0]).valueOf()/1000
+    //   this.listQuery2.time[1] = moment(this.time_tab2[1]).valueOf()/1000
+    // },
     //tab2选择函数
     handleFilter2(query) {
       this.listQuery2.page_no = 1
@@ -341,13 +353,22 @@ export default {
       this._fetchActivityList2()
     },
     async _fetchActivityList2() {
-      if (this.listQuery2.time.length == 0) {
+      // if (this.listQuery2.time.length == 0) {
+      //   this.$message({
+      //     message: '请您选择日期！',
+      //     type: 'warning'
+      //   });
+      //   return
+      // }
+      let is_num = /^\+?[1-9][0-9]*$/
+      if (!is_num.test(this.listQuery2.unsoledtime) || !is_num.test(this.listQuery2.unsalableNum)) {
         this.$message({
-          message: '请您选择日期！',
+          message: '请您输入正确的数量',
           type: 'warning'
         });
         return
       }
+      this.listQuery2.unsoledtimes = moment().subtract(this.listQuery2.unsoledtime, "days").valueOf()/1000
       let goodsList = await getunsalablegoods(this.listQuery2)
       let goodsLists = goodsList.data
       this.listQuery2.goodsLists = goodsLists
@@ -370,7 +391,7 @@ export default {
         let {data} = res
         if (data.code == 201) {
           this.$message({
-            message: '没有更多新入库信息！',
+            message: '没有更多滞销商品信息！',
             type: 'warning',
             duration:5000
           });
@@ -438,7 +459,7 @@ export default {
           },
           tooltip : {
               trigger: 'item',
-              formatter: "{a} <br/>{b} : {c} 元 ({d}%)"
+              formatter: "{a} <br/>{b} : {c} ({d}%)"
           },
           legend: {
               top: 95,
@@ -452,7 +473,7 @@ export default {
           },
           series : [
               {
-                  name: '销售额占比',
+                  name: '库存数量占比',
                   type: 'pie',
                   radius: '80%',
                   roseType: 'angle',

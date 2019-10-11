@@ -31,7 +31,12 @@
             <div><span>变动次数：</span><span>{{priceci}}</span> 次</div>
           </div>
         </div>
-        <div ref="pie_change_qushi" style="width: 80%;height:400px;margin:20px 0;"></div>
+        <div ref="pie_change_qushi" style="width: 80%;height:400px;margin:20px 0;">
+          <div class="noDate">
+            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+            <span class="nodataSpan">暂无数据</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -172,7 +177,7 @@ export default {
         let {data} = res
         if (data.code == 201) {
           this.$message({
-            message: '没有更多库存变化信息！',
+            message: '没有更多价格变化信息！',
             type: 'warning',
             duration:5000
           });

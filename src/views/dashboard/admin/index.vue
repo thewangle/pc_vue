@@ -1,8 +1,13 @@
 <template>
   <div class="dashboard-editor-container animated bounceInLeft">
-    <div ref="mapChart" style="width: 100%;min-height: 800px;"></div>
+    <div class="fengebr">山东省五指会员区域分布</div>
+    <div class="wrap">
+        <div ref="mapChart" style="width: 95%;min-height: 800px;box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);"></div>
+    </div>
     <div class="fengebr">五指科技全国辐射图</div>
-    <div ref="chinaMap" style="width: 100%;min-height: 800px;"></div>
+    <div class="wrap">
+        <div ref="chinaMap" style="width: 95%;min-height: 800px;box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);"></div>
+    </div>
   </div>
 </template>
 
@@ -104,7 +109,7 @@ export default {
         echarts.registerMap('HK', listSd[0]);
         let option = {
             title : {
-                text: '山东省五指会员区域分布图',
+                text: '',
                 textStyle: {
                     color: 'black',
                 },
@@ -314,8 +319,16 @@ export default {
 <style rel="stylesheet/scss" scoped>
 .fengebr {
   width: 100%;
-  padding: 10px 0;
+  padding: 40px 0;
   text-align: center;
   cursor: pointer;
+  font-size: 19px;
+  font-weight: bold;
+}
+.wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 </style>

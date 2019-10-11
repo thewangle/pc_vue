@@ -12,7 +12,7 @@ module.exports = {
     proxyTable: {
       //服务器代理
       '/api': {
-        target: 'http://49.235.163.210', //预发布
+        target: 'http://www.wuzhi1688.com', //预发布
         // target: 'http://topteam.ueuc.com', // 开发环境
         // target: 'http://bxunion.com', // 线上
         changeOrigin: true,

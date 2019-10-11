@@ -313,7 +313,10 @@ export default {
               }
             }
             if (data.code == 201) {
-              console.log(data)
+              this.$message({
+                message: '账号名或密码错误！',
+                type: 'warning'
+              });
             }
           }).catch(error => {
             this.$message(error.message)
