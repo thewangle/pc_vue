@@ -36,7 +36,7 @@
         </div>
       </div>
       <div style="width: 100%;padding-right:15px;">
-        <div class="fengebr" @click="zeOver3" id="zonge3"><h2>报损趋势图例分析</h2></div>
+        <div class="fengebr" @click="zeOver3" id="zonge3"><h2>报损数量趋势图例分析</h2></div>
         <div ref="pie_change_qushi" style="width: 100%;height:400px;margin:20px 0;">
           <div class="noDate">
             <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
@@ -82,6 +82,7 @@
         :data="list"
         border
         fit
+        stripe
         v-if="isgz"
         id="out-table"
         highlight-current-row
@@ -93,7 +94,7 @@
         </el-table-column>
         <el-table-column label="商品名称" width="150px" align="center">
           <template slot-scope="scope">
-            <span>{{ scope.row.name }}</span>
+            <span class="tag_yellow">{{ scope.row.name }}</span>
           </template>
         </el-table-column>
         <el-table-column label="商品编码" min-width="150px">
@@ -101,16 +102,6 @@
             <span>{{ scope.row.code }}</span>
           </template>
         </el-table-column>
-        <!-- <el-table-column label="商品分类" width="200px" align="center">
-          <template slot-scope="scope">
-            <span>{{ scope.row.sortid }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="供应商" width="100" align="center">
-          <template slot-scope="scope">
-            <span>{{ scope.row.supplierid }}</span>
-          </template>
-        </el-table-column> -->
         <el-table-column label="商品规格" width="200px" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.format }}</span>
@@ -118,7 +109,7 @@
         </el-table-column>
         <el-table-column label="报损数量" width="200px" align="center">
           <template slot-scope="scope">
-            <span>{{ scope.row.numbefore - scope.row.numnow}}</span>
+            <span class="tag_red">{{ scope.row.numbefore - scope.row.numnow}}</span>
           </template>
         </el-table-column>
         <el-table-column label="商品进价" width="200px" align="center">
@@ -133,7 +124,7 @@
         </el-table-column>
         <el-table-column label="报损时间" width="200px" align="center">
           <template slot-scope="scope">
-            <span>{{ scope.row.addtime }}</span>
+            <span class="tag_blue">{{ scope.row.addtime }}</span>
           </template>
         </el-table-column>
       </el-table>

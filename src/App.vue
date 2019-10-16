@@ -55,4 +55,33 @@ export default{
   font-size: 16px;
   font-weight: bold;
 }
+.tag_blue {
+  color: #409EFF;
+  font-weight: bold;
+}
+.tag_red {
+  color: #F56C6C;
+  font-weight: bold;
+}
+.tag_yellow {
+  color: #E6A23C;
+  font-weight: bold;
+}
+.tag_green {
+  color: #67C23A;
+  font-weight: bold;
+}
+.el-badge__content.is-fixed {
+  top: 10px;
+  right: 80px;
+}
+.addB {
+  text-align:center;
+  font-weight: bold;
+  font-size: 19px;
+  color: #409EFF;
+}
+.el-range-separator {
+  width: 20px !important;
+}
 </style>

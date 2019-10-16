@@ -19,6 +19,7 @@
       :data="list"
       border
       fit
+      stripe
       id="out-table"
       highlight-current-row
       style="width: 100%;">
@@ -37,16 +38,6 @@
           <span>{{ scope.row.code }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="商品分类" width="200px" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.sortid }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="供应商" width="100" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.supplierid }}</span>
-        </template>
-      </el-table-column> -->
       <el-table-column label="商品规格" width="200px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.format }}</span>
@@ -77,7 +68,7 @@
           <span>{{ scope.row.addtime }}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="isgz" label="操作" align="center" width="500" class-name="small-padding fixed-width">
+      <el-table-column v-if="isgz" fixed="right" label="操作" align="center" width="500" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="small" @click="handleShowDetial(scope.row)">编辑</el-button>
           <el-button type="primary" size="small" @click="handleShowprice(scope.row)">进/售价</el-button>
@@ -500,7 +491,7 @@ export default {
     },
     //点击删除
     copyTask(row_data) {
-      this.$confirm('此操作将永久删除该账号, 是否继续?', '提示', {
+      this.$confirm('此操作将永久删除该商品, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'

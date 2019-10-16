@@ -1,7 +1,7 @@
 <template>
   <div class="wrap">
     <div class="tab">
-      <div style="text-align:center;">新增会员</div>
+      <div class="addB">新增会员</div>
       <div class="biao">
         <span>会员姓名</span>
         <el-input

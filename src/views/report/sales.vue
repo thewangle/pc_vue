@@ -102,6 +102,7 @@
         :data="list"
         border
         fit
+        stripe
         id="out-table"
         v-if="isgz"
         highlight-current-row
@@ -113,7 +114,7 @@
         </el-table-column>
         <el-table-column label="商品名称" width="150px" align="center">
           <template slot-scope="scope">
-            <span>{{ scope.row.name }}</span>
+            <span class="tag_yellow">{{ scope.row.name }}</span>
           </template>
         </el-table-column>
         <el-table-column label="商品编码" min-width="150px">
@@ -121,16 +122,6 @@
             <span>{{ scope.row.code }}</span>
           </template>
         </el-table-column>
-        <!-- <el-table-column label="商品分类" width="200px" align="center">
-          <template slot-scope="scope">
-            <span>{{ scope.row.sortid }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="供应商" width="100" align="center">
-          <template slot-scope="scope">
-            <span>{{ scope.row.supplierid }}</span>
-          </template>
-        </el-table-column> -->
         <el-table-column label="商品规格" width="200px" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.format }}</span>
@@ -138,7 +129,7 @@
         </el-table-column>
         <el-table-column label="售出数量" width="200px" align="center">
           <template slot-scope="scope">
-            <span>{{ scope.row.numbefore - scope.row.numnow}}</span>
+            <span class="tag_blue">{{ scope.row.numbefore - scope.row.numnow}}</span>
           </template>
         </el-table-column>
         <el-table-column label="商品进价" width="200px" align="center">
@@ -153,12 +144,12 @@
         </el-table-column>
         <el-table-column label="毛利润" width="200px" align="center">
           <template slot-scope="scope">
-            <span>{{ (scope.row.outprice - scope.row.inprice) * (scope.row.numbefore - scope.row.numnow) }} 元</span>
+            <span class="tag_red">{{ (scope.row.outprice - scope.row.inprice) * (scope.row.numbefore - scope.row.numnow) }} 元</span>
           </template>
         </el-table-column>
         <el-table-column label="毛利率" width="200px" align="center">
           <template slot-scope="scope">
-            <span>{{ ((scope.row.outprice - scope.row.inprice) / scope.row.inprice * 100).toFixed(2) }} %</span>
+            <span class="tag_red">{{ ((scope.row.outprice - scope.row.inprice) / scope.row.inprice * 100).toFixed(2) }} %</span>
           </template>
         </el-table-column>
         <el-table-column label="售出时间" width="200px" align="center">
@@ -685,17 +676,6 @@ export default {
     pie_kucunChangeQushi() {
       let pieChart = echarts.init(this.$refs.pie_change_qushi)
       let option = {
-        noDataLoadingOption:{
-          text: '暂无数据',
-          effect: 'bubble',
-          effectOption:
-          {
-            effect:
-            {
-              n: 0
-            }
-          }
-        },
         toolbox: {
           feature: {
             saveAsImage: {

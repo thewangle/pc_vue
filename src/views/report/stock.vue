@@ -21,7 +21,7 @@
         </el-select>
         <el-button style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>
       </div>
-      <div class="fengebr" @click="zeOver" id="zonge"><h2>库存总量及占比图例分析</h2></div>
+      <div class="fengebr" @click="zeOver" id="zonge"><h2>库存总数量及占比图例分析</h2></div>
       <div class="tab1_content_wrap">
         <div class="tab1_content_left">
           <div class="tab1_content_left_tab">{{tab1name}}库存</div>
@@ -42,7 +42,7 @@
       </div>
     </div>
     <div class="tab_model_wrap">
-      <div class="fengebr" @click="zeOver1" id="zonge1"><h2>库存变化及占比图例分析</h2></div>
+      <div class="fengebr" @click="zeOver1" id="zonge1"><h2>库存数量变化及占比图例分析</h2></div>
       <div class="tab1_content_wrap">
         <div class="tab1_content_left">
           <div class="tab1_content_left_tab">{{tab1name}}库存变化</div>
@@ -83,7 +83,7 @@
         </el-select>
         <el-button style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter2">查询</el-button>
       </div>
-      <div class="fengebr" @click="zeOver2" id="zonge2"><h2>库存变化趋势图例分析</h2></div>
+      <div class="fengebr" @click="zeOver2" id="zonge2"><h2>库存数量趋势图例分析</h2></div>
       <div class="tab1_content_wrap">
         <div class="tab1_content_left">
           <div class="tab1_content_left_tab">{{tab2name}}库存趋势</div>

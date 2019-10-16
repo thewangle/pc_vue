@@ -103,6 +103,14 @@ export const asyncRouterMap = [
         hidden: true
       },
       {
+        id:30,
+        path: 'stockwarning',
+        component: () => import('@/views/report/stockwarning'),
+        name: 'Stockwarning',
+        meta: { title: '库存预警', icon: 'eye', noCache: true },
+        hidden: true
+      },
+      {
         id:27,
         path: 'storagegoods',
         component: () => import('@/views/report/storagegoods'),

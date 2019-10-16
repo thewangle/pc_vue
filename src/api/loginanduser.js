@@ -73,6 +73,12 @@ export function getUserByuid(params) {
   return axios.post(url,params)
 }
 
+//预警信息状态改变
+export function changemessage(params) {
+  let url = process.env.BASE_API + 'yii2/frontend/web/?r=login/changemessage'
+  return axios.post(url,params)
+}
+
 //获取山东地图json格式数据
 export function getmapforshandong(params) {
   let url = 'https://geo.datav.aliyun.com/areas/bound/370000_full.json'

@@ -1,5 +1,5 @@
 <template>
-  <div class="page_wrap animated flipInY">
+  <div class="page_wrap animated fadeInLeft">
     <div class="tab_model_wrap">
       <div class="tag1_wrap">
         <el-select v-if="is_zzh" v-model="listQuery2.bm" placeholder="请选择部门" clearable style="width: 200px;margin-left:10px;" class="filter-item" @change="handleFilter2(1)">

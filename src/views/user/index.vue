@@ -1,7 +1,7 @@
 <template>
   <div class="wrap">
     <div class="tab">
-      <div style="text-align:center;">新增{{ tab_biao }}</div>
+      <div class="addB">新增{{ tab_biao }}</div>
       <div class="biao">
         <span>用户名</span>
         <el-input

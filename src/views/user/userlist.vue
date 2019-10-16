@@ -13,6 +13,7 @@
       :data="list"
       border
       fit
+      stripe
       id="out-table"
       highlight-current-row
       style="width: 100%;">

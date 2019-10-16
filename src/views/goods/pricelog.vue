@@ -22,6 +22,7 @@
       :data="list"
       border
       fit
+      stripe
       id="out-table"
       highlight-current-row
       style="width: 100%;">
@@ -32,7 +33,7 @@
       </el-table-column>
       <el-table-column label="商品名称" width="150px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.name }}</span>
+          <span class="tag_yellow">{{ scope.row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="商品编码" min-width="150px">
@@ -40,16 +41,6 @@
           <span>{{ scope.row.code }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="商品分类" width="200px" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.sortid }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="供应商" width="100" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.supplierid }}</span>
-        </template>
-      </el-table-column> -->
       <el-table-column label="商品规格" width="200px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.format }}</span>
@@ -62,37 +53,29 @@
       </el-table-column>
       <el-table-column label="原商品进价" width="200px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.priceinbefore }}</span>
+          <span class="tag_blue">{{ scope.row.priceinbefore }}</span>
         </template>
       </el-table-column>
       <el-table-column label="现商品进价" width="200px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.priceinnow }}</span>
+          <span class="tag_red">{{ scope.row.priceinnow }}</span>
         </template>
       </el-table-column>
       <el-table-column label="原商品售价" width="200px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.priceoutbefore }}</span>
+          <span class="tag_blue">{{ scope.row.priceoutbefore }}</span>
         </template>
       </el-table-column>
       <el-table-column label="现商品售价" width="200px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.priceoutnow }}</span>
+          <span class="tag_red">{{ scope.row.priceoutnow }}</span>
         </template>
       </el-table-column>
       <el-table-column label="更改时间" width="200px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.addtime }}</span>
+          <span class="tag_blue">{{ scope.row.addtime }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="操作" align="center" width="500" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
-          <el-button type="primary" size="small" @click="handleShowDetial(scope.row)">编辑</el-button>
-          <el-button type="primary" size="small" @click="handleShowprice(scope.row)">进/售价</el-button>
-          <el-button type="primary" size="small" @click="handleShownums(scope.row)">出/入库</el-button>
-          <el-button type="primary" size="small" @click="copyTask(scope.row)">删除</el-button>
-        </template>
-      </el-table-column> -->
     </el-table>
     <!-- 分页栏目 -->
     <div class="pagination-container">

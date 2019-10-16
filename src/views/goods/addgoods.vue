@@ -1,7 +1,7 @@
 <template>
   <div class="wrap">
     <div class="tab">
-      <div style="text-align:center;">新增商品</div>
+      <div class="addB">新增商品</div>
       <div class="biao" style="padding:0;justify-content: space-between;">
         <div class="biao">
           <span>商品名称<span style="color:red;">*</span></span>

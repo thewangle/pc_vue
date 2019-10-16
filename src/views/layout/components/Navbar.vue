@@ -22,7 +22,9 @@
       </el-tooltip> -->
 
       <div class="tips">
-        <router-link to="/documentation">消息</router-link>
+        <el-badge :value="messageNums" :max="9" class="item" :hidden="isMessage">
+          <div @click="checkMessage">预警消息</div>
+        </el-badge>
       </div>
       <div class="download">
         <router-link to="/documentation">下载中心</router-link>
@@ -50,7 +52,9 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { getUserName } from '@/utils/auth'
+import { getpartantId, getRoleId, getUserid, getUserName } from '@/utils/auth'
+import { getUserByuid, changemessage } from '@/api/loginanduser' //请求函数
+import { getstockwarning } from '@/api/goods' //请求函数
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import Screenfull from '@/components/Screenfull'
@@ -65,9 +69,27 @@ export default {
     LangSelect,
     ThemePicker
   },
+  mounted() {
+    this.getuserinfo()
+  },
   data() {
     return {
-      name: getUserName()
+      name: getUserName(),
+      messageNums: 0,
+      isMessage: true,
+      listQuery: { //动态请求table数据时传递的参数
+        numtype: '',
+        page_no: 1, //页码
+        page_size: 10,//每页显示条数
+        name: '',//商品名称
+        code: '',//商品编码
+        sortid: '',
+        supplierid: '',
+        type: 2,//goodslog里用于判断是价格变动还是库存变动
+        role: getRoleId(),
+        uid: getUserid(),
+        pid: getpartantId()
+      },
     }
   },
   computed: {
@@ -76,12 +98,52 @@ export default {
     ])
   },
   methods: {
+    getuserinfo() {
+      if (getRoleId() == 3) {
+        getUserByuid({uid:getUserid()}).then(res => {
+          let { data } = res
+          if (data.ismessage == 0) {
+            getstockwarning(this.listQuery).then(res => {
+              let { data } = res
+              if (data.code == 200) {
+                this.messageNums = data.data.count
+                this.isMessage = false
+              }
+              if (data.code == 201) {
+                this.isMessage = true
+              }
+            }).catch(error => {
+              this.isMessage = true
+            })
+          }
+        }).catch(error => {
+          console.log(error)
+        })
+      }
+    },
+    checkMessage() {
+      if (getRoleId() == 3) {
+        this.$router.push({ path: '/report/stockwarning' })
+        this.isMessage = true
+        changemessage({messagetype: 1,uid:getUserid()}).then(res => {
+          // console.log(res)
+        })
+      } else {
+        this.$router.push({ path: '/report/stockwarnings' })
+      }
+    },
     toggleSideBar() {
       this.$store.dispatch('toggleSideBar')
     },
     logout() {
-      this.$store.dispatch('FedLogOut').then(() => {
-        location.reload()// In order to re-instantiate the vue-router object to avoid bugs
+      changemessage({messagetype: 0,uid:getUserid()}).then(res => {
+        this.$store.dispatch('FedLogOut').then(() => {
+          location.reload()// In order to re-instantiate the vue-router object to avoid bugs
+        })
+      }).catch(error => {
+        this.$store.dispatch('FedLogOut').then(() => {
+          location.reload()// In order to re-instantiate the vue-router object to avoid bugs
+        })
       })
     }
   }

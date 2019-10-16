@@ -71,3 +71,9 @@ export function getgoodschangeQushiSort(params) {
   let url = process.env.BASE_API + 'yii2/frontend/web/?r=goods/getpricechangequshisort'
   return axios.post(url,params)
 }
+
+//查询库存预警的商品
+export function getstockwarning(params) {
+  let url = process.env.BASE_API + 'yii2/frontend/web/?r=goods/getstockwarning'
+  return axios.post(url,params)
+}

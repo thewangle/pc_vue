@@ -11,6 +11,7 @@
       :data="list"
       border
       fit
+      stripe
       id="out-table"
       highlight-current-row
       style="width: 100%;">
@@ -24,11 +25,6 @@
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="分类下产品数" width="200" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.nums }}</span>
-        </template>
-      </el-table-column> -->
       <el-table-column label="备注" min-width="200px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.remark }}</span>
@@ -39,7 +35,7 @@
           <span>{{ scope.row.addtime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" min-width="300" class-name="small-padding fixed-width">
+      <el-table-column label="操作" fixed="right" align="center" min-width="300" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="small" @click="handleShowDetial(scope.row)">编辑</el-button>
           <el-button type="primary" size="small" @click="copyTask(scope.row)">删除</el-button>

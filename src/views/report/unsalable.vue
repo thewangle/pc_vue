@@ -1,8 +1,8 @@
 <template>
-  <div class="page_wrap animated rotateIn">
+  <div class="page_wrap animated fadeInLeft">
     <div class="tab_model_wrap">
       <div class="tag1_wrap">
-        <span class="tabSpan">入库时间：</span>
+        <!-- <span class="tabSpan">入库时间：</span> -->
         <!-- <el-date-picker
           v-model="time_tab2"
           @change="time_select2"
@@ -14,15 +14,20 @@
           end-placeholder="结束日期"
           :picker-options="pickerOptions">
         </el-date-picker> -->
-        <el-input placeholder="请输入入库时间" v-model="listQuery2.unsoledtime" style="width: 200px;margin-left:10px;"></el-input>
         <el-select v-if="is_zzh" v-model="listQuery2.bm" placeholder="请选择部门" clearable style="width: 200px;margin-left:10px;" class="filter-item" @change="handleFilter2(1)">
           <el-option v-for="item in bms" :label="item.label" :value="item.value"/>
         </el-select>
         <el-select v-if="is_bm" v-model="listQuery2.gz" placeholder="请选择柜组" clearable style="width: 200px;margin-left:10px;" class="filter-item" @change="handleFilter2(2)">
           <el-option v-for="item in gzs" :label="item.label" :value="item.value"/>
         </el-select>
-        <span class="tabSpan">销售数量：</span>
-        <el-input placeholder="请输入滞销数量" v-model="listQuery2.unsalableNum" style="width: 200px;margin-left:10px;"></el-input>
+        <el-input placeholder="请输入入库时间" v-model="listQuery2.unsoledtime" style="width: 300px;margin-left:10px;">
+          <template slot="prepend">入库超过</template>
+          <template slot="append">天</template>
+        </el-input>
+        <!-- <span class="tabSpan">销售数量：</span> -->
+        <el-input placeholder="请输入滞销数量" v-model="listQuery2.unsalableNum" style="width: 240px;margin-left:10px;">
+          <template slot="prepend">销量少于</template>
+        </el-input>
         <el-button style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter2">查询</el-button>
         <el-button style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="toExcle">导出</el-button>
       </div>
@@ -56,6 +61,7 @@
         :data="list"
         border
         fit
+        stripe
         id="out-table"
         highlight-current-row
         style="width: 100%;">
@@ -66,12 +72,12 @@
         </el-table-column>
         <el-table-column label="商品名称" width="150px" align="center">
           <template slot-scope="scope">
-            <span>{{ scope.row.name }}</span>
+            <span class="tag_yellow">{{ scope.row.name }}</span>
           </template>
         </el-table-column>
         <el-table-column label="库存数量" min-width="150px">
           <template slot-scope="scope">
-            <span>{{ scope.row.nums }}</span>
+            <span class="tag_red">{{ scope.row.nums }}</span>
           </template>
         </el-table-column>
         <el-table-column label="商品编码" min-width="150px">
@@ -79,16 +85,6 @@
             <span>{{ scope.row.code }}</span>
           </template>
         </el-table-column>
-        <!-- <el-table-column label="商品分类" width="200px" align="center">
-          <template slot-scope="scope">
-            <span>{{ scope.row.sortid }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="供应商" width="100" align="center">
-          <template slot-scope="scope">
-            <span>{{ scope.row.supplierid }}</span>
-          </template>
-        </el-table-column> -->
         <el-table-column label="商品规格" width="200px" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.format }}</span>
@@ -111,7 +107,7 @@
         </el-table-column>
         <el-table-column label="入库时间" width="200px" align="center">
           <template slot-scope="scope">
-            <span>{{ scope.row.addtime }}</span>
+            <span class="tag_blue">{{ scope.row.addtime }}</span>
           </template>
         </el-table-column>
       </el-table>

@@ -1,7 +1,7 @@
 <template>
   <div class="wrap">
     <div class="tab">
-      <div style="text-align:center;">新增供应商</div>
+      <div class="addB">新增供应商</div>
       <div class="biao">
         <span>供应商名称</span>
         <el-input

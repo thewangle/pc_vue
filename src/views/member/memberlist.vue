@@ -11,6 +11,7 @@
       :data="list"
       border
       fit
+      stripe
       id="out-table"
       highlight-current-row
       style="width: 100%;">
@@ -54,7 +55,7 @@
           <span>{{ scope.row.addtime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="300" class-name="small-padding fixed-width">
+      <el-table-column label="操作" fixed="right" align="center" width="300" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="small" @click="handleShowDetial(scope.row)">编辑</el-button>
           <el-button type="primary" size="small" @click="renewalfee(scope.row)">推送</el-button>
@@ -176,8 +177,12 @@ export default {
     },
     //点击续费
     renewalfee(row_data) {
-      this.table_info = row_data
-      this.dialogrenewalfee = true
+      this.$message({
+        type: 'success',
+        message: '功能正在开发中.....'
+      });
+      // this.table_info = row_data
+      // this.dialogrenewalfee = true
     },
     //更改续费提交
     renewalfeebt() {
