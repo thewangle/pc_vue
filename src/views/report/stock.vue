@@ -6,7 +6,7 @@
           v-model="time"
           @change="time_select"
           type="daterange"
-          align="right"
+          align="left"
           unlink-panels
           start-placeholder="开始日期"
           range-separator="至"
@@ -33,12 +33,11 @@
             <div><span>总毛利率：</span><span>{{tab1info.zonlilv}}</span> %</div>
           </div>
         </div>
-        <div ref="pie" style="width: 80%;height:400px;margin:20px 0;">
-          <div class="noDate">
-            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
-            <span class="nodataSpan">暂无数据</span>
-          </div>
+        <div class="noDate" v-show="!isShowEchart" style="width: 80%;">
+          <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+          <span class="nodataSpan">暂无数据</span>
         </div>
+        <div ref="pie" v-show="isShowEchart" style="width: 80%;height:400px;margin:20px 0;"></div>
       </div>
     </div>
     <div class="tab_model_wrap">
@@ -51,15 +50,14 @@
             <div><span>售出：</span><span>{{tab1change.changeout}}</span> </div>
             <div><span>退货：</span><span>{{tab1change.changetui}}</span> </div>
             <div><span>报损：</span><span>{{tab1change.changesun}}</span> </div>
-            <div><span>新入库：</span><span>{{tab1change.changein}}</span> </div>
+            <div><span>补货：</span><span>{{tab1change.changein}}</span> </div>
           </div>
         </div>
-        <div ref="ku_change_pie" style="width: 80%;height:400px;margin:20px 0;">
-          <div class="noDate">
-            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
-            <span class="nodataSpan">暂无数据</span>
-          </div>
+        <div class="noDate" v-show="!isShowEchart1" style="width: 80%;">
+          <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+          <span class="nodataSpan">暂无数据</span>
         </div>
+        <div ref="ku_change_pie" v-show="isShowEchart1" style="width: 80%;height:400px;margin:20px 0;"></div>
       </div>
     </div>
     <div class="tab_model_wrap">
@@ -68,7 +66,7 @@
           v-model="time_tab2"
           @change="time_select2"
           type="daterange"
-          align="right"
+          align="left"
           unlink-panels
           start-placeholder="开始日期"
           range-separator="至"
@@ -92,12 +90,11 @@
             <div><span>趋势所属：</span><span>{{tab2name}}</span></div>
           </div>
         </div>
-        <div ref="pie_change_qushi" style="width: 80%;height:400px;margin:20px 0;">
-          <div class="noDate">
-            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
-            <span class="nodataSpan">暂无数据</span>
-          </div>
+        <div class="noDate" v-show="!isShowEchart2" style="width: 80%;">
+          <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+          <span class="nodataSpan">暂无数据</span>
         </div>
+        <div ref="pie_change_qushi" v-show="isShowEchart2" style="width: 80%;height:400px;margin:20px 0;"></div>
       </div>
     </div>
     <div class="tab_model_wrap" v-if="is_gz">
@@ -106,7 +103,7 @@
           v-model="time_tab3"
           @change="time_select3"
           type="daterange"
-          align="right"
+          align="left"
           unlink-panels
           start-placeholder="开始日期"
           range-separator="至"
@@ -127,12 +124,11 @@
             <div><span>趋势所属：</span><span>{{tab2name}}</span></div>
           </div>
         </div>
-        <div ref="pie_change_qushi1" style="width: 80%;height:400px;margin:20px 0;">
-          <div class="noDate">
-            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
-            <span class="nodataSpan">暂无数据</span>
-          </div>
+        <div class="noDate" v-show="!isShowEchart3" style="width: 80%;">
+          <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+          <span class="nodataSpan">暂无数据</span>
         </div>
+        <div ref="pie_change_qushi1" v-show="isShowEchart3" style="width: 80%;height:400px;margin:20px 0;"></div>
       </div>
     </div>
   </div>
@@ -154,6 +150,10 @@ export default {
   },
   data() {
     return {
+      isShowEchart: true,
+      isShowEchart1: true,
+      isShowEchart2: true,
+      isShowEchart3: true,
       tab1name: getdepartmentName(),
       tab2name: getdepartmentName(),
       series_data: [],
@@ -192,7 +192,7 @@ export default {
         {value: 1,label: '售出'},
         {value: 2,label: '退货'},
         {value: 3,label: '报损'},
-        {value: 4,label: '新入库'},
+        {value: 4,label: '补货'},
       ],
       tab1info: { 
         zongnums: 0, 
@@ -258,7 +258,7 @@ export default {
         return '破损'
       }
       if (this.listQuery3.numtype == 4) {
-        return '新入库'
+        return '补货'
       }
     }
   },
@@ -440,11 +440,13 @@ export default {
         let {data} = res
         if (data.code == 201) {
           // loading.close()
+          this.isShowEchart = false
           this.$message({
             message: '没有更多库存信息！',
             type: 'warning'
           });
         } else {
+          this.isShowEchart = true
           this.tab1info.zongnums = data.data.data.zongnums
           this.tab1info.zoninprice = data.data.data.zoninprice
           this.tab1info.zonoutprice = data.data.data.zonoutprice
@@ -506,6 +508,7 @@ export default {
           },2000)
         }
       }).catch(error => {
+        this.isShowEchart = false
         this.$message({
           message: '没有更多库存信息！',
           type: 'warning'
@@ -524,12 +527,14 @@ export default {
       getgoodschangefortab1(this.listQuery).then(res => {
         let {data} = res
         if (data.code == 201) {
+          this.isShowEchart1 = false
           this.$message({
             message: '没有更多库存变化信息！',
             type: 'warning',
             duration:5000
           });
         } else {
+          this.isShowEchart1 = true
           data.data.data.leftdata.forEach((item,index) => {
             this.tab1change.zongnchange += Math.abs(Number(item.numbefore - item.numnow))
             if (item.numtype == 1) {
@@ -546,12 +551,13 @@ export default {
             }
             if (item.numtype == 4) {
               this.tab1change.changein = Math.abs(item.numbefore - item.numnow)
-              this.series_data_change.push({name:'新入库',value:Math.abs(item.numbefore - item.numnow)})
+              this.series_data_change.push({name:'补货',value:Math.abs(item.numbefore - item.numnow)})
             }
           })
         }
         this.pie_kucunChange()
       }).catch(error => {
+        this.isShowEchart1 = false
         console.log(error)
       })
     },
@@ -562,12 +568,14 @@ export default {
       getgoodschangeQushi(this.listQuery2).then(res => {
         let {data} = res
         if (data.code == 201) {
+          this.isShowEchart2 = false
           this.$message({
             message: '没有更多库存变化信息！',
             type: 'warning',
             duration:5000
           });
         } else {
+          this.isShowEchart2 = true
           data.data.data.leftdata.forEach((item,index) => {
             this.changeQushixAxis.push(item.addtime)
             this.changeQushiseries.push(item.nums)
@@ -575,6 +583,7 @@ export default {
           this.pie_kucunChangeQushi()
         }
       }).catch(error => {
+        this.isShowEchart2 = false
         console.log(error)
       })
     },
@@ -585,12 +594,14 @@ export default {
       getgoodschangeQushiSort(this.listQuery3).then(res => {
         let {data} = res
         if (data.code == 201) {
+          this.isShowEchart3 = false
           this.$message({
             message: '没有更多库存变化信息！',
             type: 'warning',
             duration:5000
           });
         } else {
+          this.isShowEchart3 = true
           data.data.data.leftdata.forEach((item,index) => {
             let nums = item.numnow - item.numbefore
             if (item.numtype) {
@@ -602,6 +613,7 @@ export default {
           this.pie_kucunChangeQushi1()
         }
       }).catch(error => {
+        this.isShowEchart3 = false
         console.log(error)
       })
     },

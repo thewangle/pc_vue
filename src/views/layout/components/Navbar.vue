@@ -105,7 +105,7 @@ export default {
           if (data.ismessage == 0) {
             getstockwarning(this.listQuery).then(res => {
               let { data } = res
-              if (data.code == 200) {
+              if (data.code == 200 && Number(data.data.count) > 0) {
                 this.messageNums = data.data.count
                 this.isMessage = false
               }

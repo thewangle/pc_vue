@@ -6,7 +6,7 @@
           v-model="time_tab2"
           @change="time_select2"
           type="daterange"
-          align="right"
+          align="left"
           unlink-panels
           start-placeholder="开始日期"
           range-separator="至"
@@ -23,42 +23,40 @@
       </div>
       <div class="salesTag">
         <div class="salesTagList" style="width:32%;" @click="zeOver" id="zonge">
-          <div class="salesTagListBiao">{{tab2name}}新入库数量</div>
+          <div class="salesTagListBiao">{{tab2name}}补货数量</div>
           <div><span class="salesTagListnum">{{tab1info.zongnums}}</span></div>
         </div>
         <div class="salesTagList" @click="zeOver1" id="zonge1" style="width:32%;background-image: linear-gradient(104deg, #6bb3ff, #58a4ff);">
-          <div class="salesTagListBiao">{{tab2name}}新入库成本</div>
+          <div class="salesTagListBiao">{{tab2name}}补货成本</div>
           <div><span class="salesTagListnum">{{tab1info.zoninprice}}</span>元</div>
         </div>
         <div class="salesTagList" @click="zeOver2" id="zonge2" style="width:32%;background-image: linear-gradient(104deg, #ffbb3f, #ff9e47);">
-          <div class="salesTagListBiao">{{tab2name}}新入库预售总额</div>
+          <div class="salesTagListBiao">{{tab2name}}补货预售总额</div>
           <div><span class="salesTagListnum">{{tab1info.zongprice}}</span>元</div>
         </div>
       </div>
       <div style="width: 100%;padding-right:15px;">
-        <div class="fengebr" @click="zeOver3" id="zonge3"><h2>新入库商品数量趋势图例分析</h2></div>
-        <div ref="pie_change_qushi" style="width: 100%;height:400px;margin:20px 0;">
-          <div class="noDate">
-            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
-            <span class="nodataSpan">暂无数据</span>
-          </div>
+        <div class="fengebr" @click="zeOver3" id="zonge3"><h2>补货商品数量趋势图例分析</h2></div>
+        <div class="noDate" v-show="!isShowEchart">
+          <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+          <span class="nodataSpan">暂无数据</span>
         </div>
-        <div class="fengebr" @click="zeOver4" id="zonge4"><h2>新入库成本占比图例分析</h2></div>
-        <div ref="zbChart" style="width: 100%;height:400px;margin:20px 0;">
-          <div class="noDate">
-            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
-            <span class="nodataSpan">暂无数据</span>
-          </div>
+        <div ref="pie_change_qushi" v-show="isShowEchart" style="width: 100%;height:400px;margin:20px 0;"></div>
+        <div class="fengebr" @click="zeOver4" id="zonge4"><h2>补货成本占比图例分析</h2></div>
+        <div class="noDate" v-show="!isShowEchart1">
+          <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+          <span class="nodataSpan">暂无数据</span>
         </div>
+        <div ref="zbChart" v-show="isShowEchart1" style="width: 100%;height:400px;margin:20px 0;"></div>
       </div>
-      <div v-if="isgz" class="fengebr" @click="zeOver9" id="zonge13"><h2>新入库商品列表</h2></div>
+      <div v-if="isgz" class="fengebr" @click="zeOver9" id="zonge13"><h2>补货商品列表</h2></div>
       <!-- 条件搜索 -->
       <div class="filter-container" v-if="isgz" style="padding: 20px;">
         <el-date-picker
           v-model="time_tab"
           @change="time_select"
           type="daterange"
-          align="right"
+          align="left"
           unlink-panels
           start-placeholder="开始日期"
           range-separator="至"
@@ -107,7 +105,7 @@
             <span>{{ scope.row.format }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="入库数量" width="200px" align="center">
+        <el-table-column label="补货数量" width="200px" align="center">
           <template slot-scope="scope">
             <span class="tag_red">{{ scope.row.numnow - scope.row.numbefore}}</span>
           </template>
@@ -127,7 +125,7 @@
             <span>{{ ((scope.row.outprice - scope.row.inprice) / scope.row.inprice * 100).toFixed(2) }} %</span>
           </template>
         </el-table-column>
-        <el-table-column label="入库时间" width="200px" align="center">
+        <el-table-column label="补货时间" width="200px" align="center">
           <template slot-scope="scope">
             <span class="tag_blue">{{ scope.row.addtime }}</span>
           </template>
@@ -160,6 +158,8 @@ export default {
   },
   data() {
     return {
+      isShowEchart: true,
+      isShowEchart1: true,
       listQuery: { //动态请求table数据时传递的参数
         time: [],
         page_no: 1, //页码
@@ -273,7 +273,7 @@ export default {
     //导出excle
     toExcle() {
       var wb = XLSX.utils.table_to_book(document.getElementById('out-table'));
-      XLSX.writeFile(wb, "新入库商品列表.xlsx")
+      XLSX.writeFile(wb, "补货商品列表.xlsx")
     },
     //系列动画函数
     zeOver() {
@@ -444,12 +444,14 @@ export default {
       Getstoragegoods(this.listQuery2).then(res => {
         let {data} = res
         if (data.code == 201) {
+          this.isShowEchart = false
           this.$message({
-            message: '没有更多新入库信息！',
+            message: '没有更多补货信息！',
             type: 'warning',
             duration:5000
           });
         } else {
+          this.isShowEchart = true
           this.tab1info = data.data.listdata
           data.data.leftdata.forEach((item) => {
             this.changeQushixAxis.push(item.addtime)
@@ -458,8 +460,9 @@ export default {
           this.pie_kucunChangeQushi()
         }
       }).catch(error => {
+        this.isShowEchart1 = false
         this.$message({
-          message: '没有更多新入库信息！',
+          message: '没有更多补货信息！',
           type: 'warning',
           duration:5000
         });
@@ -481,12 +484,14 @@ export default {
         let {data} = res
         if (data.code == 201) {
           // loading.close()
+          this.isShowEchart1 = false
           this.$message({
-            message: '没有更多新入库信息！',
+            message: '没有更多补货信息！',
             type: 'warning',
             duration:5000
           });
         } else {
+          this.isShowEchart1 = true
           data.data.leftdata.forEach((item,index) => {
             let itemnums = 0
             item.forEach((item1,index1) => {
@@ -535,6 +540,7 @@ export default {
           },2000)
         }
       }).catch(error => {
+        this.isShowEchart1 = false
         console.log(error)
       })
     },

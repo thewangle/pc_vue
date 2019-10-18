@@ -77,3 +77,9 @@ export function getstockwarning(params) {
   let url = process.env.BASE_API + 'yii2/frontend/web/?r=goods/getstockwarning'
   return axios.post(url,params)
 }
+
+//查询单个商品的库存变化趋势
+export function getstockbygoodsid(params) {
+  let url = process.env.BASE_API + 'yii2/frontend/web/?r=goods/getstockbygoodsid'
+  return axios.post(url,params)
+}

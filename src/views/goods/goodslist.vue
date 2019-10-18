@@ -138,7 +138,7 @@
         <el-button type="primary" @click="editegoodsinfo">确 定</el-button>
       </div>
     </el-dialog>
-    <!-- 编辑商品弹窗 -->
+    <!-- 商品进/售价弹窗 -->
     <el-dialog :visible.sync="dialogVisible1" title="进/售价更改">
       <div class="dialog_div">
         <span>更改类别</span>
@@ -163,7 +163,7 @@
         <el-button type="primary" @click="editegoodsinfo1">确 定</el-button>
       </div>
     </el-dialog>
-    <!-- 编辑商品弹窗 -->
+    <!-- 商品出/入库弹窗 -->
     <el-dialog :visible.sync="dialogVisible2" title="出入库更改">
       <div class="dialog_div">
         <span>出入库类别</span>
@@ -179,7 +179,7 @@
         <span>增/减数量</span>
         <el-input v-model="table_info2.changenums" autocomplete="off" style="width:300px;"></el-input>
       </div>
-      <div class="dialog_div">
+      <!-- <div class="dialog_div">
         <span>日期选择</span>
         <el-select v-model="table_info2.date" placeholder="请选择日期" style="width:300px;">
           <el-option
@@ -198,14 +198,14 @@
             :value="item.value">
           </el-option>
         </el-select>
-      </div>
+      </div> -->
       <div class="dialog_div">
         <span>商品进价</span>
-        <el-input v-model="table_info2.inpricenow" autocomplete="off" style="width:300px;"></el-input>
+        <el-input disabled v-model="table_info2.inpricenow" autocomplete="off" style="width:300px;"></el-input>
       </div>
       <div class="dialog_div">
         <span>商品售价</span>
-        <el-input v-model="table_info2.outpricenow" autocomplete="off" style="width:300px;"></el-input>
+        <el-input disabled v-model="table_info2.outpricenow" autocomplete="off" style="width:300px;"></el-input>
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible2 = false">取 消</el-button>
@@ -261,7 +261,7 @@ export default {
         {value: 1,label: '售出'},
         {value: 2,label: '退货'},
         {value: 3,label: '报损'},
-        {value: 4,label: '新入库'},
+        {value: 4,label: '补货'},
       ],
       dates: [
         {value: 1,label: '星期一'},
@@ -464,13 +464,13 @@ export default {
         });
         return
       }
-      if (!this.table_info2.date || !this.table_info2.time) {
-        this.$message({
-          message: '请您选择日期和时间',
-          type: 'warning'
-        });
-        return
-      }
+      // if (!this.table_info2.date || !this.table_info2.time) {
+      //   this.$message({
+      //     message: '请您选择日期和时间',
+      //     type: 'warning'
+      //   });
+      //   return
+      // }
       this.table_info2.type = 2
       editeGoodsinfo(this.table_info2).then(res => {
         this.dialogVisible2 = false

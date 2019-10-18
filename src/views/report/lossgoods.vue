@@ -6,7 +6,7 @@
           v-model="time_tab2"
           @change="time_select2"
           type="daterange"
-          align="right"
+          align="left"
           unlink-panels
           start-placeholder="开始日期"
           range-separator="至"
@@ -37,19 +37,17 @@
       </div>
       <div style="width: 100%;padding-right:15px;">
         <div class="fengebr" @click="zeOver3" id="zonge3"><h2>报损数量趋势图例分析</h2></div>
-        <div ref="pie_change_qushi" style="width: 100%;height:400px;margin:20px 0;">
-          <div class="noDate">
-            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
-            <span class="nodataSpan">暂无数据</span>
-          </div>
+        <div class="noDate" v-show="!isShowEchart">
+          <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+          <span class="nodataSpan">暂无数据</span>
         </div>
+        <div ref="pie_change_qushi" v-show="isShowEchart" style="width: 100%;height:400px;margin:20px 0;"></div>
         <div class="fengebr" @click="zeOver4" id="zonge4"><h2>报损成本占比图例分析</h2></div>
-        <div ref="zbChart" style="width: 100%;height:400px;margin:20px 0;">
-          <div class="noDate">
-            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
-            <span class="nodataSpan">暂无数据</span>
-          </div>
+        <div class="noDate" v-show="!isShowEchart1">
+          <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+          <span class="nodataSpan">暂无数据</span>
         </div>
+        <div ref="zbChart" v-show="isShowEchart1" style="width: 100%;height:400px;margin:20px 0;"></div>
       </div>
       <div v-if="isgz" class="fengebr" @click="zeOver9" id="zonge13"><h2>报损商品列表</h2></div>
       <!-- 条件搜索 -->
@@ -58,7 +56,7 @@
           v-model="time_tab"
           @change="time_select"
           type="daterange"
-          align="right"
+          align="left"
           unlink-panels
           start-placeholder="开始日期"
           range-separator="至"
@@ -155,6 +153,8 @@ export default {
   },
   data() {
     return {
+      isShowEchart: true,
+      isShowEchart1: true,
       listQuery: { //动态请求table数据时传递的参数
         time: [],
         page_no: 1, //页码
@@ -439,12 +439,14 @@ export default {
       Getlossgoods(this.listQuery2).then(res => {
         let {data} = res
         if (data.code == 201) {
+          this.isShowEchart = false
           this.$message({
             message: '没有更多报损信息！',
             type: 'warning',
             duration:5000
           });
         } else {
+          this.isShowEchart = true
           this.tab1info = data.data.listdata
           data.data.leftdata.forEach((item) => {
             this.changeQushixAxis.push(item.addtime)
@@ -453,6 +455,7 @@ export default {
           this.pie_kucunChangeQushi()
         }
       }).catch(error => {
+        this.isShowEchart = false
         this.$message({
           message: '没有更多报损信息！',
           type: 'warning',
@@ -476,12 +479,14 @@ export default {
         let {data} = res
         if (data.code == 201) {
           // loading.close()
+          this.isShowEchart1 = false
           this.$message({
             message: '没有更多报损信息！',
             type: 'warning',
             duration:5000
           });
         } else {
+          this.isShowEchart1 = true
           data.data.leftdata.forEach((item,index) => {
             let itemnums = 0
             item.forEach((item1,index1) => {
@@ -530,6 +535,7 @@ export default {
           },2000)
         }
       }).catch(error => {
+        this.isShowEchart = false
         console.log(error)
       })
     },

@@ -6,7 +6,7 @@
           v-model="time_tab2"
           @change="time_select2"
           type="daterange"
-          align="right"
+          align="left"
           unlink-panels
           start-placeholder="开始日期"
           range-separator="至"
@@ -41,33 +41,29 @@
       </div>
       <div style="width: 100%;padding-right:15px;">
         <div class="fengebr" @click="zeOver4" id="zonge8"><h2>销售额趋势图例分析</h2></div>
-        <div ref="pie_change_qushi" style="width: 100%;height:400px;margin:20px 0;">
-          <div class="noDate">
-            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
-            <span class="nodataSpan">暂无数据</span>
-          </div>
+        <div class="noDate" v-show="!isShowEchart">
+          <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+          <span class="nodataSpan">暂无数据</span>
         </div>
+        <div ref="pie_change_qushi" v-show="isShowEchart" style="width: 100%;height:400px;margin:20px 0;"></div>
         <div class="fengebr" @click="zeOver5" id="zonge9"><h2>销售额占比图例分析</h2></div>
-        <div ref="zbChart" style="width: 100%;height:400px;margin:20px 0;">
-          <div class="noDate" v-if="itemnums">
-            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
-            <span class="nodataSpan">暂无数据</span>
-          </div>
+        <div class="noDate" v-show="!isShowEchart1">
+          <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+          <span class="nodataSpan">暂无数据</span>
         </div>
+        <div ref="zbChart" v-show="isShowEchart1" style="width: 100%;height:400px;margin:20px 0;"></div>
         <div class="fengebr" @click="zeOver7" id="zonge11"><h2>销售额日期占比图例分析</h2></div>
-        <div ref="dateChart" style="width: 100%;height:400px;margin:20px 0;">
-          <div class="noDate" v-if="Datenums">
-            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
-            <span class="nodataSpan">暂无数据</span>
-          </div>
+        <div class="noDate" v-show="!isShowEchart">
+          <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+          <span class="nodataSpan">暂无数据</span>
         </div>
+        <div ref="dateChart" v-show="isShowEchart" style="width: 100%;height:400px;margin:20px 0;"></div>
         <div class="fengebr" @click="zeOver8" id="zonge12"><h2>销售额时间段占比图例分析</h2></div>
-        <div ref="timeChart" style="width: 100%;height:400px;margin:20px 0;">
-          <div class="noDate" v-if="Timenums">
-            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
-            <span class="nodataSpan">暂无数据</span>
-          </div>
+        <div class="noDate" v-show="!isShowEchart">
+          <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+          <span class="nodataSpan">暂无数据</span>
         </div>
+        <div ref="timeChart" v-show="isShowEchart" style="width: 100%;height:400px;margin:20px 0;"></div>
         <!-- <div class="fengebr" @click="zeOver6" id="zonge10"><h2>销售额完成率图例分析</h2></div>
         <div ref="completeChart" style="width: 100%;height:400px;margin:20px 0;"></div> -->
       </div>
@@ -78,7 +74,7 @@
           v-model="time_tab"
           @change="time_select"
           type="daterange"
-          align="right"
+          align="left"
           unlink-panels
           start-placeholder="开始日期"
           range-separator="至"
@@ -185,6 +181,8 @@ export default {
   },
   data() {
     return {
+      isShowEchart: true,
+      isShowEchart1: true,
       listQuery: { //动态请求table数据时传递的参数
         time: [],
         page_no: 1, //页码
@@ -222,7 +220,7 @@ export default {
         {value: 1,label: '售出'},
         {value: 2,label: '退货'},
         {value: 3,label: '报损'},
-        {value: 4,label: '新入库'},
+        {value: 4,label: '补货'},
       ],
       tab1info: { 
         zongnums: 0, 
@@ -527,12 +525,14 @@ export default {
       Getsoldgoods(this.listQuery2).then(res => {
         let {data} = res
         if (data.code == 201) {
+          this.isShowEchart = false
           this.$message({
             message: '没有更多商品信息！',
             type: 'warning',
             duration:5000
           });
         } else {
+          this.isShowEchart = true
           this.tab1info = data.data.listdata
           this.Datenums.forEach((item) => {
             item.value = 0
@@ -588,6 +588,7 @@ export default {
           this.timeChart()
         }
       }).catch(error => {
+        this.isShowEchart = false
         console.log(error)
       })
     },
@@ -608,12 +609,14 @@ export default {
         let {data} = res
         if (data.code == 201) {
           // loading.close()
+          this.isShowEchart1 = false
           this.$message({
             message: '没有更多商品信息！',
             type: 'warning',
             duration:5000
           });
         } else {
+          this.isShowEchart1 = true
           data.data.leftdata.forEach((item,index) => {
             let itemnums = 0
             item.forEach((item1,index1) => {
@@ -669,6 +672,7 @@ export default {
           },800)
         }
       }).catch(error => {
+        this.isShowEchart1 = false
         console.log(error)
       })
     },

@@ -115,7 +115,7 @@ export const asyncRouterMap = [
         path: 'storagegoods',
         component: () => import('@/views/report/storagegoods'),
         name: 'Storagegoods',
-        meta: { title: '新入库分析', icon: 'chart', noCache: true },
+        meta: { title: '补货分析', icon: 'chart', noCache: true },
         hidden: true
       },
       {
@@ -132,6 +132,14 @@ export const asyncRouterMap = [
         component: () => import('@/views/report/lossgoods'),
         name: 'Lossgoods',
         meta: { title: '报损分析', icon: 'dashboard', noCache: true },
+        hidden: true
+      },
+      {
+        id:23,
+        path: 'pricechange',
+        component: () => import('@/views/report/pricechange'),
+        name: 'Pricechange',
+        meta: { title: '单品分析', icon: 'money', noCache: true },
         hidden: true
       },
       {
@@ -158,14 +166,6 @@ export const asyncRouterMap = [
         meta: { title: '组织架构', icon: 'user', noCache: true },
         hidden: true
       },
-      {
-        id:23,
-        path: 'pricechange',
-        component: () => import('@/views/report/pricechange'),
-        name: 'Pricechange',
-        meta: { title: '价格分析', icon: 'money', noCache: true },
-        hidden: true
-      }
     ]
   },
   {

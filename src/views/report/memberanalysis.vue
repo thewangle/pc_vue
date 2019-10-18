@@ -26,19 +26,17 @@
       </div>
       <div style="width: 100%;padding-right:15px;">
         <div class="fengebr" @click="zeOver3" id="zonge3"><h2>会员男女比例图例分析</h2></div>
-        <div ref="pie_change_qushi" style="width: 100%;height:400px;margin:20px 0;">
-          <div class="noDate">
-            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
-            <span class="nodataSpan">暂无数据</span>
-          </div>
+        <div class="noDate" v-show="!isShowEchart">
+          <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+          <span class="nodataSpan">暂无数据</span>
         </div>
+        <div ref="pie_change_qushi" v-show="isShowEchart" style="width: 100%;height:400px;margin:20px 0;"></div>
         <div class="fengebr" @click="zeOver4" id="zonge4"><h2>会员年龄段图例分析</h2></div>
-        <div ref="zbChart" style="width: 100%;height:400px;margin:20px 0;">
-          <div class="noDate">
-            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
-            <span class="nodataSpan">暂无数据</span>
-          </div>
+        <div class="noDate" v-show="!isShowEchart">
+          <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+          <span class="nodataSpan">暂无数据</span>
         </div>
+        <div ref="zbChart" v-show="isShowEchart" style="width: 100%;height:400px;margin:20px 0;"></div>
       </div>
     </div>
   </div>
@@ -59,6 +57,7 @@ export default {
   },
   data() {
     return {
+      isShowEchart: true,
       tab2name: getdepartmentName(),
       series_data: [],
       series_data_change: [],
@@ -199,12 +198,14 @@ export default {
       getmembers(this.listQuery2).then(res => {
         let {data} = res
         if (data.code == 201) {
+          this.isShowEchart = false
           this.$message({
             message: '没有更多新入库信息！',
             type: 'warning',
             duration:5000
           });
         } else {
+          this.isShowEchart = true
           this.tab1info = data.data.listdata
           let newBoynums = 0
           let newGirlnums = 0
@@ -257,6 +258,7 @@ export default {
           },800)
         }
       }).catch(error => {
+        this.isShowEchart = false
         console.log(error)
       })
     },

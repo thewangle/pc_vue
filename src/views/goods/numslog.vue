@@ -206,7 +206,7 @@ export default {
         {value: 1,label: '售出'},
         {value: 2,label: '退货'},
         {value: 3,label: '报损'},
-        {value: 4,label: '新入库'},
+        {value: 4,label: '补货'},
       ],
       total: 1,//table一共多少条数据
       dialogVisible: false,//dialog是否显示
@@ -427,7 +427,7 @@ export default {
               item.numtype = '报损'
             }
             if (item.numtype == 4) {
-              item.numtype = '新入库'
+              item.numtype = '补货'
             }
           })
           this.list = data.data.data
