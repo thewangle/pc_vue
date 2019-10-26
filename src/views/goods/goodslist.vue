@@ -139,7 +139,7 @@
       </div>
     </el-dialog>
     <!-- 商品进/售价弹窗 -->
-    <el-dialog :visible.sync="dialogVisible1" title="进/售价更改">
+    <el-dialog :visible.sync="dialogVisible1" title="进/售价更改" @close="tcclose">
       <div class="dialog_div">
         <span>更改类别</span>
         <el-select v-model="table_info1.pricesort" @change="pricesortSelect" placeholder="请选择更改类别" style="width:300px;">
@@ -199,11 +199,11 @@
           </el-option>
         </el-select>
       </div> -->
-      <div class="dialog_div">
+      <div class="dialog_div" @click="changePrice">
         <span>商品进价</span>
         <el-input disabled v-model="table_info2.inpricenow" autocomplete="off" style="width:300px;"></el-input>
       </div>
-      <div class="dialog_div">
+      <div class="dialog_div" @click="changePrice">
         <span>商品售价</span>
         <el-input disabled v-model="table_info2.outpricenow" autocomplete="off" style="width:300px;"></el-input>
       </div>
@@ -316,6 +316,14 @@ export default {
     
   },
   methods: {
+    //点击更改进/售价
+    changePrice() {
+      this.$notify({
+        title: '提示',
+        message: '请您点击"进/售价"按钮进行价格更改！',
+        type: 'warning'
+      });
+    },
     //导出excle
     toExcle() {
       var wb = XLSX.utils.table_to_book(document.getElementById('out-table'));
@@ -377,6 +385,10 @@ export default {
       this.zcInprice = row_data.inprice //暂存进价，用于选择更改种类时恢复原价
       this.zcOutprice = row_data.outprice //暂存售价，用于选择更改种类时恢复原价
       this.dialogVisible1 = true
+    },
+    //关闭进/售价格更改弹窗回调函数
+    tcclose() {
+      this._fetchActivityList() //重新获取数据
     },
     //点击更出入库
     handleShownums(row_data) {

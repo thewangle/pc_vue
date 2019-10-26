@@ -55,6 +55,12 @@ export default{
   font-size: 16px;
   font-weight: bold;
 }
+.el-tabs__item {
+  font-size: 19px;
+}
+.el-collapse-item__header {
+  font-size: 17px;
+}
 .tag_blue {
   color: #409EFF;
   font-weight: bold;

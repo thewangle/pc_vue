@@ -56,6 +56,11 @@ export const constantRouterMap = [
     path: '/401',
     component: () => import('@/views/errorPage/401'),
     hidden: true
+  },
+  {
+    path: '/download',
+    component: () => import('@/views/download/index'),
+    hidden: true
   }
 ]
 
@@ -335,6 +340,28 @@ export const asyncRouterMap = [
         meta: { title: '上传功能', icon: 'edit' },
         hidden: true
       },
+    ]
+  },
+  {
+    id: 31,
+    path: '/count',
+    component: Layout,
+    redirct: 'dashboard',
+    name: 'aboutwuhzi',
+    meta: {
+      title: '关于',
+      icon: 'edit'
+    },
+    hidden: true,
+    children: [
+      {
+        id: 32,
+        path: 'dashboard',
+        component: () => import('@/views/wuzhiinfo/index'),
+        name: 'about',
+        meta: { title: '关于五指', icon: 'dashboard' },
+        hidden: true
+      }
     ]
   },
   // {

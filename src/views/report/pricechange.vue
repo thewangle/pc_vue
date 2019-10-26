@@ -32,12 +32,11 @@
             <div><span>变动次数：</span><span>{{priceci}}</span> 次</div>
           </div>
         </div>
-        <div ref="pie_change_qushi" style="width: 80%;height:400px;margin:20px 0;">
-          <div class="noDate">
-            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
-            <span class="nodataSpan">暂无数据</span>
-          </div>
+        <div class="noDate" v-show="!isShowEchart" style="width: 80%;">
+          <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+          <span class="nodataSpan">暂无数据</span>
         </div>
+        <div ref="pie_change_qushi" v-show="isShowEchart" style="width: 80%;height:400px;margin:20px 0;"></div>
       </div>
     </div>
     <!-- 单品库存变化趋势 -->
@@ -71,12 +70,11 @@
             <div><span>柜组：</span><span>{{tab2names}}</span></div>
           </div>
         </div>
-        <div ref="pie_change_qushi1" style="width: 80%;height:400px;margin:20px 0;">
-          <div class="noDate">
-            <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
-            <span class="nodataSpan">暂无数据</span>
-          </div>
+        <div class="noDate" v-show="!isShowEchart1" style="width: 80%;">
+          <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+          <span class="nodataSpan">暂无数据</span>
         </div>
+        <div ref="pie_change_qushi1" v-show="isShowEchart1" style="width: 80%;height:400px;margin:20px 0;"></div>
       </div>
     </div>
   </div>
@@ -98,6 +96,8 @@ export default {
   },
   data() {
     return {
+      isShowEchart: true,
+      isShowEchart1: true,
       changeQushixAxis: [],
       changeQushiseries: [],
       changeQushixAxis1: [],
@@ -285,12 +285,14 @@ export default {
       getpricechangeQushi(this.listQuery2).then(res => {
         let {data} = res
         if (data.code == 201) {
+          this.isShowEchart = false
           this.$message({
             message: '没有更多价格变化信息！',
             type: 'warning',
             duration:5000
           });
         } else {
+          this.isShowEchart = true
           this.priceci = data.data.data.leftdata.length
           if (data.data.data.leftdata[0].priceinnow) {
             this.pricelow = data.data.data.leftdata[0].priceinnow
@@ -309,9 +311,14 @@ export default {
               this.changeQushiseries.push(item.priceoutnow)
             })
           }
-          this.pie_kucunChangeQushi()
+          let self = this
+          setTimeout(function() {
+             self.pie_kucunChangeQushi()
+          },500)
+          // this.pie_kucunChangeQushi()
         }
       }).catch(error => {
+        this.isShowEchart = false
         console.log(error)
       })
     },
@@ -321,19 +328,25 @@ export default {
       getstockbygoodsid(this.listQuery1).then(res => {
         let {data} = res
         if (data.code == 201) {
+          this.isShowEchart1 = false
           this.$message({
             message: '没有更多库存变化信息！',
             type: 'warning',
             duration:5000
           });
         } else {
+          this.isShowEchart1 = true
           data.data.forEach((item,index) => {
             this.changeQushixAxis1.push(item.addtime)
             this.changeQushiseries1.push(Math.abs(Number(item.numbefore) - Number(item.numnow)))
           })
-          this.pie_kucunChangeQushi1()
+          let self = this
+          setTimeout(function() {
+            self.pie_kucunChangeQushi1()
+          },500)
         }
       }).catch(error => {
+        this.isShowEchart1 = false
         console.log(error)
       })
     },

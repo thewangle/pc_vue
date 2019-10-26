@@ -27,12 +27,12 @@
         </el-badge>
       </div>
       <div class="download">
-        <router-link to="/documentation">下载中心</router-link>
+        <router-link to="/download">下载中心</router-link>
       </div>
 
       <el-dropdown class="avatar-container right-menu-item" trigger="click">
         <div class="avatar-wrapper">
-          <img src="./test.jpg" class="user-avatar">
+          <img src="../../../assets/img/loginout.gif" class="user-avatar">
           <i class="el-icon-caret-bottom"/>
         </div>
         <el-dropdown-menu slot="dropdown">

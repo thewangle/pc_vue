@@ -200,7 +200,7 @@ export default {
         if (data.code == 201) {
           this.isShowEchart = false
           this.$message({
-            message: '没有更多新入库信息！',
+            message: '没有更多会员信息！',
             type: 'warning',
             duration:5000
           });

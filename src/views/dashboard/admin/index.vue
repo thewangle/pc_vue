@@ -1,334 +1,414 @@
 <template>
-  <div class="dashboard-editor-container animated bounceInLeft">
-    <div class="fengebr">山东省五指会员区域分布</div>
-    <div class="wrap">
-        <div ref="mapChart" style="width: 95%;min-height: 800px;box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);"></div>
+  <div class="page_wrap animated fadeInLeft">
+    <div class="navBar">经营报表</div>
+    <div class="tag1_wrap">
+        <el-select v-if="is_zzh" v-model="listQuery2.bm" placeholder="请选择部门" clearable style="width: 200px;margin-left:10px;" class="filter-item" @change="handleFilter2">
+          <el-option v-for="item in bms" :label="item.label" :value="item.value"/>
+        </el-select>
+        <el-select v-if="is_bm" v-model="listQuery2.gz" placeholder="请选择柜组" clearable style="width: 200px;margin-left:10px;" class="filter-item" @change="handleFilter2">
+          <el-option v-for="item in gzs" :label="item.label" :value="item.value"/>
+        </el-select>
+        <div class="whichDay">
+          <el-radio-group v-model="day" size="medium" @change="handleFilter2">
+            <el-radio-button label="今日" ></el-radio-button>
+            <el-radio-button label="昨日"></el-radio-button>
+          </el-radio-group>
+        </div>
     </div>
-    <div class="fengebr">五指科技全国辐射图</div>
-    <div class="wrap">
-        <div ref="chinaMap" style="width: 95%;min-height: 800px;box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);"></div>
+    <div class="infoWrap">
+        <div class="infoList">
+            <div class="infoListNum">
+                <div class="infoB">销售数量</div>
+                <div class="infoC">{{ salenums }}</div>
+            </div>
+            <div class="infoListNum">
+                <div class="infoB">销售额</div>
+                <div class="infoC">¥{{ salemoney }}</div>
+            </div>
+            <div class="infoListNum">
+                <div class="infoB">利润</div>
+                <div class="infoC">¥{{ saleprofit }}</div>
+            </div>
+        </div>
+        <div class="infoList">
+            <div class="infoListNum">
+                <div class="infoB">退货数量</div>
+                <div class="infoC">{{ returnums }}</div>
+            </div>
+            <div class="infoListNum">
+                <div class="infoB">退货额</div>
+                <div class="infoC">¥{{ returnmoney }}</div>
+            </div>
+        </div>
+        <div class="infoList">
+            <div class="infoListNum">
+                <div class="infoB">报损数量</div>
+                <div class="infoC">{{ lossums }}</div>
+            </div>
+            <div class="infoListNum">
+                <div class="infoB">报损额</div>
+                <div class="infoC">¥{{ lossmoney }}</div>
+            </div>
+        </div>
+        <div class="infoList">
+            <div class="infoListNum">
+                <div class="infoB">补货数量</div>
+                <div class="infoC">{{ patchnums }}</div>
+            </div>
+            <div class="infoListNum">
+                <div class="infoB">补货额</div>
+                <div class="infoC">¥{{ patchmoney }}</div>
+            </div>
+        </div>
+        <div class="infoList">
+            <div class="infoListNum">
+                <div class="infoB">新入库数量</div>
+                <div class="infoC">{{ storageums }}</div>
+            </div>
+            <div class="infoListNum">
+                <div class="infoB">新入库成本</div>
+                <div class="infoC">¥{{ storagemoney }}</div>
+            </div>
+        </div>
+        <div class="infoList">
+            <div class="infoListNum">
+                <div class="infoB">总库存数量</div>
+                <div class="infoC">{{ stockums }}</div>
+            </div>
+            <div class="infoListNum">
+                <div class="infoB">总库存额</div>
+                <div class="infoC">¥{{ stockmoney }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="navBar"><span>{{ istady }}</span>之最</div>
+    <div class="tag1_wrap">
+        <el-select v-model="listQuery.kind" placeholder="请选择最种类" style="width: 200px;margin-left:10px;" class="filter-item" @change="handleFilter">
+          <el-option v-for="item in zuizl" :label="item.label" :value="item.value"/>
+        </el-select>
+        <div class="whichDay">
+          <el-radio-group v-model="day2" size="medium" @change="handleFilter(1)">
+            <el-radio-button label="今日" ></el-radio-button>
+            <el-radio-button label="昨日"></el-radio-button>
+          </el-radio-group>
+        </div>
+    </div>
+    <div class="infoWrap">
+        <div class="zuiList">
+            <div class="isStart"><span>{{ istady }}</span>之星</div>
+            <div class="zuiListWrap">
+                <img src="../../../assets/img/good.png" alt="" class="goodImg">
+                <div class="zuiB">{{ startname }}</div>
+                <div class="zuiInfo">
+                  <div style="margin-right:15px;"><span>数量：</span><span class="zuiInfoNum">{{ startnum }}</span></div>
+                  <div><span>额度：</span><span class="zuiInfoNum">¥{{ startmoney }}</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="zuiList">
+            <div class="isStart" style="background:#909399;">该努力了</div>
+            <div class="zuiListWrap">
+                <img src="../../../assets/img/nogood.png" alt="" class="goodImg">
+                <div class="zuiB">{{ unstartname }}</div>
+                <div class="zuiInfo">
+                  <div style="margin-right:15px;"><span>数量：</span><span class="zuiInfoNum">{{ unstartnum }}</span></div>
+                  <div><span>额度：</span><span class="zuiInfoNum">¥{{ unstartmoney }}</span></div>
+                </div>
+            </div>
+        </div>
     </div>
   </div>
 </template>
 
 <script>
-import echarts from 'echarts'
-import { getmapforshandong } from '@/api/loginanduser' //请求函数
-import listChina from '@/assets/js/china.json'
-import listSd from '@/assets/js/map1.json'
-
+import moment from 'moment' //日期转换插件 
+import { getpartantId, getRoleId, getUserid, getdepartmentName } from '@/utils/auth'
+import { getallUserByidthis } from '@/api/loginanduser' //请求函数
+import { getruninfo, getmostone } from '@/api/report' //请求函数
 export default {
   name: 'DashboardAdmin',
-  mounted() {
-    this.Getmapforshandong()
-    this.Getmapforchina()
-  },
   components: {
     
   },
   data() {
     return {
-      //飞线地图所需
-      series: [], //地图展现数据
-      //24个省市经度纬度
-      geoCoordMap: {
-        '陕西': [109.503789, 35.860026],
-        '西安': [108.946466, 34.347269],
-        '济南': [117.000923, 36.675807],
-        '甘肃': [103.832478, 36.065465],
-        '兰州': [103.84044, 36.067321],
-        '新疆': [87.633473, 43.799238],
-        '乌鲁木齐': [87.62444, 43.830763],
-        '内蒙古': [111.772606, 40.823156],
-        '包头': [109.846544, 40.662929],
-        '青海': [101.786462, 36.627159],
-        '西宁': [101.78443, 36.623393],
-        '宁夏': [106.265605, 38.476878],
-        '银川': [106.258602, 38.487834],
-        '四川': [104.073467, 30.577543],
-        '成都': [104.081534, 30.655822],
-        '重庆': [106.558434, 29.568996],
-        '西藏': [91.124342, 29.652894],
-        '拉萨': [91.120789, 29.65005],
-        '云南': [101.592952, 24.864213],
-        '昆明': [102.852448, 24.873998],
-        '贵州': [106.714476, 26.60403],
-        '贵阳': [106.636577, 26.653325],
-        '广西': [108.924274, 23.552255],
-        '南宁': [108.373451, 22.822607],
-        '山西': [112.515496, 37.866566],
-        '太原': [112.534919, 37.873219],
-        '河南': [101.556307, 34.51139],
-        '郑州': [113.631419, 34.753439],
-        '湖北': [112.410562, 31.209316],
-        '武汉': [114.311582, 30.598467],
-        '湖南': [111.720664, 27.695864],
-        '长沙': [112.945473, 28.234889],
-        '江西': [115.676082, 27.757258],
-        '南昌': [115.864589, 28.689455],
-        '安徽': [117.33054, 31.734294],
-        '合肥': [117.233443, 31.826578],
-        '上海': [121.480539, 31.235929],
-        '浙江': [120.159533, 30.271548],
-        '杭州': [120.215503, 30.253087],
-        '广东': [113.394818, 23.408004],
-        '广州': [113.271431, 23.135336],
-        '北京': [116.413384, 39.910925],
-        '天津': [117.209523, 39.093668],
-        '河北': [117.220297, 39.173149],
-        '唐山': [118.186459, 39.636584],
-        '黑龙江': [126.642464, 45.756967],
-        '吉林': [125.3245, 43.886841],
-        '辽宁': [123.429096, 41.796767],
+      day: '今日',
+      day2: '今日',
+      is_zzh: false,
+      is_bm: false,
+      bms: [],
+      gzs: [],
+      salenums: 0,
+      salemoney: 0,
+      saleprofit: 0,
+      returnums: 0,
+      returnmoney: 0,
+      lossums: 0,
+      lossmoney: 0,
+      patchnums: 0,
+      patchmoney: 0,
+      storageums: 0,
+      storagemoney: 0,
+      stockums: 0,
+      stockmoney: 0,
+      startname: '暂无数据',
+      unstartname: '暂无数据',
+      startnum: 0,
+      startmoney: 0,
+      unstartnum: 0,
+      unstartmoney: 0,
+      istady: '今日',
+      listQuery: { 
+        time: [],
+        kind: 1,
+        role: getRoleId(),
+        uid: getUserid(),
+        pid: getpartantId()
       },
-      fromdata: '济南',//默认飞线原点
-      //初始化飞线数据
-      XAData: [
-        [{name: '济南'}, {name: '乌鲁木齐'}],
-        [{name: '济南'}, {name: '北京'}],
-        [{name: '济南'}, {name: '黑龙江'}],
-        [{name: '济南'}, {name: '吉林'}],
-        [{name: '济南'}, {name: '包头'}],
-        [{name: '济南'}, {name: '辽宁'}],
-        [{name: '济南'}, {name: '拉萨'}],
-        [{name: '济南'}, {name: '上海'}],
-        [{name: '济南'}, {name: '重庆'}],
-        [{name: '济南'}, {name: '杭州'}],
-        [{name: '济南'}, {name: '合肥'}],
-        [{name: '济南'}, {name: '广州'}],
-        [{name: '济南'}, {name: '长沙'}],
+      listQuery2: { 
+        time: [],
+        bm: '',
+        gz: '',
+        role: getRoleId(),
+        uid: getUserid(),
+        pid: getpartantId()
+      },
+      zuizl: [
+        {value: 1,label: '销售之最'},
+        {value: 2,label: '退货之最'},
+        {value: 3,label: '报损之最'},
+        {value: 4,label: '补货之最'},
+        {value: 5,label: '新入库之最'},
+        {value: 6,label: '库存之最'},
       ],
     }
   },
-  created() {
-    
+  computed: {
+  },
+  mounted() {
+    if (getRoleId() !=3) {
+      this.getAllUserByidthis()
+    }
+    if (getRoleId() == 1) {
+      this.is_zzh = true
+      this.is_bm = false
+    } else if (getRoleId() == 2) {
+      this.is_zzh = false
+      this.is_bm = true
+    } else if (getRoleId() == 3) {
+      this.is_zzh = false
+      this.is_bm = false
+    }
+    this.handleFilter2()
+    this.handleFilter(1)
   },
   methods: {
-    Getmapforshandong() {
-      let mapChart = echarts.init(this.$refs.mapChart)
-        echarts.registerMap('HK', listSd[0]);
-        let option = {
-            title : {
-                text: '',
-                textStyle: {
-                    color: 'black',
-                },
-                x:'center',
-                top: 15
-            },
-            tooltip: {
-                trigger: 'item',
-                formatter: '{b}五指会员<br/>{c}个'
-            },
-            visualMap: {
-                text:['High','Low'],
-                realtime: false,
-                calculable: true,
-                right: 30,
-                textStyle: {
-                    color: 'white',
-                },
-                inRange: {
-                    color: ['lightskyblue','yellow', 'orangered']
-                }
-            },
-            series: [
-                {
-                    name: '香港18区人口密度',
-                    type: 'map',
-                    mapType: 'HK', // 自定义扩展图表类型
-                    itemStyle:{
-                        normal:{label:{show:true}},
-                        emphasis:{label:{show:true}}
-                    },
-                    data:[
-                        {name: '济南市', value: 100},
-                        {name: '德州市', value: 120},
-                        {name: '滨州市', value: 110},
-                        {name: '东营市', value: 90},
-                        {name: '淄博市', value: 130},
-                        {name: '潍坊市', value: 70},
-                        {name: '烟台市', value: 20},
-                        {name: '青岛市', value: 40},
-                        {name: '威海市', value: 150},
-                        {name: '日照市', value: 90},
-                        {name: '临沂市', value: 160},
-                        {name: '枣庄市', value: 60},
-                        {name: '济宁市', value: 10},
-                        {name: '菏泽市', value: 200},
-                        {name: '泰安市', value: 100},
-                        {name: '聊城市', value: 80}
-                    ],
-                }
-            ]
-        }
-        mapChart.clear() 
-        mapChart.setOption(option);
-        window.addEventListener('resize',function() {
-            mapChart.resize()
-        })
-    },
-    //中国地图飞线图
-    convertData1(data) {
-        let res = []
-        for (let i = 0; i < data.length; i++) {
-            let dataItem = data[i]
-            let fromCoord = this.geoCoordMap[dataItem[0].name]
-            let toCoord = this.geoCoordMap[dataItem[1].name]
-            if (fromCoord && toCoord) {
-                res.push({
-                    fromName: dataItem[0].name, toName: dataItem[1].name, coords: [fromCoord, toCoord]
-                })
-            }
-        }
-        return res
-    },
-    Getmapforchina() {
-        let chinaMaps = echarts.init(this.$refs.chinaMap)
-        echarts.registerMap('HK1', listChina[0]);
-        let self = this
-        self.series.push(
-            {
-                type: 'lines',
-                zlevel: 15,
-                effect: {
-                    show: true, period: 4, trailLength: 0, symbol: 'arrow', symbolSize: 7,
-                },
-                lineStyle: {
-                    normal: {width: 1.2, opacity: 0.6, curveness: 0.2, color: '#F19000'}
-                },
-                data: self.convertData1(self.XAData)
-            },
-            //出发点
-            {
-                type: 'effectScatter',
-                coordinateSystem: 'geo',
-                zlevel: 15,
-                rippleEffect: {
-                    period: 4, brushType: 'stroke', scale: 4
-                },
-                symbol: 'circle',
-                symbolSize: function (val) {
-                    return 4 + val[2] / 10;
-                },
-                itemStyle: {
-                    normal: {show: false}
-                },
-                tooltip: {
-                    show: false,
-                },
-                data: [{
-                    name: self.fromdata, value: self.geoCoordMap[self.fromdata].concat([100]),
-                }],
-            },
-                /*到达点*/
-            {
-                type: 'effectScatter',
-                coordinateSystem: 'geo',
-                rippleEffect: {
-                    period: 4, brushType: 'stroke', scale: 4
-                },
-                zlevel: 15,
-                label: {
-                    normal: {
-                        show: false
-                    }
-                },
-                tooltip: {
-                    show: false,
-                },
-                symbol: 'circle',
-                symbolSize: 15,
-                itemStyle: {
-                    normal: {
-                        color: '#F19000'
-                    }
-                },
-                data: self.XAData.map(function (dataItem) {
-                    return {
-                        name: dataItem[1].name,
-                        value: self.geoCoordMap[dataItem[1].name].concat([dataItem[1].name]),
-                        tooltip: {
-                            formatter: dataItem[0].name + "--" + dataItem[1].name + "：" + dataItem[1].value
-                        }
-                    }
-                }),
-            }
-        )
-        let option = {
-            color: ['#fc5353', '#f4fc6c', '#e68b55', '#9a68ff', '#ff60c5'],
-            tooltip: {
-                trigger: 'item',
-                formatter: function (params) {
-                    if (params.value) {
-                        return params.name + ' : ' + params.value[2];
-                    } else {
-                        return params.name;
-                    }
-                }
-            },
-            legend: {
-                orient: 'horizontal',
-                left: '27%',
-                top: '5%',
-                data: ['高线'],
-                textStyle: {
-                    color: '#ffffff'
-                },
-                icon: 'circle'
-            },
-            geo: {
-                map: 'HK1',
-                zlevel: 10,
-                layoutCenter: ['48%', '43%'],
-                roam: true,
-                layoutSize: "100%",
-                zoom: 1.08,
-                label: {
-                    normal: {
-                        show: true,//地图上的省份名称是否显示
-                        textStyle:{
-                            fontSize:12,
-                            color: '#43D0D6'
-                        }
-                    },
-                    emphasis: {
-                        show: true
-                    }
-                },
-                itemStyle: {
-                    normal: {
-                        color: '#062031',
-                        borderWidth: 1.1,
-                        borderColor: '#43D0D6'
-                    },
-                    emphasis: {
-                        areaColor: '#43D0D6'
-                    }
-                }
-            },
-            series: this.series
-        }
-        chinaMaps.clear()
-        chinaMaps.setOption(option)
+    //获取经营报表信息
+    handleFilter2() {
+      let startTime =moment(new Date(new Date(new Date().toLocaleDateString()).getTime())).valueOf() // 当天0点
+      let endTime = startTime + 24 * 60 * 60 * 1000 -1// 当天23:59
+      let zuoTime = startTime - 24 * 60 * 60 * 1000// 昨日 24:00
+      if (this.day == '今日') {
+        this.listQuery2.time = []
+        this.listQuery2.time.push(startTime / 1000)
+        this.listQuery2.time.push(endTime / 1000)
       }
-    }
+      if (this.day == '昨日') {
+        this.listQuery2.time = []
+        this.listQuery2.time.push(zuoTime / 1000)
+        this.listQuery2.time.push(startTime / 1000)
+      }
+      this.salenums = this.salemoney = this.saleprofit = this.returnums = this.returnmoney = this.lossums = this.lossmoney = this.patchnums = this.patchmoney = this.storageums = this.storagemoney = this.stockums = this.stockmoney = 0
+      getruninfo(this.listQuery2).then(res => {
+        let { data } = res
+        if (data.soldgoods) {
+          this.salenums = data.soldgoods.zongnums
+          this.salemoney = data.soldgoods.zonoutprice
+          this.saleprofit = data.soldgoods.zonlirun
+        }
+        if (data.returngoods) {
+          this.returnums = data.returngoods.zongnums
+          this.returnmoney = data.returngoods.zonoutprice
+        }
+        if (data.lossgoods) {
+          this.lossums = data.lossgoods.zongnums
+          this.lossmoney = data.lossgoods.zonoutprice
+        }
+        if (data.patchgoods) {
+          this.patchnums = data.patchgoods.zongnums
+          this.patchmoney = data.patchgoods.zonoutprice
+        }
+        if (data.storagegoods) {
+          this.storageums = data.storagegoods.zongnums
+          this.storagemoney = data.storagegoods.zoninprice
+        }
+        if (data.stockgoods) {
+          this.stockums = data.stockgoods.zongnums
+          this.stockmoney = data.stockgoods.zoninprice
+        }
+      }).catch(error => {
+        console.log(error)
+      })
+    },
+    //获取今日之最信息
+    handleFilter(query) {
+      if (query == 1) {
+        this.istady = this.day2
+      }
+      let startTime =moment(new Date(new Date(new Date().toLocaleDateString()).getTime())).valueOf() // 当天0点
+      let endTime = startTime + 24 * 60 * 60 * 1000 -1// 当天23:59
+      let zuoTime = startTime - 24 * 60 * 60 * 1000// 昨日 24:00
+      if (this.day2 == '今日') {
+        this.listQuery.time = []
+        this.listQuery.time.push(startTime / 1000)
+        this.listQuery.time.push(endTime / 1000)
+      }
+      if (this.day2 == '昨日') {
+        this.listQuery.time = []
+        this.listQuery.time.push(zuoTime / 1000)
+        this.listQuery.time.push(startTime / 1000)
+      }
+      this.startname = this.unstartname = '暂无数据'
+      this.startnum = this.startmoney = this.unstartnum = this.unstartmoney = 0
+      getmostone(this.listQuery).then(res => {
+        let { data } = res
+        if (data.firstname) {
+          this.startname = data.firstname
+        }
+        if (data.lastname) {
+          this.unstartname = data.lastname
+        }
+        if (data.mostinfo.firstone.soldnum) {
+          this.startnum = data.mostinfo.firstone.soldnum
+        }
+        if (data.mostinfo.firstone.soldmonye) {
+          this.startmoney = data.mostinfo.firstone.soldmonye
+        }
+        if (data.mostinfo.lastone.soldnum) {
+          this.unstartnum = data.mostinfo.lastone.soldnum
+        }
+        if (data.mostinfo.lastone.soldmonye) {
+          this.unstartmoney = data.mostinfo.lastone.soldmonye
+        }
+      }).catch(error => {
+        console.log(error)
+      })
+    },
+    //根据用户id获取该id下的所有用户信息
+    getAllUserByidthis() {
+      getallUserByidthis(this.listQuery2).then(res => {
+        let {data} = res
+        data.forEach((item) => {
+          if (getRoleId() == 1) {
+            this.bms.push({label:item.department,value:item.id})
+          }
+          if (getRoleId() == 2) {
+            this.gzs.push({label:item.department,value:item.id})
+          }
+        })
+      }).catch(error => {
+        console.log(error)
+      })
+    },
+  }
 }
 </script>
 
-<style rel="stylesheet/scss" scoped>
-.fengebr {
+<style rel="stylesheet/scss">
+.navBar {
   width: 100%;
-  padding: 40px 0;
   text-align: center;
-  cursor: pointer;
-  font-size: 19px;
-  font-weight: bold;
+  padding: 20px 0;
+  font-size: 25px;
+  color: #409EFF;
+  border-bottom: 1px solid rgb(230,230,230);
 }
-.wrap {
+.tag1_wrap {
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgb(230,230,230);
+}
+.whichDay {
+    padding: 0 20px;
+}
+.infoWrap {
     width: 100%;
+    padding: 20px 20px 60px 20px;
+    border-bottom: 1px solid rgb(230,230,230);
     display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.infoList {
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 40px;
+    width: 30%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .42), 0 0 6px rgba(0, 0, 0, .14);
+    cursor: pointer;
+}
+.infoB {
+    color: #409EFF;
+    font-size: 17px;
+    margin-bottom: 20px;
+}
+.infoC {
+    color: #F56C6C;
+    font-size: 20px;
+    font-weight: bold;
+}
+.zuiList {
+    position: relative;
+    width: 400px;
+    height: 400px;
+}
+.isStart {
+    border-radius: 50%;
+    position: absolute;
+    z-index: -1;
+    font-size: 12px;
+    color: white;
+    top: 0px;
+    right: 0px;
+    width: 80px;
+    height: 80px;
+    background: #F56C6C;
+    text-align: center;
+    line-height: 60px;
+}
+.zuiListWrap {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .42), 0 0 6px rgba(0, 0, 0, .14);
+    margin-top: 40px;
+}
+.goodImg {
+    width: 100px;
+    height: 100px;
+}
+.zuiB {
+    color: #409EFF;
+    font-weight: bold;
+    font-size: 20px;
+    margin: 20px 0;
+}
+.zuiInfo {
+    font-size: 16px;
+    color: rgb(150,150,150);
+    display: flex;
+}
+.zuiInfoNum {
+    color: #F56C6C;
 }
 </style>

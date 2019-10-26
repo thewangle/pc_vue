@@ -41,26 +41,6 @@
       </div>
     </div>
     <div class="tab_model_wrap">
-      <div class="fengebr" @click="zeOver1" id="zonge1"><h2>库存数量变化及占比图例分析</h2></div>
-      <div class="tab1_content_wrap">
-        <div class="tab1_content_left">
-          <div class="tab1_content_left_tab">{{tab1name}}库存变化</div>
-          <div class="tab1_content_left_list">
-            <div><span>总变化：</span><span>{{tab1change.zongnchange}}</span></div>
-            <div><span>售出：</span><span>{{tab1change.changeout}}</span> </div>
-            <div><span>退货：</span><span>{{tab1change.changetui}}</span> </div>
-            <div><span>报损：</span><span>{{tab1change.changesun}}</span> </div>
-            <div><span>补货：</span><span>{{tab1change.changein}}</span> </div>
-          </div>
-        </div>
-        <div class="noDate" v-show="!isShowEchart1" style="width: 80%;">
-          <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
-          <span class="nodataSpan">暂无数据</span>
-        </div>
-        <div ref="ku_change_pie" v-show="isShowEchart1" style="width: 80%;height:400px;margin:20px 0;"></div>
-      </div>
-    </div>
-    <div class="tab_model_wrap">
       <div class="tag1_wrap">
         <el-date-picker
           v-model="time_tab2"
@@ -86,7 +66,7 @@
         <div class="tab1_content_left">
           <div class="tab1_content_left_tab">{{tab2name}}库存趋势</div>
           <div class="tab1_content_left_list">
-            <div><span>类别：</span><span>全部类别</span></div>
+            <div><span>类别：</span><span>库存总量</span></div>
             <div><span>趋势所属：</span><span>{{tab2name}}</span></div>
           </div>
         </div>
@@ -95,6 +75,26 @@
           <span class="nodataSpan">暂无数据</span>
         </div>
         <div ref="pie_change_qushi" v-show="isShowEchart2" style="width: 80%;height:400px;margin:20px 0;"></div>
+      </div>
+    </div>
+    <div class="tab_model_wrap">
+      <div class="fengebr" @click="zeOver1" id="zonge1"><h2>库存数量变化及占比图例分析</h2></div>
+      <div class="tab1_content_wrap">
+        <div class="tab1_content_left">
+          <div class="tab1_content_left_tab">{{tab1name}}库存变化</div>
+          <div class="tab1_content_left_list">
+            <div><span>变化总量：</span><span>{{tab1change.zongnchange}}</span></div>
+            <div><span>售出：</span><span>{{tab1change.changeout}}</span> </div>
+            <div><span>退货：</span><span>{{tab1change.changetui}}</span> </div>
+            <div><span>报损：</span><span>{{tab1change.changesun}}</span> </div>
+            <div><span>补货：</span><span>{{tab1change.changein}}</span> </div>
+          </div>
+        </div>
+        <div class="noDate" v-show="!isShowEchart1" style="width: 80%;">
+          <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
+          <span class="nodataSpan">暂无数据</span>
+        </div>
+        <div ref="ku_change_pie" v-show="isShowEchart1" style="width: 80%;height:400px;margin:20px 0;"></div>
       </div>
     </div>
     <div class="tab_model_wrap" v-if="is_gz">
@@ -634,8 +634,10 @@ export default {
         },
         series: [
           {
+            name: '库存数量',
             type: "pie",
             data: this.series_data,
+            roseType: 'angle',
             label: {
               formatter: '{b}: {d}%'
             },

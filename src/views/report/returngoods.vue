@@ -80,7 +80,7 @@
         <el-select v-if="isgz" v-model="listQuery.sortid" placeholder="请选择分类" clearable style="width: 200px" @change="handleFilter">
           <el-option v-for="item in sorts" :label="item.label" :value="item.value"/>
         </el-select>
-        <el-select v-if="isgz" v-model="listQuery.supplierid" placeholder="请选择分类" clearable style="width: 200px" @change="handleFilter">
+        <el-select v-if="isgz" v-model="listQuery.supplierid" placeholder="请选择供应商" clearable style="width: 200px" @change="handleFilter">
           <el-option v-for="item in suppliers" :label="item.label" :value="item.value"/>
         </el-select>
         <el-button style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">查询</el-button>

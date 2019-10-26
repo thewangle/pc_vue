@@ -64,7 +64,7 @@
         <el-button type="primary" @click="addsortsubmit">确 定</el-button>
       </div>
     </el-dialog>
-    <el-dialog :visible.sync="dialogVisible" :close="dialog_close" title="供应商编辑">
+    <el-dialog :visible.sync="dialogVisible" :close="dialog_close" title="分类编辑" @close="tcclose">
       <div class="dialog_div">
         <span>分类名称</span>
         <el-input v-model="table_info.name" autocomplete="off"></el-input>
@@ -131,6 +131,10 @@ export default {
     
   },
   methods: {
+    //关闭进/售价格更改弹窗回调函数
+    tcclose() {
+      this._fetchActivityList() //重新获取数据
+    },
     //导出excle
     toExcle() {
       var wb = XLSX.utils.table_to_book(document.getElementById('out-table'));
