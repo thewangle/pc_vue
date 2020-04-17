@@ -1,18 +1,20 @@
 <template>
   <div class="page_wrap animated fadeInLeft">
     <div class="navBar">经营报表</div>
-    <div class="tag1_wrap">
-        <el-select v-if="is_zzh" v-model="listQuery2.bm" placeholder="请选择部门" clearable style="width: 200px;margin-left:10px;" class="filter-item" @change="handleFilter2">
-          <el-option v-for="item in bms" :label="item.label" :value="item.value"/>
-        </el-select>
-        <el-select v-if="is_bm" v-model="listQuery2.gz" placeholder="请选择柜组" clearable style="width: 200px;margin-left:10px;" class="filter-item" @change="handleFilter2">
-          <el-option v-for="item in gzs" :label="item.label" :value="item.value"/>
-        </el-select>
-        <div class="whichDay">
-          <el-radio-group v-model="day" size="medium" @change="handleFilter2">
-            <el-radio-button label="今日" ></el-radio-button>
-            <el-radio-button label="昨日"></el-radio-button>
-          </el-radio-group>
+    <div class="tag1_wrap11">
+        <div class="tag1_wrap1">
+          <el-select v-if="is_zzh" v-model="listQuery2.bm" placeholder="请选择部门" clearable style="width: 200px;margin-left:10px;" class="filter-item" @change="handleFilter2">
+            <el-option v-for="item in bms" :label="item.label" :value="item.value"/>
+          </el-select>
+          <el-select v-if="is_bm" v-model="listQuery2.gz" placeholder="请选择柜组" clearable style="width: 200px;margin-left:10px;" class="filter-item" @change="handleFilter2">
+            <el-option v-for="item in gzs" :label="item.label" :value="item.value"/>
+          </el-select>
+          <div class="whichDay">
+            <el-radio-group v-model="day" size="medium" @change="handleFilter2">
+              <el-radio-button label="今日" ></el-radio-button>
+              <el-radio-button label="昨日"></el-radio-button>
+            </el-radio-group>
+          </div>
         </div>
     </div>
     <div class="infoWrap">
@@ -76,22 +78,25 @@
                 <div class="infoC">{{ stockums }}</div>
             </div>
             <div class="infoListNum">
-                <div class="infoB">总库存额</div>
+                <div class="infoB">总库存成本</div>
                 <div class="infoC">¥{{ stockmoney }}</div>
             </div>
         </div>
     </div>
     <div class="navBar"><span>{{ istady }}</span>之最</div>
-    <div class="tag1_wrap">
-        <el-select v-model="listQuery.kind" placeholder="请选择最种类" style="width: 200px;margin-left:10px;" class="filter-item" @change="handleFilter">
-          <el-option v-for="item in zuizl" :label="item.label" :value="item.value"/>
-        </el-select>
-        <div class="whichDay">
-          <el-radio-group v-model="day2" size="medium" @change="handleFilter(1)">
-            <el-radio-button label="今日" ></el-radio-button>
-            <el-radio-button label="昨日"></el-radio-button>
-          </el-radio-group>
+    <div class="tag1_wrap11">
+        <div class="tag1_wrap1">
+          <el-select v-model="listQuery.kind" placeholder="请选择最种类" style="width: 200px;margin-left:10px;" class="filter-item" @change="handleFilter">
+            <el-option v-for="item in zuizl" :label="item.label" :value="item.value"/>
+          </el-select>
+          <div class="whichDay">
+            <el-radio-group v-model="day2" size="medium" @change="handleFilter(1)">
+              <el-radio-button label="今日" ></el-radio-button>
+              <el-radio-button label="昨日"></el-radio-button>
+            </el-radio-group>
+          </div>
         </div>
+        <div v-if="isCheck">请<span class="look" @click="getgoodsnosuchs">点击查看</span><span>{{ lookWhich }}</span>为0的<span>{{ lookSize }}</span>列表</div>
     </div>
     <div class="infoWrap">
         <div class="zuiList">
@@ -117,6 +122,49 @@
             </div>
         </div>
     </div>
+    <div class="beian"><span>备案号：鲁ICP备19049737号</span></div>
+    <drawer title="列表" :visible.sync='dialogNoList' align="bottom" width="500px" close-on-click-modal>
+      <ul>
+        <li v-for="item in dialogNoListInfo">{{item}}</li>
+      </ul>
+    </drawer>
+    <drawer title="首页 - 使用说明" :visible.sync='dialogVisible' width="500px" close-on-click-modal>
+      <div class="smWrap">
+        <div class="smB">概述：此页分为经营报表和今日/昨日之最两大模块</div>
+        <div class="smContent">
+          <span class="smContentB">经营报表：</span>
+          <div class="smContentC">
+            <div>1.此模块展现今日/昨日的销售、退货、报损、补货、新产品入库、总库存的相关信息</div>
+            <div>2."商场级别"账号可以选择部门来查看所选部门的经营报表（默认不选择，展现整个商场的经营报表，选择后可去除）</div>
+            <div>3."部门级别"账号可以选择柜组来查看所选柜组的经营报表（默认不选择，展现整个部门的经营报表，选择后可去除）</div>
+          </div>
+        </div>
+        <div class="smContent">
+          <span class="smContentB">今日之最：</span>
+          <div class="smContentC">
+            <div>1.此模块根据所选条件展现今日/昨日的各项数据之最</div>
+            <div>2.数据为 0 时不参与评比，例如：销售之最，如果销售为 0 则不参与最好和最差评选</div>
+            <div>3."商场级别"账号展现其下面部门之最</div>
+            <div>4."部门级别"账号展现其下面柜组之最</div>
+            <div>5."柜组级别"账号展现其下面单品之最</div>
+          </div>
+        </div>
+        <div class="smContent">
+          <span class="smContentB">备注：</span>
+          <div class="smContentC">
+            <div>1."新入库"是指之前没有的产品新入库，区别于"补货"(补货是对已有产品的补缺)</div>
+            <div>2."成本"是指商品入库时的"进价"</div>
+            <div>3.销售、退货的额度是按"售价"计算，报损、补货、新入库、总库存是按"进价"</div>
+          </div>
+        </div>
+      </div>
+    </drawer>
+    <div class="hellpWrap" @click="dialogVisible = true">
+      <div class="hellpWrap1">
+        <img src="../../../assets/img/hellp.jpg" alt="" class="hellpImg">
+        <span class="hellpB">使用帮助</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -124,7 +172,7 @@
 import moment from 'moment' //日期转换插件 
 import { getpartantId, getRoleId, getUserid, getdepartmentName } from '@/utils/auth'
 import { getallUserByidthis } from '@/api/loginanduser' //请求函数
-import { getruninfo, getmostone } from '@/api/report' //请求函数
+import { getruninfo, getmostone, getgoodsnosuch } from '@/api/report' //请求函数
 export default {
   name: 'DashboardAdmin',
   components: {
@@ -132,6 +180,11 @@ export default {
   },
   data() {
     return {
+      isCheck: false,
+      dialogNoList: false,
+      dialogNoListInfo: [],
+      lookSize: '',
+      dialogVisible: false,
       day: '今日',
       day2: '今日',
       is_zzh: false,
@@ -173,6 +226,11 @@ export default {
         uid: getUserid(),
         pid: getpartantId()
       },
+      listQuery3: { 
+        role: getRoleId(),
+        uid: getUserid(),
+        pid: getpartantId()
+      },
       zuizl: [
         {value: 1,label: '销售之最'},
         {value: 2,label: '退货之最'},
@@ -184,6 +242,26 @@ export default {
     }
   },
   computed: {
+    lookWhich() {
+      if (this.listQuery.kind == 1) {
+        return '销售'
+      }
+      if (this.listQuery.kind == 2) {
+        return '退货'
+      }
+      if (this.listQuery.kind == 3) {
+        return '报损'
+      }
+      if (this.listQuery.kind == 4) {
+        return '补货'
+      }
+      if (this.listQuery.kind == 5) {
+        return '新入库'
+      }
+      if (this.listQuery.kind == 6) {
+        return '库存'
+      }
+    }
   },
   mounted() {
     if (getRoleId() !=3) {
@@ -192,12 +270,18 @@ export default {
     if (getRoleId() == 1) {
       this.is_zzh = true
       this.is_bm = false
+      this.lookSize = '部门'
+      this.isCheck = false
     } else if (getRoleId() == 2) {
       this.is_zzh = false
       this.is_bm = true
+      this.lookSize = '柜组'
+      this.isCheck = true
     } else if (getRoleId() == 3) {
       this.is_zzh = false
       this.is_bm = false
+      this.lookSize = '单品'
+      this.isCheck = true
     }
     this.handleFilter2()
     this.handleFilter(1)
@@ -232,11 +316,11 @@ export default {
         }
         if (data.lossgoods) {
           this.lossums = data.lossgoods.zongnums
-          this.lossmoney = data.lossgoods.zonoutprice
+          this.lossmoney = data.lossgoods.zoninprice
         }
         if (data.patchgoods) {
           this.patchnums = data.patchgoods.zongnums
-          this.patchmoney = data.patchgoods.zonoutprice
+          this.patchmoney = data.patchgoods.zoninprice
         }
         if (data.storagegoods) {
           this.storageums = data.storagegoods.zongnums
@@ -252,8 +336,19 @@ export default {
     },
     //获取今日之最信息
     handleFilter(query) {
+      //如果是今日和昨日切换触发的，把day的值赋值一下
       if (query == 1) {
         this.istady = this.day2
+      }
+      //点击查看是否出现
+      if (getRoleId() != 1) {
+        if (this.listQuery.kind == 5 || this.listQuery.kind == 6) {
+          this.isCheck = false
+        } else {
+          this.isCheck = true
+        }
+      } else {
+        this.isCheck = false
       }
       let startTime =moment(new Date(new Date(new Date().toLocaleDateString()).getTime())).valueOf() // 当天0点
       let endTime = startTime + 24 * 60 * 60 * 1000 -1// 当天23:59
@@ -294,6 +389,13 @@ export default {
         console.log(error)
       })
     },
+    async getgoodsnosuchs() {
+      await getgoodsnosuch(this.listQuery).then(res => {
+        let {data} = res
+        this.dialogNoListInfo = data
+      })
+      this.dialogNoList = true
+    },
     //根据用户id获取该id下的所有用户信息
     getAllUserByidthis() {
       getallUserByidthis(this.listQuery2).then(res => {
@@ -323,12 +425,17 @@ export default {
   color: #409EFF;
   border-bottom: 1px solid rgb(230,230,230);
 }
-.tag1_wrap {
+.tag1_wrap11 {
   width: 100%;
   padding: 20px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   border-bottom: 1px solid rgb(230,230,230);
+}
+.tag1_wrap1 {
+  display: flex;
+  align-items: center;
 }
 .whichDay {
     padding: 0 20px;

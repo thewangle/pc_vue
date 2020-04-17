@@ -12,7 +12,7 @@
           </el-input>
         </div>
         <div class="biao">
-          <span>商品编码</span>
+          <span>商品编码<span style="color:red;">*</span></span>
           <el-input
             placeholder="请输入商品编码"
             prefix-icon="el-icon-share"
@@ -22,7 +22,7 @@
       </div>
       <div class="biao" style="padding:0;">
         <div class="biao">
-          <span>商品分类</span>
+          <span>商品分类<span style="color:red;">*</span></span>
           <el-select v-model="sort" placeholder="请选择商品分类" style="width:60%;">
             <el-option
               v-for="item in sorts"
@@ -32,7 +32,7 @@
           </el-select>
         </div>
         <div class="biao">
-          <span>供应商</span>
+          <span>供应商<span style="color:red;">*</span></span>
           <el-select v-model="supplier" placeholder="请选择供应商" style="width:60%;">
             <el-option
               v-for="item in suppliers"
@@ -54,7 +54,7 @@
           </el-input>
         </div>
         <div class="biao">
-          <span>商品数量</span>
+          <span>商品数量<span style="color:red;">*</span></span>
           <el-input
             style="width:60%;"
             placeholder="请输入商品数量"
@@ -66,7 +66,7 @@
       </div>
       <div class="biao" style="padding:0;">
         <div class="biao">
-          <span>库存上线</span>
+          <span>库存上线<span style="color:red;">*</span></span>
           <el-input
             placeholder="请输入商品库存上线"
             style="width:60%;"
@@ -76,7 +76,7 @@
           </el-input>
         </div>
         <div class="biao">
-          <span>库存下线</span>
+          <span>库存下线<span style="color:red;">*</span></span>
           <el-input
             placeholder="请输入商品库存下线"
             style="width:60%;"
@@ -88,7 +88,7 @@
       </div>
       <div class="biao" style="padding:0;">
         <div class="biao">
-          <span>商品进价</span>
+          <span>商品进价<span style="color:red;">*</span></span>
           <el-input
             placeholder="请输入商品进价"
             style="width:60%;"
@@ -98,7 +98,7 @@
           </el-input>
         </div>
         <div class="biao">
-          <span>商品售价</span>
+          <span>商品售价<span style="color:red;">*</span></span>
           <el-input
             placeholder="请输入商品售价"
             style="width:60%;"
@@ -120,6 +120,40 @@
       </div>
       <el-button class="submit" :loading="loading" type="primary" @click.native.prevent="handleLogin">确 认</el-button>
     </div>
+    <!-- 使用说明 -->
+    <drawer title="添加商品页 - 使用说明" :visible.sync='dialogVisible' width="500px" close-on-click-modal>
+      <div class="smWrap">
+        <div class="smB">概述：此页为添加商品功能页</div>
+        <div class="smContent">
+          <span class="smContentB">字段说明：</span>
+          <div class="smContentC">
+            <div>1."商品名称"：该商品的名称</div>
+            <div>2."商品编码"：该商品的编码</div>
+            <div>3."商品分类"：该商品的所属分类(需要在"分类管理"模块添加分类)</div>
+            <div>4."供应商"：该商品的所属供应商(需要在"供应商/添加供应商"模块添加供应商)</div>
+            <div>5."商品规格"：该商品的规格(选填)</div>
+            <div>6."商品数量"：该商品的入库数量</div>
+            <div>7."库存上线"：该商品的库存上线(用于库存预警)</div>
+            <div>8."库存下线"：该商品的库存下线(用于库存预警)</div>
+            <div>9."商品进价"：该商品的进价(单位：元)</div>
+            <div>10."商品售价"：该商品的预售价格(单位：元)</div>
+            <div>10."商品描述"：该商品的描述信息(选填)</div>
+          </div>
+        </div>
+        <div class="smContent">
+          <span class="smContentB">备注：</span>
+          <div class="smContentC">
+            <div>1.带"*"均为必填项</div>
+          </div>
+        </div>
+      </div>
+    </drawer>
+    <div class="hellpWrap" @click="dialogVisible = true" style="top: 100px;">
+      <div class="hellpWrap1">
+        <img src="../../assets/img/hellp.jpg" alt="" class="hellpImg">
+        <span class="hellpB">使用帮助</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -134,6 +168,7 @@ export default {
   name: 'registered',
   data() {
     return{
+      dialogVisible: false,
       inprice: '',
       outprice: '',
       maxnums: '',

@@ -96,6 +96,32 @@
         <el-button type="primary" @click="edituserinfo">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 使用说明 -->
+    <drawer title="供应商列表页 - 使用说明" :visible.sync='dialogVisible11' width="500px" close-on-click-modal>
+      <div class="smWrap">
+        <div class="smB">概述：此页为供应商的展示与编辑页</div>
+        <div class="smContent">
+          <span class="smContentB">列表：</span>
+          <div class="smContentC">
+            <div>1.展示账号下的所有供应商</div>
+            <div>2.点击"编辑"会弹出"供应商编辑"对话框，对该供应商进行编辑，点击"取消"取消编辑，点击"确定"提交编辑</div>
+            <div>3.点击"删除"会弹出"是否删除该供应商"提示框"取消"将不删除该供应商，"确定"会永久删除该供应商</div>
+          </div>
+        </div>
+        <div class="smContent">
+          <span class="smContentB">备注：</span>
+          <div class="smContentC">
+            <div>"导出"功能，是导出当前商品列表里的内容，如果想多导出，可把列表每页显示调高（最高每页/50）</div>
+          </div>
+        </div>
+      </div>
+    </drawer>
+    <div class="hellpWrap" @click="dialogVisible11 = true" style="top:100px;">
+      <div class="hellpWrap1">
+        <img src="../../assets/img/hellp.jpg" alt="" class="hellpImg">
+        <span class="hellpB">使用帮助</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -110,6 +136,7 @@ export default {
   name: 'Dashboard',
   data() {
     return {
+      dialogVisible11: false,
       listLoading: false,//table加载的时候loading
       list: [], //table的数据
       listQuery: { //动态请求table数据时传递的参数

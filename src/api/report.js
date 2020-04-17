@@ -143,3 +143,9 @@ export function getmostone(params) {
   let url = process.env.BASE_API + 'yii2/frontend/web/?r=report/getmostone'
   return axios.post(url,params)
 }
+
+//今日/昨日之最中没有销售。。的列表 -- 用于首页今日之最
+export function getgoodsnosuch(params) {
+  let url = process.env.BASE_API + 'yii2/frontend/web/?r=goods/getgoodsnosuch'
+  return axios.post(url,params)
+}

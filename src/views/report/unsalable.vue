@@ -114,6 +114,43 @@
       <div class="pagination-container" style="padding: 0 20px;">
         <el-pagination :current-page="listQuery2.page_no" :page-sizes="[10,20,30, 50]" :page-size="listQuery2.page_size" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
       </div>
+      <!-- 使用说明 -->
+      <drawer title="滞销分析页 - 使用说明" :visible.sync='dialogVisible' width="500px" close-on-click-modal>
+        <div class="smWrap">
+          <div class="smB">概述：此页分为滞销图例分析和滞销商品列表</div>
+          <div class="smContent">
+            <span class="smContentB">图例分析：</span>
+            <div class="smContentC">
+              <div>"滞销商品库存数量图例分析"</div>
+              <div>1."商场级别"账号可以选择部门来查看所选部门的滞销图例分析（默认不选择，展现整个商场的滞销图例分析，选择后可去除）</div>
+              <div>2."部门级别"账号可以选择柜组来查看所选柜组的滞销图例分析（默认不选择，展现整个部门的滞销图例分析，选择后可去除）</div>
+              <div>3.时间段选择需要选择"开始日期"和"结束日期"，也可选择"最近一周"、"最近一个月"、"最近三个月"的快捷方式（默认最近一周，时间段为必选！）</div>
+              <div>4.当"商场级别"账号的时候展示其下面各"部门"的滞销占比，当"部门级别"账号或"商场级别"账号不选择"部门"时展示其下面各柜组的滞销占比，当"柜组级别"账号或"部门级别"账号不选择"柜组"时展示其下面各"分类"的滞销占比</div>
+            </div>
+          </div>
+          <div class="smContent">
+            <span class="smContentB">商品列表：</span>
+            <div class="smContentC">
+              <div>1.列表展示输入条件下的滞销商品</div>
+              <div>2.其中"入库时间"字段为该商品最早入库时间，如果有补货不会显示最后补货的日期</div>
+            </div>
+          </div>
+          <div class="smContent">
+            <span class="smContentB">备注：</span>
+            <div class="smContentC">
+              <div>1.条件中的"入库超过_天"为最新入库时间（即若有补货会从最新补货那天开始计算）</div>
+              <div>2.条件中的"销量少于"为"数量"而非"销售额"</div>
+              <div>3.导出功能，是导出当前商品列表里的内容，如果想多导出，可把列表每页显示调高（最高每页/50）</div>
+            </div>
+          </div>
+        </div>
+      </drawer>
+      <div class="hellpWrap" @click="dialogVisible = true">
+        <div class="hellpWrap1">
+          <img src="../../assets/img/hellp.jpg" alt="" class="hellpImg">
+          <span class="hellpB">使用帮助</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -137,6 +174,7 @@ export default {
   },
   data() {
     return {
+      dialogVisible: false,
       isShowEchart: true,
       listQuery: { //动态请求table数据时传递的参数
         page_no: 1, //页码

@@ -76,6 +76,44 @@
         </div>
         <div ref="pie_change_qushi1" v-show="isShowEchart1" style="width: 80%;height:400px;margin:20px 0;"></div>
       </div>
+      <!-- 使用说明 -->
+      <drawer title="单品分析页 - 使用说明" :visible.sync='dialogVisible' width="500px" close-on-click-modal>
+        <div class="smWrap">
+          <div class="smB">概述：此页分为单品价格变动分析和库存变动分析</div>
+          <div class="smContent">
+            <span class="smContentB">价格变动：</span>
+            <div class="smContentC">
+              <div>1."时间段"、"商品"、"进/售价"均为必选字段</div>
+              <div>2.时间段选择需要选择"开始日期"和"结束日期"，也可选择"最近一周"、"最近一个月"、"最近三个月"的快捷方式（默认最近一周，时间段为必选！）</div>
+              <div>3."商品"支持模糊搜索选择，点击下拉框后，可在输入框中输入要选商品的名称或名称一部分</div>
+              <div>4.左栏展示所选条件下的"最高价格"、"最低价格"、"变动次数"</div>
+              <div>5.右栏展示所选条件下的"价格变动"的趋势记录(可点右侧下载此图例)</div>
+            </div>
+          </div>
+          <div class="smContent">
+            <span class="smContentB">库存变动：</span>
+            <div class="smContentC">
+              <div>1."时间段"、"商品"、"进/售价"均为必选字段</div>
+              <div>2.时间段选择需要选择"开始日期"和"结束日期"，也可选择"最近一周"、"最近一个月"、"最近三个月"的快捷方式（默认最近一周，时间段为必选！）</div>
+              <div>3."商品"支持模糊搜索选择，点击下拉框后，可在输入框中输入要选商品的名称或名称一部分</div>
+              <div>4.左栏展示所选条件下的"类别"、"柜组名称"</div>
+              <div>5.右栏展示所选条件下的"库存数量变动"的趋势记录(为该单品的变动个数而非单品库存总数)</div>
+            </div>
+          </div>
+          <div class="smContent">
+            <span class="smContentB">备注：</span>
+            <div class="smContentC">
+              <div>1.此模块只有"柜组级别"账号有</div>
+            </div>
+          </div>
+        </div>
+      </drawer>
+      <div class="hellpWrap" @click="dialogVisible = true">
+        <div class="hellpWrap1">
+          <img src="../../assets/img/hellp.jpg" alt="" class="hellpImg">
+          <span class="hellpB">使用帮助</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -96,6 +134,7 @@ export default {
   },
   data() {
     return {
+      dialogVisible: false,
       isShowEchart: true,
       isShowEchart1: true,
       changeQushixAxis: [],

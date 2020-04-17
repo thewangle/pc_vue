@@ -3,7 +3,7 @@
     <div class="tab">
       <div class="addB">新增{{ tab_biao }}</div>
       <div class="biao">
-        <span>用户名</span>
+        <span>用户名<span style="color:red;">*</span></span>
         <el-input
           placeholder="请输入用户名"
           v-model="username">
@@ -11,7 +11,7 @@
         </el-input>
       </div>
       <div class="biao">
-        <span>密码</span>
+        <span>密码<span style="color:red;">*</span></span>
         <el-input
           placeholder="请输入密码"
           v-model="password">
@@ -19,7 +19,7 @@
         </el-input>
       </div>
       <div class="biao">
-        <span>{{ tab_biao }}名称</span>
+        <span>{{ tab_biao }}名称<span style="color:red;">*</span></span>
         <el-input
           :placeholder="'请输入' + tab_biao + '名称'"
           v-model="department">
@@ -27,7 +27,7 @@
         </el-input>
       </div>
       <div class="biao">
-        <span>管理员</span>
+        <span>管理员<span style="color:red;">*</span></span>
         <el-input
           placeholder="请输入管理员名称"
           v-model="adminname">
@@ -35,7 +35,7 @@
         </el-input>
       </div>
       <div class="biao">
-        <span>电话</span>
+        <span>电话<span style="color:red;">*</span></span>
         <el-input
           placeholder="请输入管理员电话"
           v-model="phone">
@@ -43,6 +43,35 @@
         </el-input>
       </div>
       <el-button class="submit" :loading="loading" type="primary" @click.native.prevent="handleLogin">注 册</el-button>
+    </div>
+    <!-- 使用说明 -->
+    <drawer title="添加账号页 - 使用说明" :visible.sync='dialogVisible' width="500px" close-on-click-modal>
+      <div class="smWrap">
+        <div class="smB">概述：此页为添加账号功能页</div>
+        <div class="smContent">
+          <span class="smContentB">字段说明：</span>
+          <div class="smContentC">
+            <div>1."用户名"：该账号的用户名，用于登录(必填)</div>
+            <div>2."名称"：该账号的电话，用于经营分析、列表等的展示(必填)</div>
+            <div>3."密码"：该账号的密码，用于登录(必填)</div>
+            <div>4."管理员"：该账号的管理员(必填)</div>
+            <div>5."电话"：该账号的联系电话(必填)</div>
+          </div>
+        </div>
+        <div class="smContent">
+          <span class="smContentB">备注：</span>
+          <div class="smContentC">
+            <div>1.带"*"均为必填项</div>
+            <div>2."商场级别"的账号可以创建"部门级别"的账号，"部门级别"的账号可以创建"柜组级别"的账号</div>
+          </div>
+        </div>
+      </div>
+    </drawer>
+    <div class="hellpWrap" @click="dialogVisible = true" style="top: 100px;">
+      <div class="hellpWrap1">
+        <img src="../../assets/img/hellp.jpg" alt="" class="hellpImg">
+        <span class="hellpB">使用帮助</span>
+      </div>
     </div>
   </div>
 </template>
@@ -56,6 +85,7 @@ export default {
   name: 'registered',
   data() {
     return{
+      dialogVisible: false,
       username: '',
       name: '',
       password: '',

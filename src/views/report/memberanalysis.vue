@@ -30,13 +30,44 @@
           <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
           <span class="nodataSpan">暂无数据</span>
         </div>
-        <div ref="pie_change_qushi" v-show="isShowEchart" style="width: 100%;height:400px;margin:20px 0;"></div>
+        <div ref="pie_change_qushi" v-show="isShowEchart" style="width: 100%;height:500px;margin:20px 0;"></div>
         <div class="fengebr" @click="zeOver4" id="zonge4"><h2>会员年龄段图例分析</h2></div>
         <div class="noDate" v-show="!isShowEchart">
           <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
           <span class="nodataSpan">暂无数据</span>
         </div>
-        <div ref="zbChart" v-show="isShowEchart" style="width: 100%;height:400px;margin:20px 0;"></div>
+        <div ref="zbChart" v-show="isShowEchart" style="width: 100%;height:500px;margin:20px 0;"></div>
+      </div>
+      <!-- 使用说明 -->
+      <drawer title="会员分析页 - 使用说明" :visible.sync='dialogVisible' width="500px" close-on-click-modal>
+        <div class="smWrap">
+          <div class="smB">概述：此页为会员男女比例和年龄段图例分析</div>
+          <div class="smContent">
+            <span class="smContentB">男女比例：</span>
+            <div class="smContentC">
+              <div>1.展示所选条件下的男女比例占比的图例分析</div>
+            </div>
+          </div>
+          <div class="smContent">
+            <span class="smContentB">年龄段：</span>
+            <div class="smContentC">
+              <div>1.展示所选条件下的年龄段占比的图例分析</div>
+            </div>
+          </div>
+          <div class="smContent">
+            <span class="smContentB">备注：</span>
+            <div class="smContentC">
+              <div>1."商场级别"账号可以选择部门来查看所选部门的会员情况（默认不选择，展现整个商场的会员情况，选择后可去除）</div>
+              <div>2."部门级别"账号可以选择柜组来查看所选柜组的会员情况（默认不选择，展现整个部门的会员情况，选择后可去除）</div>
+            </div>
+          </div>
+        </div>
+      </drawer>
+      <div class="hellpWrap" @click="dialogVisible = true">
+        <div class="hellpWrap1">
+          <img src="../../assets/img/hellp.jpg" alt="" class="hellpImg">
+          <span class="hellpB">使用帮助</span>
+        </div>
       </div>
     </div>
   </div>
@@ -57,6 +88,7 @@ export default {
   },
   data() {
     return {
+      dialogVisible: false,
       isShowEchart: true,
       tab2name: getdepartmentName(),
       series_data: [],

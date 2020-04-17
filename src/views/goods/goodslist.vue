@@ -167,7 +167,7 @@
     <el-dialog :visible.sync="dialogVisible2" title="出入库更改">
       <div class="dialog_div">
         <span>出入库类别</span>
-        <el-select v-model="table_info2.numtype" placeholder="请选出入库分类" style="width:300px;">
+        <el-select v-model="table_info2.numtype" placeholder="请选出入库类别" style="width:300px;">
           <el-option
             v-for="item in numtypes"
             :label="item.label"
@@ -212,6 +212,36 @@
         <el-button type="primary" @click="editegoodsinfo2">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 使用说明 -->
+    <drawer title="商品列表页 - 使用说明" :visible.sync='dialogVisible11' width="500px" close-on-click-modal>
+      <div class="smWrap">
+        <div class="smB">概述：此页为商品的展示与编辑页</div>
+        <div class="smContent">
+          <span class="smContentB">商品列表：</span>
+          <div class="smContentC">
+            <div>1.展示账号下的所有商品</div>
+            <div>2.点击"编辑"会弹出"商品编辑"对话框，对该商品进行编辑（不包括"商品进价"、"商品售价"、"商品数量"）</div>
+            <div>3.点击"进/售价"会弹出进/售价更改对话框，先选择"更改类别",然后对所选进行修改（点击"取消"不会提交更改，点击"确定"会提交更改）</div>
+            <div>4.点击"出/入库"会弹出"出/入库更改"对话框，"进价"和"售价"不可在此更改，如需修改请先点击"进/售价"按钮,更改完价格后再进行出入库操作</div>
+            <div>5.点击"删除"会弹出"是否删除该商品"提示框，"取消"将不删除该商品，"确定"会永久删除该商品</div>
+          </div>
+        </div>
+        <div class="smContent">
+          <span class="smContentB">备注：</span>
+          <div class="smContentC">
+            <div>1."部门级别"账号不能编辑商品</div>
+            <div>2."导出"功能，是导出当前商品列表里的内容，如果想多导出，可把列表每页显示调高（最高每页/50）</div>
+            <div>3."进/售价"、"出/入库"更改时间为点击"确定"时的提交时间</div>
+          </div>
+        </div>
+      </div>
+    </drawer>
+    <div class="hellpWrap" @click="dialogVisible11 = true" style="top:100px;">
+      <div class="hellpWrap1">
+        <img src="../../assets/img/hellp.jpg" alt="" class="hellpImg">
+        <span class="hellpB">使用帮助</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -228,6 +258,7 @@ export default {
   name: 'Dashboard',
   data() {
     return {
+      dialogVisible11: false,
       isgz: false,
       zcInprice: 0,
       zcOutprice: 0,

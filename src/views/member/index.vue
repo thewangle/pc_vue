@@ -3,7 +3,7 @@
     <div class="tab">
       <div class="addB">新增会员</div>
       <div class="biao">
-        <span>会员姓名</span>
+        <span>会员姓名<span style="color:red;">*</span></span>
         <el-input
           placeholder="请输入会员姓名"
           v-model="name">
@@ -19,7 +19,7 @@
         </el-input>
       </div>
       <div class="biao">
-        <span>会员生日</span>
+        <span>会员生日<span style="color:red;">*</span></span>
         <el-date-picker
           v-model="birthday"
           type="date"
@@ -27,7 +27,7 @@
         </el-date-picker>
       </div>
       <div class="biao">
-        <span>会员性别</span>
+        <span>会员性别<span style="color:red;">*</span></span>
         <el-radio v-model="sex" label="1">男</el-radio>
         <el-radio v-model="sex" label="2">女</el-radio>
       </div>
@@ -42,6 +42,34 @@
       </div>
       <el-button class="submit" :loading="loading" type="primary" @click.native.prevent="handleLogin">添加会员</el-button>
     </div>
+    <!-- 使用说明 -->
+    <drawer title="添加会员页 - 使用说明" :visible.sync='dialogVisible' width="500px" close-on-click-modal>
+      <div class="smWrap">
+        <div class="smB">概述：此页为添加会员功能页</div>
+        <div class="smContent">
+          <span class="smContentB">字段说明：</span>
+          <div class="smContentC">
+            <div>1."会员姓名"：该会员的名称(必填)</div>
+            <div>2."电话"：该会员的电话(选填)</div>
+            <div>3."会员生日"：该会员的生日(必填)</div>
+            <div>4."会员性别"：该会员的性别(必填)</div>
+            <div>10."会员描述"：该会员的描述信息(选填)</div>
+          </div>
+        </div>
+        <div class="smContent">
+          <span class="smContentB">备注：</span>
+          <div class="smContentC">
+            <div>1.带"*"均为必填项</div>
+          </div>
+        </div>
+      </div>
+    </drawer>
+    <div class="hellpWrap" @click="dialogVisible = true" style="top: 100px;">
+      <div class="hellpWrap1">
+        <img src="../../assets/img/hellp.jpg" alt="" class="hellpImg">
+        <span class="hellpB">使用帮助</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -54,8 +82,9 @@ export default {
   name: 'addMember',
   data() {
     return {
+      dialogVisible: false,
       name: '',
-      birthday: '',
+      birthday: moment().subtract(7650, "days").format(),
       sex: '1',
       description: '',
       phone: '',
@@ -72,7 +101,7 @@ export default {
     //添加新会员
     handleLogin() {
       //验证表单是否填写完整
-      if (this.name == '' || this.birthday == '' || this.description == '' || this.phone == '') {
+      if (this.name == '' || this.birthday == '') {
         this.$message({
           message: '请您填写完整信息',
           type: 'warning'

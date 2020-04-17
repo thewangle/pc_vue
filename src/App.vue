@@ -50,6 +50,11 @@ export default{
   width: 200px;
   height: 200px;
 }
+.look {
+  color: #409EFF;
+  margin: 0 5px;
+  cursor: pointer;
+}
 .nodataSpan {
   color: rgba(180,180,180);
   font-size: 16px;
@@ -89,5 +94,63 @@ export default{
 }
 .el-range-separator {
   width: 20px !important;
+}
+.hellpWrap {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+}
+.hellpWrap1 {
+  display: flex;
+  align-items: center;
+}
+.hellpImg {
+  width: 40px;
+  height: 50px;
+}
+.hellpB {
+  font-size: 15px;
+  color: #409EFF;
+}
+.smWrap {
+  width: 100%;
+}
+.smWrap>div {
+  margin-bottom: 15px;
+}
+.smB {
+  font-size: 18px;
+  color: #409EFF;
+}
+.smContent {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+}
+.smContentB {
+  width: 80px;
+}
+.smContentC {
+  width: 350px;
+}
+.smContentC>div {
+  margin-bottom: 10px;
+}
+.echartList {
+  width: 100%;
+  height:400px;
+  margin:20px 0;
+}
+.echartWrap {
+  width: 100%;
+  padding-right:15px;
+}
+.beian {
+  width: 100%;
+  padding: 30px 0;
+  display: flex;
+  justify-content: center;
+  color: rgb(180,180,180);
 }
 </style>

@@ -29,6 +29,9 @@ import moment from 'moment' //日期转换插件
 import axios from 'axios'
 import animate from 'animate.css'
 
+import drawer from './drawer/drawer' //抽屉组件
+Vue.component('drawer', drawer)
+
 Vue.use(animate)
 Vue.use(Element, {
   size: 'medium'

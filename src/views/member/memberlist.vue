@@ -105,6 +105,33 @@
         <el-button type="primary" @click="renewalfeebt">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 使用说明 -->
+    <drawer title="会员列表页 - 使用说明" :visible.sync='dialogVisible11' width="500px" close-on-click-modal>
+      <div class="smWrap">
+        <div class="smB">概述：此页为会员的展示与编辑页</div>
+        <div class="smContent">
+          <span class="smContentB">会员列表：</span>
+          <div class="smContentC">
+            <div>1.展示账号下的所有会员</div>
+            <div>2.点击"编辑"会弹出"会员编辑"对话框，对该会员进行编辑（包括"电话"、"会员描述"）</div>
+            <div>3.点击"推送"会弹出推送对话框，填写推送信息，点击"确定"会以短信的方式发送给目标客户（目前正在开发中）</div>
+            <div>4.点击"删除"会弹出"是否删除该会员"提示框，"取消"将不删除该会员，"确定"会永久删除该会员</div>
+          </div>
+        </div>
+        <div class="smContent">
+          <span class="smContentB">备注：</span>
+          <div class="smContentC">
+            <div>"导出"功能，是导出当前商品列表里的内容，如果想多导出，可把列表每页显示调高（最高每页/50）</div>
+          </div>
+        </div>
+      </div>
+    </drawer>
+    <div class="hellpWrap" @click="dialogVisible11 = true" style="top:100px;">
+      <div class="hellpWrap1">
+        <img src="../../assets/img/hellp.jpg" alt="" class="hellpImg">
+        <span class="hellpB">使用帮助</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -119,6 +146,7 @@ export default {
   name: 'Dashboard',
   data() {
     return {
+      dialogVisible11: false,
       years: 1, //续费用年限
       listLoading: false,//table加载的时候loading
       list: [], //table的数据

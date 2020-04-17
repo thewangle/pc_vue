@@ -28,7 +28,7 @@ router.beforeEach(async(to, from, next) => {
         let data = {
           username: getUserName()
         }
-        axios.get(url + '&username=' + getUserName()).then(res => {
+        axios.post(url + '&username=' + getUserName()).then(res => {
           menuList = res.data
           store.dispatch('GenerateRoutes',menuList)
         })
@@ -51,4 +51,5 @@ router.beforeEach(async(to, from, next) => {
 
 router.afterEach(() => {
   NProgress.done() // finish progress bar
+  window.scrollTo(0,0)
 })

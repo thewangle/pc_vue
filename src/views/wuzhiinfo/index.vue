@@ -8,6 +8,33 @@
     <div class="wrap">
         <div ref="chinaMap" style="width: 95%;min-height: 800px;box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);"></div>
     </div>
+    <div class="beian"><span>备案号：鲁ICP备19049737号</span></div>
+    <!-- 使用说明 -->
+    <drawer title="关于五指页 - 使用说明" :visible.sync='dialogVisible' width="500px" close-on-click-modal>
+      <div class="smWrap">
+        <div class="smB">概述：此页为五指大数据会员分布与辐射区域页</div>
+        <div class="smContent">
+          <span class="smContentB">区域分布：</span>
+          <div class="smContentC">
+            <div>1.山东省的五指会员区域分布</div>
+            <div>2.鼠标移至地区会显示该地区五指会员数量</div>
+            <div>3.右下角标尺可以拖动"会员数量范围"</div>
+          </div>
+        </div>
+        <div class="smContent">
+          <span class="smContentB">辐射区域：</span>
+          <div class="smContentC">
+            <div>五指大数据辐射省份</div>
+          </div>
+        </div>
+      </div>
+    </drawer>
+    <div class="hellpWrap" @click="dialogVisible = true">
+      <div class="hellpWrap1">
+        <img src="../../assets/img/hellp.jpg" alt="" class="hellpImg">
+        <span class="hellpB">使用帮助</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -28,6 +55,7 @@ export default {
   },
   data() {
     return {
+      dialogVisible: false,
       //飞线地图所需
       series: [], //地图展现数据
       //24个省市经度纬度

@@ -11,7 +11,7 @@
           start-placeholder="开始日期"
           range-separator="至"
           end-placeholder="结束日期"
-          :picker-options="pickerOptions">
+          :picker-options="pickerOptions" style="display:none;">
         </el-date-picker>
         <el-select v-if="is_zzh" v-model="listQuery.bm" placeholder="请选择部门" clearable style="width: 200px;margin-left:10px;" class="filter-item" @change="handleFilter(1)">
           <el-option v-for="item in bms" :label="item.label" :value="item.value"/>
@@ -37,7 +37,7 @@
           <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
           <span class="nodataSpan">暂无数据</span>
         </div>
-        <div ref="pie" v-show="isShowEchart" style="width: 80%;height:400px;margin:20px 0;"></div>
+        <div ref="pie" class="echartList" v-show="isShowEchart" style="width: 80%;height:400px;margin:20px 0;"></div>
       </div>
     </div>
     <div class="tab_model_wrap">
@@ -74,7 +74,7 @@
           <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
           <span class="nodataSpan">暂无数据</span>
         </div>
-        <div ref="pie_change_qushi" v-show="isShowEchart2" style="width: 80%;height:400px;margin:20px 0;"></div>
+        <div ref="pie_change_qushi" class="echartList" v-show="isShowEchart2" style="width: 80%;height:400px;margin:20px 0;"></div>
       </div>
     </div>
     <div class="tab_model_wrap">
@@ -83,7 +83,7 @@
         <div class="tab1_content_left">
           <div class="tab1_content_left_tab">{{tab1name}}库存变化</div>
           <div class="tab1_content_left_list">
-            <div><span>变化总量：</span><span>{{tab1change.zongnchange}}</span></div>
+            <div><span>变动总量：</span><span>{{tab1change.zongnchange}}</span></div>
             <div><span>售出：</span><span>{{tab1change.changeout}}</span> </div>
             <div><span>退货：</span><span>{{tab1change.changetui}}</span> </div>
             <div><span>报损：</span><span>{{tab1change.changesun}}</span> </div>
@@ -94,7 +94,7 @@
           <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
           <span class="nodataSpan">暂无数据</span>
         </div>
-        <div ref="ku_change_pie" v-show="isShowEchart1" style="width: 80%;height:400px;margin:20px 0;"></div>
+        <div ref="ku_change_pie" class="echartList" v-show="isShowEchart1" style="width: 80%;height:400px;margin:20px 0;"></div>
       </div>
     </div>
     <div class="tab_model_wrap" v-if="is_gz">
@@ -128,7 +128,61 @@
           <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
           <span class="nodataSpan">暂无数据</span>
         </div>
-        <div ref="pie_change_qushi1" v-show="isShowEchart3" style="width: 80%;height:400px;margin:20px 0;"></div>
+        <div ref="pie_change_qushi1" class="echartList" v-show="isShowEchart3" style="width: 1000px;height:400px;margin:20px 0;"></div>
+      </div>
+      <!-- 使用说明 -->
+      <drawer title="库存分析页 - 使用说明" :visible.sync='dialogVisible' width="500px" close-on-click-modal>
+        <div class="smWrap">
+          <div class="smB">概述：此页为库存的相关图例分析</div>
+          <div class="smContent">
+            <span class="smContentB">图例一：</span>
+            <div class="smContentC">
+              <div>1."库存数量占比图例分析"("数量"而非"成本")</div>
+              <div>2."商场级别"账号可以选择部门来查看所选部门的库存占比图例分析（默认不选择，展现整个商场的库存占比图例分析，选择后可去除）</div>
+              <div>3."部门级别"账号可以选择柜组来查看所选柜组的库存占比图例分析（默认不选择，展现整个部门的库存占比图例分析，选择后可去除）</div>
+              <div>4.左栏展示所选条件下的"总库存"(库存"数量"而非"成本")、"总进价"、"预售总额"(售价总额)、"毛利润"、"毛利率"</div>
+              <div>5.右栏展示所选条件下的"库存数量占比图例分析"(可点右侧下载此图例)</div>
+            </div>
+          </div>
+          <div class="smContent">
+            <span class="smContentB">图例二：</span>
+            <div class="smContentC">
+              <div>1."库存数量趋势图例分析"</div>
+              <div>2.左栏展示所选条件下的"类别"、"趋势所属"</div>
+              <div>3.右栏展示所选条件下的"库存数量"的趋势记录(为所选条件下的库存总数量，区别于"单品分析"里的"库存变动趋势")</div>
+            </div>
+          </div>
+          <div class="smContent">
+            <span class="smContentB">图例三：</span>
+            <div class="smContentC">
+              <div>1."库存数量变动占比图例分析"</div>
+              <div>2.左栏展示所选条件下的"变动总量"、"售出"、"退货"、"报损"、"补货"(数量而非额度)</div>
+              <div>3.右栏展示所选条件下的"库存数量变动"的各分类占比</div>
+            </div>
+          </div>
+          <div class="smContent">
+            <span class="smContentB">图例四：</span>
+            <div class="smContentC">
+              <div>1."库存数量变动趋势图例分析"</div>
+              <div>2.左栏展示所选条件下的"类别"(默认不选类别，展示所有类别)、"趋势所属"(变动数量而非额度)</div>
+              <div>3.右栏展示所选条件下的"库存数量变动"的趋势</div>
+              <div>4.默认展示所有类别，此时"退货"和"补货"为"正数","售出"和"报损"为"负数"</div>
+              <div>5.选择类别时展示所选类别，此时"退货"、"补货"、"售出"和"报损"均为"正数"</div>
+            </div>
+          </div>
+          <div class="smContent">
+            <span class="smContentB">备注：</span>
+            <div class="smContentC">
+              <div>1.时间段选择需要选择"开始日期"和"结束日期"，也可选择"最近一周"、"最近一个月"、"最近三个月"的快捷方式（默认最近一周，时间段为必选！）</div>
+            </div>
+          </div>
+        </div>
+      </drawer>
+      <div class="hellpWrap" @click="dialogVisible = true">
+        <div class="hellpWrap1">
+          <img src="../../assets/img/hellp.jpg" alt="" class="hellpImg">
+          <span class="hellpB">使用帮助</span>
+        </div>
       </div>
     </div>
   </div>
@@ -150,6 +204,7 @@ export default {
   },
   data() {
     return {
+      dialogVisible: false,
       isShowEchart: true,
       isShowEchart1: true,
       isShowEchart2: true,
@@ -263,6 +318,7 @@ export default {
     }
   },
   mounted() {
+    $('.echartList').width($('.tab1_content_wrap').width() * 0.8)
     this.time_select()
     this.time_select2()
     this.time_select3()

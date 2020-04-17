@@ -163,6 +163,33 @@
         <el-button type="primary" @click="editegoodsinfo2">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 使用说明 -->
+    <drawer title="价格变动记录页 - 使用说明" :visible.sync='dialogVisible11' width="500px" close-on-click-modal>
+      <div class="smWrap">
+        <div class="smB">概述：此页为价格变动记录的列表展示页</div>
+        <div class="smContent">
+          <span class="smContentB">变动列表：</span>
+          <div class="smContentC">
+            <div>1.展示账号下的商品的所有价格变动记录</div>
+            <div>2.支持"商品名称"，"商品编码"的模糊查询</div>
+            <div>2.支持按"商品分类"，"供应商"和"进/售价"查询</div>
+          </div>
+        </div>
+        <div class="smContent">
+          <span class="smContentB">备注：</span>
+          <div class="smContentC">
+            <div>1."更改时间"字段为价格更改时的提交时间</div>
+            <div>2."导出"功能，是导出当前商品列表里的内容，如果想多导出，可把列表每页显示调高（最高每页/50）</div>
+          </div>
+        </div>
+      </div>
+    </drawer>
+    <div class="hellpWrap" @click="dialogVisible11 = true" style="top:100px;">
+      <div class="hellpWrap1">
+        <img src="../../assets/img/hellp.jpg" alt="" class="hellpImg">
+        <span class="hellpB">使用帮助</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -179,6 +206,7 @@ export default {
   name: 'Dashboard',
   data() {
     return {
+      dialogVisible11: false,
       years: 1,
       sorts: [],
       suppliers: [],

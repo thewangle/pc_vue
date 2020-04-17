@@ -35,19 +35,19 @@
           <div><span class="salesTagListnum">{{tab1info.zongprice}}</span>元</div>
         </div>
       </div>
-      <div style="width: 100%;padding-right:15px;">
+      <div class="echartWrap">
         <div class="fengebr" @click="zeOver3" id="zonge3"><h2>补货商品数量趋势图例分析</h2></div>
         <div class="noDate" v-show="!isShowEchart">
           <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
           <span class="nodataSpan">暂无数据</span>
         </div>
-        <div ref="pie_change_qushi" v-show="isShowEchart" style="width: 100%;height:400px;margin:20px 0;"></div>
+        <div ref="pie_change_qushi" v-show="isShowEchart" class="echartList"></div>
         <div class="fengebr" @click="zeOver4" id="zonge4"><h2>补货成本占比图例分析</h2></div>
         <div class="noDate" v-show="!isShowEchart1">
           <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
           <span class="nodataSpan">暂无数据</span>
         </div>
-        <div ref="zbChart" v-show="isShowEchart1" style="width: 100%;height:400px;margin:20px 0;"></div>
+        <div ref="zbChart" v-show="isShowEchart1" class="echartList"></div>
       </div>
       <div v-if="isgz" class="fengebr" @click="zeOver9" id="zonge13"><h2>补货商品列表</h2></div>
       <!-- 条件搜索 -->
@@ -135,6 +135,47 @@
       <div v-if="isgz" class="pagination-container" style="padding: 0 20px;">
         <el-pagination :current-page="listQuery.page_no" :page-sizes="[10,20,30, 50]" :page-size="listQuery.page_size" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
       </div>
+      <!-- 使用说明 -->
+      <drawer title="补货分析页 - 使用说明" :visible.sync='dialogVisible' width="500px" close-on-click-modal>
+        <div class="smWrap">
+          <div class="smB">概述：此页分为补货图例分析和补货商品列表</div>
+          <div class="smContent">
+            <span class="smContentB">图例分析：</span>
+            <div class="smContentC">
+              <div>1.包括"补货商品数量趋势图例分析"、"补货成本占比图例分析"</div>
+              <div>2."商场级别"账号可以选择部门来查看所选部门的补货图例分析（默认不选择，展现整个商场的补货图例分析，选择后可去除）</div>
+              <div>3."部门级别"账号可以选择柜组来查看所选柜组的补货图例分析（默认不选择，展现整个部门的补货图例分析，选择后可去除）</div>
+              <div>4.时间段选择需要选择"开始日期"和"结束日期"，也可选择"最近一周"、"最近一个月"、"最近三个月"的快捷方式（默认最近一周，时间段为必选！）</div>
+              <div>5."补货成本占比图例分析",当"商场级别"账号的时候展示其下面各"部门"的补货成本占比，当"部门级别"账号或"商场级别"账号不选择"部门"时展示其下面各柜组的补货成本占比，当"柜组级别"账号或"部门级别"账号不选择"柜组"时展示其下面各"分类"的补货成本占比</div>
+            </div>
+          </div>
+          <div class="smContent">
+            <span class="smContentB">商品列表：</span>
+            <div class="smContentC">
+              <div>1.只有"柜组级别"的账号有此模块</div>
+              <div>2.列表展示选定条件下的商品补货数据</div>
+              <div>3.日期条件为必选，默认近一周</div>
+              <div>4.支持按"商品名称"、"商品编码"的模糊查询（模糊查询即不用输入全名称，例："李宁运动裤"可输入"李宁"）</div>
+              <div>5."分类"条件可选，（默认不选，展示所有分类）</div>
+              <div>6."供应商"条件可选，（默认不选，展示所有供应商）</div>
+            </div>
+          </div>
+          <div class="smContent">
+            <span class="smContentB">备注：</span>
+            <div class="smContentC">
+              <div>1."补货成本"是按商品补货时的"进价"计算</div>
+              <div>2."补货数量"为商品的数量而非商品的"成本"</div>
+              <div>2."导出"功能，是导出当前商品列表里的内容，如果想多导出，可把列表每页显示调高（最高每页/50）</div>
+            </div>
+          </div>
+        </div>
+      </drawer>
+      <div class="hellpWrap" @click="dialogVisible = true">
+        <div class="hellpWrap1">
+          <img src="../../assets/img/hellp.jpg" alt="" class="hellpImg">
+          <span class="hellpB">使用帮助</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -158,6 +199,7 @@ export default {
   },
   data() {
     return {
+      dialogVisible: false,
       isShowEchart: true,
       isShowEchart1: true,
       listQuery: { //动态请求table数据时传递的参数
@@ -240,6 +282,7 @@ export default {
   computed: {
   },
   mounted() {
+    $('.echartList').width($('.echartWrap').width())
     if (getRoleId() == 3) {
       this.isgz = true
       this.handleFilter() //获取商品列表

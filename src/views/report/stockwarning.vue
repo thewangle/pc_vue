@@ -86,6 +86,37 @@
     <div class="pagination-container">
       <el-pagination :current-page="listQuery.page_no" :page-sizes="[10,20,30, 50]" :page-size="listQuery.page_size" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div>
+    <!-- 使用说明 -->
+    <drawer title="库存预警页 - 使用说明" :visible.sync='dialogVisible' width="500px" close-on-click-modal>
+      <div class="smWrap">
+        <div class="smB">概述：此页为库存预警列表展示</div>
+        <div class="smContent">
+          <span class="smContentB">预警列表：</span>
+          <div class="smContentC">
+            <div>1.只有"柜组级别"的账号有此模块</div>
+            <div>2.列表展示选定条件下的商品预警数据（包括"超限预警"、"低限预警"）</div>
+            <div>3.预警按商品添加时的"库存上线"，"库存下线"来计算，当单品库存低于"库存下线"便会"低限预警",当单品库存超出"库存上线"便会"超限预警"</div>
+            <div>4.支持按"商品名称"、"商品编码"的模糊查询（模糊查询即不用输入全名称，例："李宁运动裤"可输入"李宁"）</div>
+            <div>5."分类"条件可选，（默认不选，展示所有分类）</div>
+            <div>6."供应商"条件可选，（默认不选，展示所有供应商）</div>
+            <div>7."预警类别"条件可选，（默认不选，展示所有预警类别）</div>
+            <div>8.其中"入库时间"字段为该商品最早入库时间，如果有补货不会显示最后补货的日期</div>
+          </div>
+        </div>
+        <div class="smContent">
+          <span class="smContentB">备注：</span>
+          <div class="smContentC">
+            <div>"导出"功能，是导出当前商品列表里的内容，如果想多导出，可把列表每页显示调高（最高每页/50）</div>
+          </div>
+        </div>
+      </div>
+    </drawer>
+    <div class="hellpWrap" @click="dialogVisible = true" style="top:90px;">
+      <div class="hellpWrap1">
+        <img src="../../assets/img/hellp.jpg" alt="" class="hellpImg">
+        <span class="hellpB">使用帮助</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -99,6 +130,7 @@ export default {
   name: 'Dashboard',
   data() {
     return {
+      dialogVisible: false,
       sorts: [],
       suppliers: [],
       listLoading: false,//table加载的时候loading

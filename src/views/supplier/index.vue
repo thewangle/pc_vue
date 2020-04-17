@@ -3,7 +3,7 @@
     <div class="tab">
       <div class="addB">新增供应商</div>
       <div class="biao">
-        <span>供应商名称</span>
+        <span>供应商名称<span style="color:red;">*</span></span>
         <el-input
           placeholder="请输入供应商名称"
           v-model="name">
@@ -11,7 +11,7 @@
         </el-input>
       </div>
       <div class="biao">
-        <span>供应商地址</span>
+        <span>供应商地址<span style="color:red;">*</span></span>
         <el-input
           type="textarea"
           :rows="2"
@@ -20,7 +20,7 @@
         </el-input>
       </div>
       <div class="biao">
-        <span>联系人</span>
+        <span>联系人<span style="color:red;">*</span></span>
         <el-input
           placeholder="请输入联系人"
           v-model="contact">
@@ -28,7 +28,7 @@
         </el-input>
       </div>
       <div class="biao">
-        <span>电话</span>
+        <span>电话<span style="color:red;">*</span></span>
         <el-input
           placeholder="请输入管理员电话"
           v-model="phone">
@@ -45,6 +45,34 @@
         </el-input>
       </div>
       <el-button class="submit" :loading="loading" type="primary" @click.native.prevent="handleLogin">确 定</el-button>
+      <!-- 使用说明 -->
+      <drawer title="添加供应商页 - 使用说明" :visible.sync='dialogVisible' width="500px" close-on-click-modal>
+        <div class="smWrap">
+          <div class="smB">概述：此页为添加供应商功能页</div>
+          <div class="smContent">
+            <span class="smContentB">字段说明：</span>
+            <div class="smContentC">
+              <div>1."供应商名称"：该供应商的名称(必填)</div>
+              <div>2."供应商地址"：该供应商的联系地址(必填)</div>
+              <div>3."联系人"：该供应商的联系人姓名(必填)</div>
+              <div>4."电话"：该供应商的联系电话(必填)</div>
+              <div>5."备注"：该供应商的备注信息(选填)</div>
+            </div>
+          </div>
+          <div class="smContent">
+            <span class="smContentB">备注：</span>
+            <div class="smContentC">
+              <div>带"*"均为必填项</div>
+            </div>
+          </div>
+        </div>
+      </drawer>
+      <div class="hellpWrap" @click="dialogVisible = true" style="top: 100px;">
+        <div class="hellpWrap1">
+          <img src="../../assets/img/hellp.jpg" alt="" class="hellpImg">
+          <span class="hellpB">使用帮助</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -58,6 +86,7 @@ export default {
   name: 'registered',
   data() {
     return{
+      dialogVisible: false,
       name: '',
       address: '',
       contact: '',
