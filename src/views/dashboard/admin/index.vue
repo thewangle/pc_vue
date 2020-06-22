@@ -27,10 +27,10 @@
                 <div class="infoB">销售额</div>
                 <div class="infoC">¥{{ salemoney }}</div>
             </div>
-            <div class="infoListNum">
+            <!-- <div class="infoListNum">
                 <div class="infoB">利润</div>
                 <div class="infoC">¥{{ saleprofit }}</div>
-            </div>
+            </div> -->
         </div>
         <div class="infoList">
             <div class="infoListNum">
@@ -171,7 +171,7 @@
 <script>
 import moment from 'moment' //日期转换插件 
 import { getpartantId, getRoleId, getUserid, getdepartmentName } from '@/utils/auth'
-import { getallUserByidthis } from '@/api/loginanduser' //请求函数
+import { getallUserByidthis,getcost } from '@/api/loginanduser' //请求函数
 import { getruninfo, getmostone, getgoodsnosuch } from '@/api/report' //请求函数
 export default {
   name: 'DashboardAdmin',
@@ -237,7 +237,7 @@ export default {
         {value: 3,label: '报损之最'},
         {value: 4,label: '补货之最'},
         {value: 5,label: '新入库之最'},
-        {value: 6,label: '库存之最'},
+        // {value: 6,label: '库存之最'},
       ],
     }
   },
@@ -289,6 +289,17 @@ export default {
   methods: {
     //获取经营报表信息
     handleFilter2() {
+      getcost(this.listQuery3).then(res => {
+        let {data} = res
+        console.log(data)
+        if (data.code == 200) {
+          this.stockmoney = data.data[0].cost
+        } else {
+          this.stockmoney = 0
+        }
+      }).catch(err => {
+        this.stockmoney = 0
+      })
       let startTime =moment(new Date(new Date(new Date().toLocaleDateString()).getTime())).valueOf() // 当天0点
       let endTime = startTime + 24 * 60 * 60 * 1000 -1// 当天23:59
       let zuoTime = startTime - 24 * 60 * 60 * 1000// 昨日 24:00
@@ -302,7 +313,7 @@ export default {
         this.listQuery2.time.push(zuoTime / 1000)
         this.listQuery2.time.push(startTime / 1000)
       }
-      this.salenums = this.salemoney = this.saleprofit = this.returnums = this.returnmoney = this.lossums = this.lossmoney = this.patchnums = this.patchmoney = this.storageums = this.storagemoney = this.stockums = this.stockmoney = 0
+      this.salenums = this.salemoney = this.saleprofit = this.returnums = this.returnmoney = this.lossums = this.lossmoney = this.patchnums = this.patchmoney = this.storageums = this.storagemoney = this.stockums = 0
       getruninfo(this.listQuery2).then(res => {
         let { data } = res
         if (data.soldgoods) {
@@ -328,7 +339,6 @@ export default {
         }
         if (data.stockgoods) {
           this.stockums = data.stockgoods.zongnums
-          this.stockmoney = data.stockgoods.zoninprice
         }
       }).catch(error => {
         console.log(error)

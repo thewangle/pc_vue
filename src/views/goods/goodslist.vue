@@ -253,6 +253,7 @@ import moment from 'moment' //日期转换插件
 import { getGoodsinfo, editeGoodsinfo, deletegoodsinfo } from '@/api/goods' //请求函数
 import { getSortinfoone, getSortinfoall } from '@/api/sort' //请求函数
 import { getSupplierall } from '@/api/supplier' //获取供应商
+import { changecost } from '@/api/loginanduser'
 import XLSX from 'xlsx' //导出excle
 export default {
   name: 'Dashboard',
@@ -507,13 +508,6 @@ export default {
         });
         return
       }
-      // if (!this.table_info2.date || !this.table_info2.time) {
-      //   this.$message({
-      //     message: '请您选择日期和时间',
-      //     type: 'warning'
-      //   });
-      //   return
-      // }
       this.table_info2.type = 2
       editeGoodsinfo(this.table_info2).then(res => {
         this.dialogVisible2 = false
@@ -521,6 +515,19 @@ export default {
           type: 'success',
           message: res.data.message
         });
+        if (res.data.code == 200) {
+          let info = {
+            outprice: Number(this.table_info2.outpricenow) * Number(this.table_info2.changenums),
+            numtype: this.table_info2.numtype,
+            uid: getUserid()
+          }
+          if (this.table_info2.numtype == 3 || this.table_info2.numtype == 4 ) {
+            info.outprice = Number(this.table_info2.inpricenow) * Number(this.table_info2.changenums)
+          }
+          changecost(info).then(res => {
+            let {data} = res
+          })
+        }
         this.table_info2 = ''
         this._fetchActivityList()
       }).catch(error => {

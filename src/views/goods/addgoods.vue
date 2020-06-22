@@ -164,6 +164,7 @@ import moment from 'moment' //日期转换插件
 import { getSortinfoall } from '@/api/sort' //获取分类
 import { getSupplierall } from '@/api/supplier' //获取供应商
 import { addGoods } from '@/api/goods' //商品请求函数
+import { changecost } from '@/api/loginanduser'
 export default {
   name: 'registered',
   data() {
@@ -286,6 +287,14 @@ export default {
               message: '恭喜您！添加商品成功！',
               type: 'success'
             });
+            let info = {
+              outprice: Number(self.inprice) * Number(self.nums),
+              numtype: 4,
+              uid: getUserid()
+            }
+            changecost(info).then(res => {
+              let {data} = res
+            })
             self.$router.push({ path: '/goods/goodslist' })
           } else {
             self.$message.error('对不起！添加商品失败！')

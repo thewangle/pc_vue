@@ -46,7 +46,7 @@
         </div>
       </div>
       <div style="width: 100%;padding-right:15px;">
-        <div class="fengebr" @click="zeOver4" id="zonge4"><h2>滞销商品库存数量占比图例分析</h2></div>
+        <div class="fengebr" @click="zeOver4" id="zonge4"><h2>滞销商品分类库存数量占比图例分析</h2></div>
         <div class="noDate" v-show="!isShowEchart">
           <img src="../../assets/img/nodata.jpg" alt="" class="nodataImg">
           <span class="nodataSpan">暂无数据</span>
@@ -388,6 +388,7 @@ export default {
       this.itemnames = []
       getunsalablegoodsinfoForzb(query).then(res => {
         let {data} = res
+        console.log(data)
         if (data.code == 201) {
           this.isShowEchart = false
           this.$message({

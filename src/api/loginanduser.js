@@ -85,3 +85,16 @@ export function getmapforshandong(params) {
   return axios.get(url)
 }
 
+//商品出入库操作更改用户的成本
+export function changecost(params) {
+  let url = process.env.BASE_API + 'yii2/frontend/web/?r=login/changecost'
+  return axios.post(url,params)
+}
+
+//获取用户的成本
+export function getcost(params) {
+  let url = process.env.BASE_API + 'yii2/frontend/web/?r=login/getcost'
+  return axios.post(url,params)
+}
+
+

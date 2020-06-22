@@ -26,18 +26,26 @@
           <div class="salesTagListBiao" id="zonge">{{tab2name}}销售总额</div>
           <div id="zonge1"><span class="salesTagListnum">{{tab1info.zongnums}}</span>元</div>
         </div>
-        <div class="salesTagList animated bounceInDown" @click="zeOver1" style="background-image: linear-gradient(104deg, #ffbb3f, #ff9e47);">
-          <div class="salesTagListBiao" id="zonge2">{{tab2name}}进价总额</div>
-          <div id="zonge3"><span class="salesTagListnum">{{tab1info.zoninprice}}</span>元</div>
-        </div>
         <div class="salesTagList animated bounceInUp" @click="zeOver2" style="background-image: linear-gradient(104deg, #6bb3ff, #58a4ff);">
-          <div class="salesTagListBiao" id="zonge4">{{tab2name}}毛利润</div>
-          <div id="zonge5"><span class="salesTagListnum">{{tab1info.zonlirun}}</span>元</div>
+          <div class="salesTagListBiao" id="zonge4">{{tab2name}}销售数量</div>
+          <div id="zonge5"><span class="salesTagListnum">{{tab1info.soldnums}}</span></div>
         </div>
         <div class="salesTagList animated bounceInDown" @click="zeOver3" style="background-image: linear-gradient(104deg, #78d4ae, #57c7e0);">
+          <div id="zonge6" class="salesTagListBiao">{{tab2name}}毛利润</div>
+          <div id="zonge7"><span class="salesTagListnum">{{tab1info.zonlirun}}</span>元</div>
+        </div>
+        <div class="salesTagList animated bounceInDown" @click="zeOver1" style="background-image: linear-gradient(104deg, #ffbb3f, #ff9e47);">
+          <div class="salesTagListBiao" id="zonge2">{{tab2name}}库存总额</div>
+          <div id="zonge3"><span class="salesTagListnum">{{stockmoney}}</span>元</div>
+        </div>
+        <!-- <div class="salesTagList animated bounceInUp" @click="zeOver2" style="background-image: linear-gradient(104deg, #6bb3ff, #58a4ff);">
+          <div class="salesTagListBiao" id="zonge4">{{tab2name}}毛利润</div>
+          <div id="zonge5"><span class="salesTagListnum">{{tab1info.zonlirun}}</span>元</div>
+        </div> -->
+        <!-- <div class="salesTagList animated bounceInDown" @click="zeOver3" style="background-image: linear-gradient(104deg, #78d4ae, #57c7e0);">
           <div id="zonge6" class="salesTagListBiao">{{tab2name}}毛利率</div>
           <div id="zonge7"><span class="salesTagListnum">{{tab1info.zonlilv}}</span>%</div>
-        </div>
+        </div> -->
       </div>
       <div class="echartWrap">
         <div class="fengebr" @click="zeOver4" id="zonge8"><h2>销售额趋势图例分析</h2></div>
@@ -207,7 +215,7 @@ import echarts from 'echarts'
 import axios from 'axios'
 import moment from 'moment' //日期转换插件 
 import { getpartantId, getRoleId, getUserid, getdepartmentName } from '@/utils/auth'
-import { getallUserByidthis, getUserByuid } from '@/api/loginanduser' //请求函数
+import { getallUserByidthis, getUserByuid,getcost } from '@/api/loginanduser' //请求函数
 import { getgoodschangeQushi, getGoodsinfo } from '@/api/goods' //请求函数
 import { getSortinfoone, getSortinfoall } from '@/api/sort' //请求函数
 import { Getsoldgoods, GetsoldgoodsByGroup, getsoldGoodsinfo } from '@/api/report' //请求函数
@@ -235,6 +243,7 @@ export default {
         uid: getUserid(),
         pid: getpartantId()
       },
+      stockmoney: 0,
       sorts: [],
       suppliers: [],
       isgz: false,
@@ -267,7 +276,8 @@ export default {
         zoninprice: 0,
         zonlilv: 0,
         zonlirun: 0,
-        zonoutprice: 0
+        zonoutprice: 0,
+        soldnums: 0
       },
       bms: [],
       gzs: [],
@@ -296,6 +306,11 @@ export default {
         {value: 0,name:'16:00 - 20:00'},
         {value: 0,name:'20:00 - 24:00'}
       ],
+      listQuery3: { 
+        role: getRoleId(),
+        uid: getUserid(),
+        pid: getpartantId()
+      },
       //日期组件的快捷选项设置
       pickerOptions: {
         shortcuts: [{
@@ -329,6 +344,16 @@ export default {
   computed: {
   },
   mounted() {
+    getcost(this.listQuery3).then(res => {
+      let {data} = res
+      if (data.code == 200) {
+        this.stockmoney = data.data[0].cost
+      } else {
+        this.stockmoney = 0
+      }
+    }).catch(err => {
+      this.stockmoney = 0
+    })
     $('.echartList').width($('.echartWrap').width())
     if (getRoleId() == 3) {
       this.isgz = true
